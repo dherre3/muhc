@@ -49,7 +49,7 @@ if ($lookupResult->num_rows===0) {
 
   } else
   {
-    echo "Insertion Query Failed!"; 
+    echo "Insertion Query Failed!";
   }
 }else
 {

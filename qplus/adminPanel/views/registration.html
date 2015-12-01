@@ -1,5 +1,8 @@
 <div class="main-div-container" align="center" style="box-shadow: 0 0 20px lightgrey;">
 <div  style="width:30%;margin-top:30px">
+  <div class="col-xs-12" style="margin:20px">
+    <button class="btn btn-primary btn-lg btn-block" ng-click="completeRequest()">WORK!</button>
+  </div>
   <div align="left"><strong>Enter Patient's SSN:</strong></div><br>
   <div align="center" class="input-group">
     <span class="input-group-addon" id="basic-addon1">Patient SSN</span>
@@ -14,7 +17,7 @@
   <uib-alert type="{{alert.type}}">{{alert.message}}</uib-alert>
 
 </div>
-      
+
 <!--*******************************************************************************-->
 <!--This part of the form only  shows up if the SSN is found in ARIA -->
 <div ng-show="patientFound" align="center" style="padding:0 20px 20px 20px;width:80%;">

@@ -18,6 +18,25 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
       }
 
   });
+  $scope.completeRequest=function()
+  {
+    $scope.uid='asda-asdas-das';
+    var EnableSMS=0;
+    //var objectToSend=$scope.ariaResponse[0];
+    objectToSend.EnableSMS=1;
+    objectToSend.Language='EN';
+    objectToSend.PatientFirstName="David";
+    objectToSend.PatientLastName="Herrera";
+    objectToSend.Email="da@gmail.com";
+    objectToSend.SSN=DEMZ98552411;
+    objectToSend.PatientSer=123123;
+    objectToSend.LoginId="asda-asdas-dasas";
+    objectToSend.PatientId=123123;
+    api.getFieldFromServer(URLs.getBasicURLPHP()+'MysqlRegister.php',objectToSend).then(function(response){
+      console.log(response);
+    });
+
+  }
   $scope.FindPatient= function (ssn) {
     /**
    * @ngdoc method
@@ -70,14 +89,14 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
    */
    $scope.message = "";
    $scope.alert={};
-   
+
     if ($scope.Email!==$scope.EmailConfirm) {
       $timeout(function(){
 
 
 
    });
-      $scope.alert.type='danger'; 
+      $scope.alert.type='danger';
       $scope.alert.message="Emails do not match!";
 
     }
@@ -87,7 +106,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
 
 
    });
-      $scope.alert.type='danger'; 
+      $scope.alert.type='danger';
       $scope.alert.message="Passwords do not match!";    }
     else if ($scope.TelNumForSMS && $scope.TelNumForSMS.length !==10 ) {
       $timeout(function(){
@@ -95,7 +114,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
 
 
    });
-      $scope.alert.type='danger'; 
+      $scope.alert.type='danger';
       $scope.alert.message="Enter a valid phone number!";
     }
     else {
@@ -110,23 +129,23 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
               if (error)
               {
                 switch(error.code){
-                case "EMAIL_TAKEN": 
+                case "EMAIL_TAKEN":
                 $timeout(function(){
-                  $scope.alert.type='danger'; 
+                  $scope.alert.type='danger';
                   $scope.alert.message="Email is already registered !";
                 });
 
                 break;
-                case "INVALID_EMAIL": 
+                case "INVALID_EMAIL":
                 $timeout(function(){
-                  $scope.alert.type='danger'; 
+                  $scope.alert.type='danger';
                   $scope.alert.message="Invalid email, please enter a valid email!";
                 });
-                   
+
                 break;
                 default :
                 $timeout(function(){
-                  $scope.alert.type='danger'; 
+                  $scope.alert.type='danger';
                   $scope.alert.message="Error has occurred creating user. Please check internet connection!";
                   });
                 }
@@ -136,7 +155,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
                 var EnableSMS=0;
                 var objectToSend=$scope.ariaResponse[0];
                 objectToSend.TelNumForSMS=$scope.TelNumForSMS;
-                objectToSend.LoginId=userData.uid;  
+                objectToSend.LoginId=userData.uid;
                 objectToSend.EnableSMS=($scope.TelNumForSMS) ?1:0;
                 objectToSend.Email=$scope.Email;
                 objectToSend.Language=$scope.Language;
