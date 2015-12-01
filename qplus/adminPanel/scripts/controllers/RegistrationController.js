@@ -27,7 +27,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
         api.getFieldFromServer(msURL,{PatientSSN:ssn}).then(function(response)
         {
           $scope.ariaResponse=response
-
+          console.log(response[0]);
           if ($scope.ariaResponse!=="PatientNotFound" ) {
             $scope.Alias="";
             $scope.message = "";
@@ -127,7 +127,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
                 var EnableSMS=0;
                 if ($scope.TelNumForSMS) { EnableSMS=1;}
                 $scope.myURL=URLs.getBasicURLPHP()+"MysqlRegister.php?PatientSerNum="
-                +$scope.ariaResponse[0]["PatientSerNum"]+"&PatientId="+PatientID+"&FirstName="+$scope.PatientFirstName+"&LastName="
+                +$scope.ariaResponse[0]["PatientSer"]+"&PatientId="+PatientID+"&FirstName="+$scope.PatientFirstName+"&LastName="
                 +$scope.PatientLastName+"&TelNumForSMS="+$scope.TelNumForSMS+"&Email="+$scope.Email+"&loginID="+userData.uid+"&Password="+$scope.Password
                 +"&Language="+$scope.Language+"&Diagnosis="+Diagnosis+"&PatientSSN="+PatientSSN+"&Alias="+$scope.Alias+"&EnableSMS="+EnableSMS ;
                 $http.get($scope.myURL).success( function(result)

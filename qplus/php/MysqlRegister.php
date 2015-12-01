@@ -1,22 +1,20 @@
 <?php
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST)) $_POST = json_decode(file_get_contents('php://input'), true);
 
-
-$PatientId=$_GET["PatientId"];
-$FirstName=$_GET["FirstName"];
-$LastName=$_GET["LastName"];
-$TelNumForSMS=$_GET["TelNumForSMS"];
-$Email=$_GET["Email"];
-$loginID=$_GET["loginID"];
-$Language=$_GET["Language"];
-$Diagnosis=$_GET["Diagnosis"];
-$Oncologist=$_GET["Oncologist"];
-$Physician=$_GET["Physician"];
-$PatientSSN=$_GET["PatientSSN"];
-$PatientSerNum=$_GET["PatientSerNum"];
-$Alias=$_GET["Alias"];
-$Password=$_GET["Password"];
-$EnableSMS=$_GET["EnableSMS"];
+$PatientId=$_POST["PatientId"];
+$FirstName=$_POST["FirstName"];
+$LastName=$_POST["LastName"];
+$TelNumForSMS=$_POST["TelNumForSMS"];
+$Email=$_POST["Email"];
+$loginID=$_POST["loginID"];
+$Language=$_POST["Language"];
+$Oncologist=$_POST["Oncologist"];
+$Physician=$_POST["Physician"];
+$PatientSSN=$_POST["PatientSSN"];
+$PatientSerNum=$_POST["PatientSer"];
+$Password=$_POST["Password"];
+$EnableSMS=$_POST["EnableSMS"];
 
 
 
@@ -40,10 +38,8 @@ $sqlLookup="
 $lookupResult = $conn->query($sqlLookup);
 // If patientId doesn't already exist , Register the patient
 if ($lookupResult->num_rows===0) {
-$sqlInsert ="
-	INSERT INTO Patient
-		(PatientSerNum,PatientAriaSer,PatientId,FirstName,LastName,Alias,TelNumForSMS,Email,Language,LoginID,Password,SSN,LastUpdated,EnableSMS)
-	VALUES (NULL,'".$PatientSerNum."','".$PatientId."','".$FirstName."','".$LastName."','".$Alias."','".$TelNumForSMS."','".$Email."','".$Language."','".$loginID."','".$Password."','".$PatientSSN."',CURRENT_TIMESTAMP,'".$EnableSMS."') ";
+  $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."',NULL,".$TelNumForSMS.",'".$EnableSMS."','".$Email."','".$Language."','".$SSN."', NULL)";
+  echo $sqlInsert;
   if ($conn->query($sqlInsert) === TRUE)
   {
     echo "Registration was successful. A confirmation email was sent to you.";
