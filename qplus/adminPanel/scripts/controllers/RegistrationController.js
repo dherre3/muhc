@@ -11,6 +11,13 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
   */
   $scope.message="";
   $scope.patientFound=false;
+  $scope.$watch('SSN',function(newValue, oldValue){
+      if(newValue!==oldValue)
+      {
+        $scope.alert={};
+      }
+
+  });
   $scope.FindPatient= function (ssn) {
     /**
    * @ngdoc method
@@ -21,12 +28,13 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
    * @param {Object} ssn Patient's SSN
    * @returns {String} $scope.patientFound
    */
+
    $scope.message="";
      if ($scope.SSN.length>11){
         var msURL=URLs.getBasicURLPHP()+"FindPatient.php";
         api.getFieldFromServer(msURL,{PatientSSN:ssn}).then(function(response)
         {
-          $scope.ariaResponse=response
+          $scope.ariaResponse=response;
           console.log(response[0]);
           if ($scope.ariaResponse!=="PatientNotFound" ) {
             $scope.Alias="";
@@ -124,20 +132,16 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
                 }
               } else {
                 // Register to MySQL
+
                 var EnableSMS=0;
-                if ($scope.TelNumForSMS) { EnableSMS=1;}
-                $scope.myURL=URLs.getBasicURLPHP()+"MysqlRegister.php?PatientSerNum="
-                +$scope.ariaResponse[0]["PatientSer"]+"&PatientId="+PatientID+"&FirstName="+$scope.PatientFirstName+"&LastName="
-                +$scope.PatientLastName+"&TelNumForSMS="+$scope.TelNumForSMS+"&Email="+$scope.Email+"&loginID="+userData.uid+"&Password="+$scope.Password
-                +"&Language="+$scope.Language+"&Diagnosis="+Diagnosis+"&PatientSSN="+PatientSSN+"&Alias="+$scope.Alias+"&EnableSMS="+EnableSMS ;
-                $http.get($scope.myURL).success( function(result)
-                {
-                  $timeout(function(){
-                   $scope.alert.type='success'; 
-                    $scope.alert.message="You have successfully registered, donwload the app to obtain up-to-date personalized information about your treatment ";
-                 }); 
-                 
-                //Send Confirmation SMS and Email with a $http request to SP
+                var objectToSend=$scope.ariaResponse[0];
+                objectToSend.TelNumForSMS=$scope.TelNumForSMS;
+                objectToSend.LoginId=userData.uid;  
+                objectToSend.EnableSMS=($scope.TelNumForSMS) ?1:0;
+                objectToSend.Email=$scope.Email;
+                objectToSend.Language=$scope.Language;
+                api.getFieldFromServer(URLs.getBasicURLPHP()+'MysqlRegister.php',objectToSend).then(function(response){
+                  console.log(response);
                 });
               }
             });
