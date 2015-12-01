@@ -18,25 +18,29 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
       }
 
   });
-  $scope.completeRequest=function()
+ /* 
+//for testing purposes;
+ $scope.completeRequest=function()
   {
     $scope.uid='asda-asdas-das';
     var EnableSMS=0;
     //var objectToSend=$scope.ariaResponse[0];
+    objectToSend={};
     objectToSend.EnableSMS=1;
     objectToSend.Language='EN';
     objectToSend.PatientFirstName="David";
     objectToSend.PatientLastName="Herrera";
     objectToSend.Email="da@gmail.com";
-    objectToSend.SSN=DEMZ98552411;
+    objectToSend.SSN='DEMZ98552411';
     objectToSend.PatientSer=123123;
     objectToSend.LoginId="asda-asdas-dasas";
     objectToSend.PatientId=123123;
+    objectToSend.TelNumForSMS=5146419404;
     api.getFieldFromServer(URLs.getBasicURLPHP()+'MysqlRegister.php',objectToSend).then(function(response){
       console.log(response);
     });
 
-  }
+  }*/
   $scope.FindPatient= function (ssn) {
     /**
    * @ngdoc method

@@ -34,12 +34,16 @@ $lookupResult = $conn->query($sqlLookup);
 // If patientId doesn't already exist , Register the patient
 if ($lookupResult->num_rows===0) {
   $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."','',".$TelNumForSMS.",".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
+  echo $sqlInsert;
   if ($conn->query($sqlInsert) === TRUE)
   {
-    $query="SELECT LAST_INSERT_ID();";
+    $query="SELECT PatientSerNum FROM Patient WHERE PatientId='".$PatientId."'";
+    //echo $query;
     $serNum = $conn->query($query);
-    echo $serNum;
-    $sql="INSERT INTO `Users` (`UserSerNum`, `UserType`, `UserTypeSerNum`, `Username`, `Password`) VALUES (NULL,'Patient',".$UserSerNum.",'".$loginID."',NULL)";
+    $row=$serNum->fetch_assoc();
+    echo json_encode($row);
+    $sql="INSERT INTO `Users` (`UserSerNum`, `UserType`, `UserTypeSerNum`, `Username`, `Password`) VALUES (NULL,'Patient',".$row['PatientSerNum'].",'".$loginID."','')";
+    echo $sql;
     if($conn->query($sql) === TRUE)
     {
       echo "Patient has been registered succesfully!";
