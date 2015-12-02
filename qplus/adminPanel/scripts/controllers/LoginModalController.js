@@ -93,6 +93,11 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
             response.Username=username;
             response.Password=password;
             signinUser(response);
+          }else if(response=="")
+          {
+            $rootScope.alerts["LoginAlert"]={};
+            $rootScope.alerts["LoginAlert"].type="danger";
+            $rootScope.alerts["LoginAlert"].message="Enter Password!";
           }
           else if (response =="Invalid Password")
           {

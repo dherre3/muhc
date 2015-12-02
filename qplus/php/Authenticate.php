@@ -2,6 +2,8 @@
 require('./password_compat/lib/password.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST)) $_POST = json_decode(file_get_contents('php://input'), true);
+
+
 if ( isset($_POST["Username"]) && isset($_POST["Password"]))
 {
 
@@ -34,7 +36,7 @@ if ( isset($_POST["Username"]) && isset($_POST["Password"]))
          $row = $lookupUser->fetch_assoc();
          if (!password_verify($_POST["Password"] ,$row['Password']))
          {
-           echo json_encode('Invalid Password');
+           echo 'Invalid Password';
            exit();
          }else{
            if($row['UserType']=='Admin')
@@ -80,6 +82,7 @@ if ( isset($_POST["Username"]) && isset($_POST["Password"]))
 }
 else
 {
+  
   exit();
 }
 ?>
