@@ -59,8 +59,9 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
    */
    $scope.resetPassword=function()
    {
+    var ref=new Firebase("https://luminous-heat-8715.firebaseio.com/");
      ref.resetPassword({
-      email: $scope.ariaResponse.Email;
+      email: $scope.ariaResponse.Email
     }, function(error) {
       if (error) {
         switch (error.code) {

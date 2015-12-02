@@ -1,8 +1,8 @@
 var app=angular.module('adminPanelApp');
-app.controller('SearchController',function ($rootScope, $log,$http,$scope, $state, Patient) {
+app.controller('SearchController',function ($rootScope, $log,$http,$scope, $state, Patient,URLs) {
 
 	$scope.findPatient=function(){
-		   var patientURL="http://localhost:8888/qplus/AdminPanel-MySQLDB-NodeListener-Docs/php/MySQLFind.php?";
+		   var patientURL=URLs.getBasicURLPHP()+"MySQLFind.php?";
 	      if ($scope.LastName)
 	      {
 	        patientURL=patientURL+"LastName="+$scope.LastName +"&";
