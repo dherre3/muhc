@@ -76,7 +76,12 @@ else {
      ";
 
     $lookupresult= $conn->query($sqllookup);
-    if ( $lookupresult->num_rows===1) { echo "Patient is already registered!"; }
+    if ( $lookupresult->num_rows===1) { 
+        $row=$lookupresult->fetch_assoc();
+        $row['response']="Patient has already been registered!";
+        echo json_encode($row);
+
+    }
     else {echo $patientData;}
 }
 if (!$all)

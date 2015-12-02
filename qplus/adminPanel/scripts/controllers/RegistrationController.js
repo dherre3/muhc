@@ -18,9 +18,9 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
       }
 
   });
- /* 
+ $scope.alert={};
 //for testing purposes;
- $scope.completeRequest=function()
+ /*$scope.completeRequest=function()
   {
     $scope.uid='asda-asdas-das';
     var EnableSMS=0;
@@ -38,6 +38,11 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
     objectToSend.TelNumForSMS=5146419404;
     api.getFieldFromServer(URLs.getBasicURLPHP()+'MysqlRegister.php',objectToSend).then(function(response){
       console.log(response);
+      $timeout(function(){
+        $scope.alert.type=response.Type;
+        $scope.alert.message=response.Response;
+      });
+
     });
 
   }*/
@@ -58,8 +63,15 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
         api.getFieldFromServer(msURL,{PatientSSN:ssn}).then(function(response)
         {
           $scope.ariaResponse=response;
-          console.log(response[0]);
-          if ($scope.ariaResponse!=="PatientNotFound" ) {
+          console.log(response);
+          if(response.response=="Patient has already been registered!")
+          {
+            $scope.patientFound=false;
+            $scope.alert.type="warning";
+            $scope.alert.message=response.response;
+            $scope.patientRegistered=true;
+          }
+          else if ($scope.ariaResponse!=="PatientNotFound" ) {
             $scope.Alias="";
             $scope.message = "";
             $scope.Email="";
@@ -165,6 +177,11 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
                 objectToSend.Language=$scope.Language;
                 api.getFieldFromServer(URLs.getBasicURLPHP()+'MysqlRegister.php',objectToSend).then(function(response){
                   console.log(response);
+                  $timeout(function(){
+                    $scope.alert.type=response.Type;
+                    $scope.alert.message=response.Response;
+                  });
+
                 });
               }
             });

@@ -6,6 +6,7 @@ $PatientId=$_POST["PatientId"];
 $FirstName=$_POST["PatientFirstName"];
 $LastName=$_POST["PatientLastName"];
 $TelNumForSMS=$_POST["TelNumForSMS"];
+if(!isset($TelNumForSMS)) $TelNumForSMS=0;
 $Email=$_POST["Email"];
 $loginID=$_POST["LoginId"];
 $Language=$_POST["Language"];
@@ -32,32 +33,41 @@ $sqlLookup="
 ";
 $lookupResult = $conn->query($sqlLookup);
 // If patientId doesn't already exist , Register the patient
+$response= array();
 if ($lookupResult->num_rows===0) {
+
   $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."','',".$TelNumForSMS.",".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
-  echo $sqlInsert;
   if ($conn->query($sqlInsert) === TRUE)
   {
     $query="SELECT PatientSerNum FROM Patient WHERE PatientId='".$PatientId."'";
     //echo $query;
     $serNum = $conn->query($query);
     $row=$serNum->fetch_assoc();
-    echo json_encode($row);
+
     $sql="INSERT INTO `Users` (`UserSerNum`, `UserType`, `UserTypeSerNum`, `Username`, `Password`) VALUES (NULL,'Patient',".$row['PatientSerNum'].",'".$loginID."','')";
-    echo $sql;
+  
     if($conn->query($sql) === TRUE)
     {
-      echo "Patient has been registered succesfully!";
+      $response['Type']='success';
+      $response['Response']="Patient has been registered succesfully!";
+      echo json_encode($response);
     }else{
-      echo "Insertion Query Failed!"; 
+      $response['Type']='danger';
+      $response['Response']="Server problem, missing fields in request!";
+      echo json_encode($response);
     }
 
   } else
   {
-    echo "Insertion Query Failed!";
+      $response['Type']='danger';
+      $response['Response']="Server problem, missing fields in request!";
+      echo json_encode($response);
   }
 }else
 {
-	echo "Patient is already registered!";
+      $response['Type']='warning';
+      $response['Response']="Patient has already been registered!";
+      echo json_encode($response);
 }
 
 $conn->close();
