@@ -15,6 +15,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
       if(newValue!==oldValue)
       {
         $scope.alert={};
+        $scope.patientRegistered=false;
       }
 
   });
@@ -56,7 +57,34 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
    * @param {Object} ssn Patient's SSN
    * @returns {String} $scope.patientFound
    */
+   $scope.resetPassword=function()
+   {
+     ref.resetPassword({
+      email: $scope.ariaResponse.Email;
+    }, function(error) {
+      if (error) {
+        switch (error.code) {
+        case "INVALID_USER":
+        $timeout(function(){
+          $scope.alert.type="danger";
+          $scope.alert.message="Specified account does not exist, try again later!";
+        });
+          break;
+        default:
+        $timeout(function(){
+          $scope.alert.type="danger";
+          $scope.alert.message="Error resetting password, try again later!";
+        });
+      }
+    } else {
+      $timeout(function(){
+        $scope.alert.type="success";
+        $scope.alert.message="Password reset email sent successfully!";
+      });
 
+  }
+});
+   }
    $scope.message="";
      if ($scope.SSN.length>11){
         var msURL=URLs.getBasicURLPHP()+"FindPatient.php";

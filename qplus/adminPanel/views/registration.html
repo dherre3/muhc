@@ -1,6 +1,6 @@
 <div class="main-div-container" align="center" style="box-shadow: 0 0 20px lightgrey;">
 <div  style="width:30%;margin-top:30px">
-  
+
   <!--<div class="col-xs-12" style="margin:20px">
     <button class="btn btn-primary btn-lg btn-block" ng-click="completeRequest()">WORK!</button>
   </div>-->
@@ -19,7 +19,39 @@
   <uib-alert type="{{alert.type}}">{{alert.message}}</uib-alert>
 
 </div>
+<div ng-show="patientRegistered">
+<table class="table table-bordered table-condensed">
+  <tr>
+    <th>
+      First Name
+    </th>
+    <th>
+      Last Name
+    </th>
+    <th>
+      SSN
+    </th>
+    <th>
+      Reset Password
+    </th>
+  </tr>
+  <tr>
+    <td>
+      {{ariaResponse.FirstName}}
+    </td>
+    <td>
+      {{ariaResponse.LastName}}
+    </td>
+    <td>
+      {{ariaResponse.SSN}}
+    </td>
+    <td>
+      <button class="btn btn-primary" ng-click="resetPassword()">Reset Password</button>
+    </td>
+  </tr>
 
+</table>
+</div>
 <!--*******************************************************************************-->
 <!--This part of the form only  shows up if the SSN is found in ARIA -->
 <div ng-show="patientFound" align="center" style="padding:0 20px 20px 20px;width:80%;">
