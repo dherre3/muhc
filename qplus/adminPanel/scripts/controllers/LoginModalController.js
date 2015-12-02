@@ -13,7 +13,7 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
     $rootScope.alerts={};
     $rootScope.user= {};
     checkForUserAlreadyLoggedIn();
-    
+
     function checkForUserAlreadyLoggedIn()
     {
       var user=window.localStorage.getItem('OpalAdminUser');
@@ -36,8 +36,8 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
         $rootScope.userType='Staff';
       }
       $rootScope.alerts["LoginAlert"]={};
-      response.Username=username;
-      User.setUserFields(response,username,password);
+
+      User.setUserFields(response,response.Username,response.Password);
       User.getNumberOfPatientsForUserFromServer().then(function(data){
         $rootScope.loggedin=true;
         $rootScope.TotalNumberOfPatients=data[0].TotalNumberOfPatients;
@@ -90,10 +90,13 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
       {
         api.getFieldFromServer(URLs.getUserAuthenticationUrl(),{Username:username, Password:password}).then(function(response)
         {
-          console.log(response);
-          window.localStorage.setItem('OpalAdminUser',response);
+
           if ( response.AdminSerNum ||response.DoctorSerNum||response.StaffSerNum)
           {
+            console.log(response);
+            response.Username=username;
+            response.Password=password;
+            window.localStorage.setItem('OpalAdminUser',response);
             signinUser(response);
           }
           else if (response =="Invalid Password")
