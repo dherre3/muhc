@@ -106,7 +106,6 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
             $scope.Email="";
             $scope.EmailConfirm="";
             $scope.PasswordConfirm="";
-            $scope.TelNumForSMS="";
             $scope.patientFound=true;
             var PatientSSN=$scope.SSN;
               $scope.Language="EN";
@@ -153,14 +152,14 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
    });
       $scope.alert.type='danger';
       $scope.alert.message="Passwords do not match!";    }
-    else if ($scope.TelNumForSMS && $scope.TelNumForSMS.length !==10 ) {
+    else if (typeof $scope.TelNumForSMS !=='undefined'&& $scope.TelNumForSMS.length !==10 ) {
       $timeout(function(){
-
+        $scope.alert.type='danger';
+        $scope.alert.message="Enter a valid phone number!";
 
 
    });
-      $scope.alert.type='danger';
-      $scope.alert.message="Enter a valid phone number!";
+      
     }
     else {
       $scope.message="";
@@ -199,9 +198,16 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
 
                 var EnableSMS=0;
                 var objectToSend=$scope.ariaResponse[0];
-                objectToSend.TelNumForSMS=$scope.TelNumForSMS;
+                if(typeof $scope.TelNumForSMS!=='undefined')
+                {
+                  objectToSend.TelNumForSMS=$scope.TelNumForSMS;
+                  objectToSend.EnableSMS=1;
+              }else{
+                objectToSend.EnableSMS=0;
+              }
+
+              console.log(objectToSend);
                 objectToSend.LoginId=userData.uid;
-                objectToSend.EnableSMS=($scope.TelNumForSMS) ?1:0;
                 objectToSend.Email=$scope.Email;
                 objectToSend.Language=$scope.Language;
                 api.getFieldFromServer(URLs.getBasicURLPHP()+'MysqlRegister.php',objectToSend).then(function(response){

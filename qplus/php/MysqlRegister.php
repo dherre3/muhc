@@ -5,8 +5,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST)) $_POST = json_decode(
 $PatientId=$_POST["PatientId"];
 $FirstName=$_POST["PatientFirstName"];
 $LastName=$_POST["PatientLastName"];
-$TelNumForSMS=$_POST["TelNumForSMS"];
-if(!isset($TelNumForSMS)) $TelNumForSMS=0;
+$TelNumForSMS=$_POST["TelNumForSMS"]; 
 $Email=$_POST["Email"];
 $loginID=$_POST["LoginId"];
 $Language=$_POST["Language"];
@@ -35,8 +34,12 @@ $lookupResult = $conn->query($sqlLookup);
 // If patientId doesn't already exist , Register the patient
 $response= array();
 if ($lookupResult->num_rows===0) {
+if(!isset($TelNumForSMS)){
+    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."','',NULL,".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
 
-  $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."','',".$TelNumForSMS.",".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
+  }else{
+    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."','',".$TelNumForSMS.",".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
+  }
   if ($conn->query($sqlInsert) === TRUE)
   {
     $query="SELECT PatientSerNum FROM Patient WHERE PatientId='".$PatientId."'";

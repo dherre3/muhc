@@ -47,24 +47,24 @@
           <div class="collapse navbar-collapse" id="js-navbar-collapse">
 
             <ul class="nav navbar-nav">
-              <li class="main-theme-font-color" ng-class="activeClasses['home']">
+              <li class="main-theme-font-color" ui-sref-active="active">
                 <a ui-sref="home"><span class="item-menu-size"><i class="ion-home"></i> <strong>Home</strong></span></a>
               </li>
-              <li ng-show="userType!=='Doctor'" class="main-theme-font-color item-menu-size" ng-class="activeClasses['registration']">
+              <li ng-show="userType!=='Doctor'" class="main-theme-font-color item-menu-size" ui-sref-active="active">
                 <a ui-sref="registration"><span class="item-menu-size"><i class="icon ion-clipboard"></i>  <strong>Registration</strong></a>
               </li>
-              <li ng-show="userType!=='Staff'" class="main-theme-font-color item-menu-size" ng-class="activeClasses['patients.search-patients']">
+              <li ng-show="userType!=='Staff'" class="main-theme-font-color item-menu-size" ui-sref-active="active">
                 <a ui-sref="patients.search-patients"><span class="item-menu-size"><i class="ion-ios-people" ></i> <strong>Patients</strong></span></a>
               </li>
 
-              <li ng-show="userType!=='Staff'" class="main-theme-font-color item-menu-size" ng-class="activeClasses['messages']">
+              <li ng-show="userType!=='Staff'" class="main-theme-font-color item-menu-size" ui-sref-active="active">
                 <a ui-sref="messages"><span class="item-menu-size"><i class="ion-email"></i><i class="{{}}"></i>  <strong>Messages  <span class="badge" ng-show="NumberOfNewMessages!==0">{{NumberOfNewMessages}}</span></a></strong></span></a>
               </li>
 
             <!--  <li class="main-theme-font-color item-menu-size" ng-class="activeClasses[3]">
                 <a ui-sref="requests"><span class="item-menu-size"><i class="ion-ios-information"></i> <strong>Requests</strong></span></a>
               </li>-->
-              <li class="main-theme-font-color item-menu-size" ng-class="activeClasses['account']"><a ui-sref="account"><span class="item-menu-size"><i class="ion-gear-a"></i>  <strong>Account</strong></span></a></li>
+              <li class="main-theme-font-color item-menu-size" ui-sref-active="active"><a ui-sref="account"><span class="item-menu-size"><i class="ion-gear-a"></i>  <strong>Account</strong></span></a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
             <li ng-show="currentUser" class="dropdown" >
