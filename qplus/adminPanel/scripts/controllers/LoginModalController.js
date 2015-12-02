@@ -12,7 +12,55 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
   */
     $rootScope.alerts={};
     $rootScope.user= {};
+    checkForUserAlreadyLoggedIn();
+    
+    function checkForUserAlreadyLoggedIn()
+    {
+      var user=window.localStorage.getItem('OpalAdminUser');
+      user=JSON.parse(user);
+      signinUser(user);
+    }
+    function signinUser(response)
+    {
+      if(response.AdminSerNum)
+      {
+        $rootScope.userType='Admin';
+      }else if(response.DoctorSerNum){
+        $rootScope.userType='Doctor';
+        console.log($rootScope.userType);
+      }else{
+        $rootScope.userType='Staff';
+      }
+      $rootScope.alerts["LoginAlert"]={};
+      response.Username=username;
+      User.setUserFields(response,username,password);
+      User.getNumberOfPatientsForUserFromServer().then(function(data){
+        $rootScope.loggedin=true;
+        $rootScope.TotalNumberOfPatients=data[0].TotalNumberOfPatients;
+        if($rootScope.userType=='Doctor')
+        {
+          User.setNumberOfDoctorPatients(data[1].TotalNumberOfDoctorPatients);
+          $rootScope.TotalNumberOfDoctorPatients=User.getNumberOfDoctorPatients();
+        }
 
+        api.getAllPatients().then(function(result){
+          AllPatients.setPatients(result);
+          Messages.getMessagesFromServer().then(function(messagesFromService){
+          Messages.setMessages(messagesFromService);
+        });
+      });
+
+      });
+      $modalInstance.close(response);
+      if(User.getUserFields().UserRole=='Admin'){
+        $rootScope.admin=true;
+      }else {
+        $timeout(function(){
+          $rootScope.admin=false;
+        })
+
+      }
+    }
     $rootScope.login = function (username,password)
     {
       /**
@@ -39,47 +87,10 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
         api.getFieldFromServer(URLs.getUserAuthenticationUrl(),{Username:username, Password:password}).then(function(response)
         {
           console.log(response);
+          window.localStorage.setItem('OpalAdminUser',response);
           if ( response.AdminSerNum ||response.DoctorSerNum||response.StaffSerNum)
           {
-            if(response.AdminSerNum)
-            {
-              $rootScope.userType='Admin';
-            }else if(response.DoctorSerNum){
-              $rootScope.userType='Doctor';
-              console.log($rootScope.userType);
-            }else{
-              $rootScope.userType='Staff';
-            }
-            $rootScope.alerts["LoginAlert"]={};
-            response.Username=username;
-            User.setUserFields(response,username,password);
-            User.getNumberOfPatientsForUserFromServer().then(function(data){
-              $rootScope.loggedin=true;
-              $rootScope.TotalNumberOfPatients=data[0].TotalNumberOfPatients;
-              if($rootScope.userType=='Doctor')
-              {
-                User.setNumberOfDoctorPatients(data[1].TotalNumberOfDoctorPatients);
-                $rootScope.TotalNumberOfDoctorPatients=User.getNumberOfDoctorPatients();
-              }
-              
-              api.getAllPatients().then(function(result){
-                AllPatients.setPatients(result);
-                Messages.getMessagesFromServer().then(function(messagesFromService){
-                Messages.setMessages(messagesFromService);
-              });
-            });
-
-            });
-            $modalInstance.close(response);
-            if(User.getUserFields().UserRole=='Admin'){
-              $rootScope.admin=true;
-            }else {
-              $timeout(function(){
-                $rootScope.admin=false;
-              })
-
-            }
-
+            signinUser(response);
           }
           else if (response =="Invalid Password")
           {

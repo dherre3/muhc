@@ -59,7 +59,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
    */
    $scope.resetPassword=function()
    {
-    var ref=new Firebase("https://luminous-heat-8715.firebaseio.com/");
+    var ref=new Firebase("https://brilliant-inferno-7679.firebaseio.com/");
      ref.resetPassword({
       email: $scope.ariaResponse.Email
     }, function(error) {
@@ -165,7 +165,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
     else {
       $scope.message="";
       //Register to FireBase
-            var FB=new Firebase("https://luminous-heat-8715.firebaseio.com/");
+            var FB=new Firebase("https://brilliant-inferno-7679.firebaseio.com/");
             FB.createUser({
               email : $scope.Email,
               password: $scope.Password
