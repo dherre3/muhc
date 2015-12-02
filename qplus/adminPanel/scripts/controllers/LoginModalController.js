@@ -17,8 +17,12 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
     function checkForUserAlreadyLoggedIn()
     {
       var user=window.localStorage.getItem('OpalAdminUser');
-      user=JSON.parse(user);
-      signinUser(user);
+      if(user)
+      {
+        user=JSON.parse(user);
+        signinUser(user);
+      }
+
     }
     function signinUser(response)
     {
