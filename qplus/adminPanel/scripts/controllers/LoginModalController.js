@@ -16,16 +16,18 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
 
     function checkForUserAlreadyLoggedIn()
     {
-      var user=window.localStorage.getItem('OpalAdminUser');
+      var user=window.localStorage.getItem('OpalPanelUser');
       if(user)
       {
         user=JSON.parse(user);
         signinUser(user);
+        $modalInstance.close(response);
       }
 
     }
     function signinUser(response)
     {
+      
       if(response.AdminSerNum)
       {
         $rootScope.userType='Admin';
@@ -35,8 +37,9 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
       }else{
         $rootScope.userType='Staff';
       }
+      $rootScope.currentUser=response;
       $rootScope.alerts["LoginAlert"]={};
-
+      console.log(response);
       User.setUserFields(response,response.Username,response.Password);
       User.getNumberOfPatientsForUserFromServer().then(function(data){
         $rootScope.loggedin=true;
@@ -55,7 +58,7 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
       });
 
       });
-      $modalInstance.close(response);
+      
       if(User.getUserFields().UserRole=='Admin'){
         $rootScope.admin=true;
       }else {
@@ -64,6 +67,7 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
         })
 
       }
+      $modalInstance.close(response);
     }
     $rootScope.login = function (username,password)
     {
@@ -77,16 +81,8 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
      * @param {String} password password specified by the user.
      * @returns {Object} $rootScope.Admin
      */
-
-
-      // Authentication for superuser
-      if (username==="root" && $rootScope.user.users[username]===password)
-        {
-          $rootScope.alerts["LoginAlert"]={};
-          $modalInstance.close(username);
-        }
       // Authentication for normal users
-      else if (typeof username !== 'undefined' )
+      if (typeof username !== 'undefined' )
       {
         api.getFieldFromServer(URLs.getUserAuthenticationUrl(),{Username:username, Password:password}).then(function(response)
         {
@@ -96,7 +92,6 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
             console.log(response);
             response.Username=username;
             response.Password=password;
-            window.localStorage.setItem('OpalAdminUser',response);
             signinUser(response);
           }
           else if (response =="Invalid Password")

@@ -169,7 +169,8 @@ app.service('LoginModal', function ($rootScope,$uibModal)
         });
         return modalInstance.result.then(function (user){
           console.log(user);
-          $rootScope.currentUser=user;
+          
+          
           var userLocalStorage=window.localStorage.getItem('OpalPanelUser');
           if(!userLocalStorage){
             window.localStorage.setItem('OpalPanelUser',JSON.stringify(user));
@@ -257,6 +258,7 @@ app.run(function ($rootScope, $state,LoginModal,$timeout)
       event.preventDefault();
       LoginModal()
       .then(function () {
+
         setMenuClasses(toState.name);
         return $state.go(toState.name, toParams);
       })
