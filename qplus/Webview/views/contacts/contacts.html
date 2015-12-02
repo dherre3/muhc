@@ -1,18 +1,7 @@
 <div class="container"  align="center"  >
   <div class="row" style="margin-top:10vh;width:90%;height:60vh;border:1px solid lightgrey;border-radius:4px;  box-shadow: 0 0 20px lightgrey;" >
     <div class="col-xs-12 col-md-4" style="padding:0;border-right:1px solid lightgrey;height:100%;">
-      <div style="padding-top:10px;margin-bottom:20px" >
-      <ui-select ng-model="selectedItem" theme="bootstrap" ng-disabled="disabled" reset-search-input="false">
-          <ui-select-match placeholder="Enter an name or role...">
-              <span ng-bind="$select.selected.FirstName"></span>
-          </ui-select-match>
-          <ui-select-choices repeat="item in (itemArray | filter: $select.search) track by item.FirstName">
-              <span ng-bind="item.FirstName"></span>
-          </ui-select-choices>
-      </ui-select>
-    </div>
-</ui-select>
-      <ul class="list" style="overflow-y:scroll;height:88%">
+      <ul class="list" style="overflow-y:scroll;height:100%">
   <li class=" list__header">
     Primary Doctor
   </li>

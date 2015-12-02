@@ -139,7 +139,7 @@ myApp.controller('flow',function($scope,UserPlanWorkflow){
 	$scope.classCircle=function(index)
 	{
 		var nextIndex=UserPlanWorkflow.getNextStageIndex();
-		if(nextIndex===index){
+		if(nextIndex-1===index){
 			return 'numberCircle blueCircle';
 		}
 		var date=$scope.stages[index].Date;
@@ -180,7 +180,7 @@ myApp.controller('flow',function($scope,UserPlanWorkflow){
   }
 	$scope.iconClass=function(index){
 		var currentIndex=UserPlanWorkflow.getNextStageIndex();
-		if(currentIndex===index){
+		if(currentIndex-1===index){
 			return 'ion-ios-circle-filled';
 		}
 		var date=$scope.stages[index].Date;
