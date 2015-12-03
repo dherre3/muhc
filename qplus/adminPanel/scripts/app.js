@@ -169,14 +169,6 @@ app.service('LoginModal', function ($rootScope,$uibModal)
         });
         return modalInstance.result.then(function (user){
           console.log(user);
-          
-          
-          var userLocalStorage=window.localStorage.getItem('OpalPanelUser');
-          if(!userLocalStorage){
-            window.localStorage.setItem('OpalPanelUser',JSON.stringify(user));
-          }
-
-
         });
       };
   });

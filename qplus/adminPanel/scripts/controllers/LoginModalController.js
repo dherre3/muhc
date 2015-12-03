@@ -20,14 +20,18 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
       if(user)
       {
         user=JSON.parse(user);
-        signinUser(user);
-        $modalInstance.close(response);
+        var date=new Date(user.timestamp);
+        if(date>new Date())
+        {
+          signinUser(user);
+        }
+        $modalInstance.close(user);
       }
 
     }
     function signinUser(response)
     {
-      
+
       if(response.AdminSerNum)
       {
         $rootScope.userType='Admin';
@@ -58,7 +62,7 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
       });
 
       });
-      
+
       if(User.getUserFields().UserRole=='Admin'){
         $rootScope.admin=true;
       }else {
@@ -90,8 +94,12 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
           if ( response.AdminSerNum ||response.DoctorSerNum||response.StaffSerNum)
           {
             console.log(response);
+            var date=new Date();
+            date.setHours(date.getHours()+24);
+            response.timestamp=date;
             response.Username=username;
             response.Password=password;
+            window.localStorage.setItem('OpalPanelUser',JSON.stringify(response));
             signinUser(response);
           }else if(response=="")
           {
