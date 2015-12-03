@@ -16,16 +16,23 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
 
     function checkForUserAlreadyLoggedIn()
     {
+      
       var user=window.localStorage.getItem('OpalPanelUser');
       if(user)
       {
         user=JSON.parse(user);
+        console.log(user);
+        signinUser(user);
+        $modalInstance.close(response);
         var date=new Date(user.timestamp);
         if(date>new Date())
         {
-          signinUser(user);
+          
+
+        }else{
+          $modalInstance.close(user);
         }
-        $modalInstance.close(user);
+        
       }
 
     }

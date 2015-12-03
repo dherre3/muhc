@@ -176,9 +176,6 @@ app.service('LoginModal', function ($rootScope,$uibModal)
 // RUN
 app.run(function ($rootScope, $state,LoginModal,$timeout)
 {
-  $rootScope.activeClasses={};
-  $rootScope.activeClasses['home']='active';
-
   /**
   * @ngdoc service
   * @name AdminPanel.service:run
@@ -192,66 +189,13 @@ app.run(function ($rootScope, $state,LoginModal,$timeout)
   $rootScope.$on('$stateChangeStart', function (event, toState, toParams)
   {
     var requireLogin = toState.data.requireLogin;
-    console.log(toState.name);
-    setMenuClasses(toState.name);
-    function makeOtherTabsInactive(menu, tabToActive){
-      for (var tab in menu) {
-        if(tab!==tabToActive)
-        {
-          menu[tab]='';
-        }
-      }
-    }
-    function setMenuClasses(tab){
-      $timeout(function(){
-          $rootScope.activeClasses[tab]='active';
-          makeOtherTabsInactive($rootScope.activeClasses,tab);
-
-
-        /*
-         if(tab=='home'){
-            $rootScope.activeClasses=['active','','','',''];
-          }else if(tab=='messages'){
-            $rootScope.activeClasses=['','','active','',''];
-          }else if(tab=='requests'){
-            $rootScope.activeClasses=['','','','active',''];
-          }else if(tab=='account'){
-            $rootScope.activeClasses=['','','','','active'];
-          }
-          else if(tab=='patients.patient.general'){
-            $rootScope.activeClassesPatientMenu=['active','','','','','',''];
-          }else if(tab=='patients.patient.doctors'){
-            $rootScope.activeClassesPatientMenu=['','active','','','','',''];
-          }
-          else if(tab=='patients.patient.appointments'){
-            $rootScope.activeClassesPatientMenu=['','','active','','','',''];
-          }
-          else if(tab=='patients.patient.treatmentplan'){
-            $rootScope.activeClassesPatientMenu=['','','','active','','',''];
-          }
-          else if(tab=='patients.patient.documents'){
-            $rootScope.activeClassesPatientMenu=['','','','','active','',''];
-          }
-          else if(tab=='patients.patient.messages'){
-            $rootScope.activeClassesPatientMenu=['','','','','','active',''];
-          }
-          else if(tab=='patients.patient.requests'){
-            $rootScope.activeClassesPatientMenu=['','','','','','','active'];
-          else if(tab=='patients.patient.')
-          }else{
-            $rootScope.activeClasses=['','active','','',''];
-          }*/
-      });
-
-
-    }
+    
+    
     if (requireLogin && typeof $rootScope.currentUser === 'undefined')
     {
       event.preventDefault();
       LoginModal()
       .then(function () {
-
-        setMenuClasses(toState.name);
         return $state.go(toState.name, toParams);
       })
       .catch(function ()
@@ -261,8 +205,5 @@ app.run(function ($rootScope, $state,LoginModal,$timeout)
       });
 
     }
-
-  });
-
-
 });
+  });

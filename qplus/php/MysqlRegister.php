@@ -15,6 +15,7 @@ $Password=$_POST["Password"];
 $EnableSMS=$_POST["EnableSMS"];
 $var=$_POST;
 $SSN=$_POST["SSN"];
+$Alias=$_POST['Alias'];
 // Create DB connection
 include 'config.php';
 $conn = new mysqli("localhost", DB_USERNAME, DB_PASSWORD, MYSQL_DB);
@@ -34,11 +35,17 @@ $lookupResult = $conn->query($sqlLookup);
 // If patientId doesn't already exist , Register the patient
 $response= array();
 if ($lookupResult->num_rows===0) {
-if(!isset($TelNumForSMS)){
-    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."','',NULL,".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
 
+if(!isset($TelNumForSMS)&&!isset($Alias)){
+    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `Alias`,`ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."',NULL,'',NULL,".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
+
+  }else if(isset($TelNumForSMS)&&!isset($Alias)){
+    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."',NULL,'',".$TelNumForSMS.",".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
+  }else if(!isset($TelNumForSMS)&&isset($Alias)){
+    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `Alias`,`ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."','".$Alias."','',NULL,".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
   }else{
-    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."','',".$TelNumForSMS.",".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
+    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `Alias`,`ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."','".$Alias."','',".$TelNumForSMS.",".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
+
   }
   if ($conn->query($sqlInsert) === TRUE)
   {

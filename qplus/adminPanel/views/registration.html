@@ -19,6 +19,9 @@
   <uib-alert type="{{alert.type}}">{{alert.message}}</uib-alert>
 
 </div>
+<div ng-show="resetCode">
+  <span style="font-size:30px;color:darkgreen" ><strong>{{resetCode}}</strong></span>
+</div>
 <div ng-show="patientRegistered" style="margin:20px">
 <table class="table table-bordered table-condensed" align="center">
   <tr align="center">

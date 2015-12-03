@@ -20,8 +20,8 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
 
   });
  $scope.alert={};
-//for testing purposes;
- /*$scope.completeRequest=function()
+/*//for testing purposes;
+ $scope.completeRequest=function()
   {
     $scope.uid='asda-asdas-das';
     var EnableSMS=0;
@@ -37,6 +37,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
     objectToSend.LoginId="asda-asdas-dasas";
     objectToSend.PatientId=123123;
     objectToSend.TelNumForSMS=5146419404;
+    objectToSend.Alias="David Herrera";
     api.getFieldFromServer(URLs.getBasicURLPHP()+'MysqlRegister.php',objectToSend).then(function(response){
       console.log(response);
       $timeout(function(){
@@ -112,11 +113,12 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
        });
      }
    } else {
-     api.getFieldFromServer(URLs.getBasicURLPHP+'test/test.php',{}).then(function(response){
+     api.getFieldFromServer(URLs.getBasicURLPHP()+'test/test.php',{}).then(function(response){
        console.log(response);
        $timeout(function(){
          $scope.alert.type="success";
-         $scope.alert.message="Password reset email sent successfully! Use this code"+response+" and the temporary password sent to you email, to reset your password. ";
+         $scope.alert.message="Password reset email sent successfully! Use the following code along with the temporary password sent to your email to reset your password.";
+         $scope.resetCode=response;
        });
      });
 
@@ -168,7 +170,10 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
     else {
       $scope.message="";
       //Register to FireBase
-            var FB=new Firebase("https://brilliant-inferno-7679.firebaseio.com/");
+      api.getFieldFromServer(URLs.getBasicURLPHP()+'aliasChecking.php',{Alias:$scope.Alias}).then(function(data){
+        if(data=='false')
+        {
+             var FB=new Firebase("https://brilliant-inferno-7679.firebaseio.com/");
             FB.createUser({
               email : $scope.Email,
               password: $scope.Password
@@ -214,6 +219,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
                 objectToSend.LoginId=userData.uid;
                 objectToSend.Email=$scope.Email;
                 objectToSend.Language=$scope.Language;
+                objectToSend.Alias=$scope.Alias;
                 api.getFieldFromServer(URLs.getBasicURLPHP()+'MysqlRegister.php',objectToSend).then(function(response){
                   console.log(response);
                   $timeout(function(){
@@ -224,7 +230,14 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
                 });
               }
             });
-        console.log($scope.alert);
+        }else{
+          $timeout(function(){
+              $scope.alert.type='danger';
+              $scope.alert.message="Pick a different alias!";
+          });
+        }
+      });
+         
         }
     }
 }]);
