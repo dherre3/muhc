@@ -1,5 +1,9 @@
 var app=angular.module('adminPanelApp');
 app.controller('LoginModalController',function ($scope, $modalInstance,$rootScope,$http,User, api, Messages, $timeout, AllPatients,URLs) {
+  var a=CryptoJS.SHA556('Password');
+  var b=CryptoJS.SHA556('Password');
+  console.log(a.toString());
+  console.log(b.toString());
 
     /**
   * @ngdoc controller
