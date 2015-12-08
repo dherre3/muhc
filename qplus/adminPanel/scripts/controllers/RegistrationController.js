@@ -19,9 +19,9 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
       }
 
   });
-  $scope.questions=[{id:1,Question:'What is the name of your first pet?'},{id:2,Question:'What is your favorite musical instrument?'},
-                    {id:3,Question:'What was the name of your favorite superhero as a child?'},{id:4,Question:'What is the first name of your childhood best friend?'},{id:5,Question:'What was the color of your first car?'},
-                    {id:6,Question:'What city were you born in?'},{id:7,Question:'What was the first name of your first roommate?'},{id:8,Question:'What is your favorite cartoon?'},{id:9,Question:'What was your favorite athlete as a child?'},{id:10,Question:'What is your father\'s middle name?'}];
+  $scope.questions=['What is the name of your first pet?','What is your father\'s middle name?','What is your favorite musical instrument?',
+                    'What was the name of your favorite superhero as a child?','What is the first name of your childhood best friend?','What was the color of your first car?',
+                    'What city were you born in?','What was the first name of your first roommate?','What is your favorite cartoon?']
  $scope.alert={};
 /*//for testing purposes;
  $scope.completeRequest=function()
@@ -144,31 +144,30 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
    $scope.alert={};
 
     if ($scope.Email!==$scope.EmailConfirm) {
-      $timeout(function(){
-
-
-
-   });
       $scope.alert.type='danger';
       $scope.alert.message="Emails do not match!";
 
     }
     else if ($scope.Password !== $scope.PasswordConfirm ) {
-      $timeout(function(){
-
-
-
-   });
       $scope.alert.type='danger';
       $scope.alert.message="Passwords do not match!";    }
     else if (typeof $scope.TelNumForSMS !=='undefined'&& $scope.TelNumForSMS.length !==10 ) {
-      $timeout(function(){
         $scope.alert.type='danger';
         $scope.alert.message="Enter a valid phone number!";
 
+    }else if(typeof $scope.selectedQuestion1=='undefined'||typeof $scope.selectedQuestion2=='undefined'||typeof $scope.selectedQuestion3=='undefined')
+    {
+        $scope.alert.type="error";
+        $scope.alert.message="Select questions";
 
-   });
 
+    }else if(typeof $scope.answerQuestion1=='undefined'||typeof $scope.answerQuestion2=='undefined'||typeof $scope.answerQuestion3=='undefined')
+    {
+      $scope.alert.type="error";
+      $scope.alert.message="Select answers";
+    }else if(!validate()){
+      $scope.alert.type="error"
+      $scope.alert.message="Pick an answer with no special characters. i.e. *$@)|...";
     }
     else {
       $scope.message="";
@@ -243,5 +242,21 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
       });
 
         }
+    }
+    function validate()
+    {
+      $scope.answerQuestion1Server=$scope.answerQuestion1.toUpperCase();
+      $scope.answerQuestion2Server=$scope.answerQuestion2.toUpperCase();
+      $scope.answerQuestion3Server=$scope.answerQuestion3.toUpperCase();
+      var reg=new RegExp('^[a-zA-Z0-9]*$');
+      if(!reg.test($scope.answerQuestion1Server),!reg.test($scope.answerQuestion2Server),!reg.test($scope.answerQuestion3Server))
+      {
+        return false;
+      }else{
+        return true
+      }
+
+
+
     }
 }]);

@@ -19,10 +19,10 @@
   <uib-alert type="{{alert.type}}">{{alert.message}}</uib-alert>
 
 </div>
-    
+
 <h5>Security questions</h5>
   <select ng-options="question as question.Question for question in questions track by question.id" ng-model="selectedQuestion1"></select>
-  <input class="form-control" ng-model="answerQuestion1" placeholder="Answer to first question"> 
+  <input class="form-control" ng-model="answerQuestion1" placeholder="Answer to first question">
   <select ng-options="question as question.Question for question in questions track by question.id" ng-model="selectedQuestion2"></select>
   <input class="form-control" ng-model="answerQuestion2" placeholder="Answer to second question">
   <select ng-options="question as question.Question for question in questions track by question.id" ng-model="selectedQuestion3"></select>
@@ -70,8 +70,7 @@
   <br>
     <p> Fill in the information below to complete the registration: </p><br>
     <!--REGISTRATION FORM-->
-    <form novalidate name="myForm" ng-submit="Register()">
-
+<form novalidate name="myForm" ng-submit="Register()">
     <div class="form-group" ng-class="{ 'has-error': myForm.formEmail.$invalid,'has-success':myForm.formPassword.$valid }">
       <span class="glyphicon glyphicon-envelope"></span><label class="control-label"><strong>Email <em>(required)</em></strong></label><br>
       <input type="email" class="form-control" name="formEmail" ng-model="Email" required>
@@ -111,6 +110,78 @@
     <input type="text" class="form-control" ng-model="TelNumForSMS" placeholder="5144381414"> <br><br>
 
     <button type="submit" class="btn btn-success btn-sm" >Register</button>
+    <div class="container">
+  <h3>Security questions</h3>
+  <div  class="well">
+  <div class="row">
+    <div class="col-xs-2 col-xs-offset-1">
+      <label>Question 1:</label>
+    </div>
+    <div class="col-xs-7">
+      <select class="form-control" name="question1" style="widht:50px" ng-options="question as question.Question for question in questions track by question.id" ng-model="selectedQuestion1"></select>
+      <span ng-show="myForm.question1.$error.required">Select service</span>
+    </div>
+  </div>
+      <br>
+  <div class="row">
+    <div class="col-xs-2 col-xs-offset-1">
+      <label>Answer 1:</label>
+    </div>
+    <div class="col-xs-7">
+      <input class="form-control" name="answerQuestion1" ng-model="answerQuestion1" placeholder="Answer to first question"  required>
+      <span class="error" style="color:#8A0808" ng-show="myForm.answerQuestion1.$error.required" class="help-inline">
+        *Required</span>
+    </div>
+  </div>
+
+</div>
+  <div class="well">
+  <div class="row">
+    <div class="col-xs-2 col-xs-offset-1">
+      <label>Question 2:</label>
+    </div>
+    <div class="col-xs-7">
+      <select class="form-control" style="widht:50px" name="selectQuestion1" ng-options="question as question.Question for question in questions track by question.id" ng-model="selectedQuestion2" required></select>
+    </div>
+  </div>
+    <br>
+
+  <div class="row">
+    <div class="col-xs-2 col-xs-offset-1">
+      <label>Answer 2:</label>
+    </div>
+    <div class="col-xs-7">
+      <input class="form-control" name="answerQuestion2" ng-model="answerQuestion2" placeholder="Answer to second question"  required>
+      <span class="error" style="color:#8A0808" ng-show="myForm.answerQuestion2.$error.required" class="help-inline">
+        *Required</span>
+    </div>
+  </div>
+</div>
+<div class="well">
+  <div class="row">
+    <div class="col-xs-2 col-xs-offset-1">
+      <label>Question 3:</label>
+    </div>
+    <div class="col-xs-7">
+      <select  class="form-control" style="widht:50px" ng-options="question as question.Question for question in questions track by question.id" ng-model="selectedQuestion3"></select>
+    </div>
+  </div>
+      <br>
+  <div class="row">
+    <div class="col-xs-2 col-xs-offset-1">
+      <label>Answer 3:</label>
+    </div>
+    <div class="col-xs-7">
+      <input class="form-control"name="answerQuestion3" ng-model="answerQuestion3" placeholder="Answer to third question"  required>
+      <span class="error" style="color:#8A0808" ng-show="myForm.answerQuestion3.$error.required" class="help-inline">
+        *Required</span>
+    </div>
+  </div>
+</div>
+<div class="text-center">
+  <button type="submit" class="btn btn-success" >Register</button>
+</div>
+</div>
     </form>
 </div>
 
