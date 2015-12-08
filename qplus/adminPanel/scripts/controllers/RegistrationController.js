@@ -146,21 +146,27 @@ $scope.alert={};
    * .Creates and account in firebase and MySQL for the patient with the information provided in the HTML form.
    * @returns {String} $scope.message
    */
+   var numRegex=new RegExp('^[0-9]{10}$');
    $scope.message = "";
    $scope.alert={};
 
     if ($scope.Email!==$scope.EmailConfirm) {
       $scope.alert.type='danger';
       $scope.alert.message="Emails do not match!";
+      $scope.currentPage=1;
 
     }
     else if ($scope.Password !== $scope.PasswordConfirm ) {
       $scope.alert.type='danger';
-      $scope.alert.message="Passwords do not match!";    }
-    else if (typeof $scope.TelNumForSMS !=='undefined'&& $scope.TelNumForSMS.length !==10 ) {
+      $scope.alert.message="Passwords do not match!";
+      $scope.currentPage=1;
+
+    }
+    else if (typeof $scope.TelNumForSMS !=='undefined'&&$scope.TelNumForSMS!==''&&!numRegex.test($scope.TelNumForSMS)) {
+
         $scope.alert.type='danger';
         $scope.alert.message="Enter a valid phone number!";
-
+        $scope.currentPage=1;
     }else{
       $scope.currentPage=2;
     }
@@ -170,13 +176,16 @@ $scope.alert={};
     if(typeof $scope.selectedQuestion1=='undefined'||typeof $scope.selectedQuestion2=='undefined'||typeof $scope.selectedQuestion3=='undefined')
     {
         $scope.alert.type="danger";
-        $scope.alert.message="Select questions";
+        $scope.alert.message="Select three questions";
 
 
     }else if(typeof $scope.answerQuestion1=='undefined'||typeof $scope.answerQuestion2=='undefined'||typeof $scope.answerQuestion3=='undefined')
     {
       $scope.alert.type="danger";
-      $scope.alert.message="Select answers";
+      $scope.alert.message="Answer all questions";
+    }else if($scope.selectedQuestion2.id===$scope.selectedQuestion3.id||$scope.selectedQuestion2.id===$scope.selectedQuestion1.id||$scope.selectedQuestion1.id===$scope.selectedQuestion3.id){
+      $scope.alert.type="danger";
+      $scope.alert.message="Select different questions!"
     }else if(!validate()){
       $scope.alert.type="danger"
       $scope.alert.message="Pick an answer with no special characters. i.e. *$@)|...";

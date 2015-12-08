@@ -63,8 +63,8 @@
     <p> Fill in the information below to complete the registration: </p><br>
     <!--REGISTRATION FORM-->
     <div class="btn-group">
-    <label class="btn btn-success" ng-model="currentPage" uib-btn-radio="1" uncheckable>1</label>
-    <label class="btn btn-success" ng-model="currentPage" uib-btn-radio="2" ng-disabled="currentPage==1" uncheckable>2</label>
+    <label class="btn btn-success" ng-model="currentPage" uib-btn-radio="1">1</label>
+    <label class="btn btn-success" ng-model="currentPage" uib-btn-radio="2" ng-click="RegisterFirstPage()">2</label>
 </div>
 <div ng-show="currentPage==1">
 <form novalidate name="myForm" ng-submit="RegisterFirstPage()">
@@ -105,7 +105,7 @@
     <span class="glyphicon glyphicon-phone"></span>
     <label>Cellular Number <em>(optional)</em></label><br>
     <input type="text" class="form-control" ng-model="TelNumForSMS" placeholder="5144381414"> <br><br>
-  <button type="submit" class="btn btn-success" >Register</button>
+  <button type="submit" class="btn btn-success" >continue &raquo;</button>
     </form>
   </div>
   <div class="container" ng-show="currentPage==2">
