@@ -161,16 +161,16 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
 
     }else if(typeof $scope.selectedQuestion1=='undefined'||typeof $scope.selectedQuestion2=='undefined'||typeof $scope.selectedQuestion3=='undefined')
     {
-        $scope.alert.type="error";
+        $scope.alert.type="danger";
         $scope.alert.message="Select questions";
 
 
     }else if(typeof $scope.answerQuestion1=='undefined'||typeof $scope.answerQuestion2=='undefined'||typeof $scope.answerQuestion3=='undefined')
     {
-      $scope.alert.type="error";
+      $scope.alert.type="danger";
       $scope.alert.message="Select answers";
     }else if(!validate()){
-      $scope.alert.type="error"
+      $scope.alert.type="danger"
       $scope.alert.message="Pick an answer with no special characters. i.e. *$@)|...";
     }
     else {
