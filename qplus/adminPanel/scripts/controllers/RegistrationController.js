@@ -161,6 +161,8 @@ $scope.alert={};
         $scope.alert.type='danger';
         $scope.alert.message="Enter a valid phone number!";
 
+    }else{
+      $scope.currentPage=2;
     }
 
   };

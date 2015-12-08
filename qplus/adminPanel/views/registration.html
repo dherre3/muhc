@@ -57,13 +57,12 @@
 </div>
 <!--*******************************************************************************-->
 <!--This part of the form only  shows up if the SSN is found in ARIA -->
-<uib-pager total-items="totalItems" ng-model="currentPage" ng-disabled="currentPage==2&&pageOneUncompleted"></uib-pager>
 <div ng-show="patientFound" align="center" style="padding:0 20px 20px 20px;width:80%;">
   <h3 style="color:#04B45F">Patient Found : {{ariaResponse["0"]["PatientLastName"]}} , {{ariaResponse["0"]["PatientFirstName"]}}</h3>
   <br>
     <p> Fill in the information below to complete the registration: </p><br>
     <!--REGISTRATION FORM-->
-  <div>
+    <uib-pagination direction-links="false" total-items="totalItems" ng-model="currentPage" num-pages="smallnumPages"></uib-pagination>
 <div ng-show="currentPage==1">
 <form novalidate name="myForm" ng-submit="RegisterFirstPage()">
     <div class="form-group" ng-class="{ 'has-error': myForm.formEmail.$invalid,'has-success':myForm.formPassword.$valid }">
@@ -105,7 +104,6 @@
     <input type="text" class="form-control" ng-model="TelNumForSMS" placeholder="5144381414"> <br><br>
   <button type="submit" class="btn btn-success" >Register</button>
     </form>
-  </div>
   </div>
   <div class="container" ng-show="currentPage==2">
     <form novalidate name="myForm2" class="form-css" ng-submit="RegisterSecondPage()">
