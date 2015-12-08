@@ -19,9 +19,13 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
       }
 
   });
-  $scope.questions=['What is the name of your first pet?','What is your father\'s middle name?','What is your favorite musical instrument?',
-                    'What was the name of your favorite superhero as a child?','What is the first name of your childhood best friend?','What was the color of your first car?',
-                    'What city were you born in?','What was the first name of your first roommate?','What is your favorite cartoon?']
+  $scope.questions=[{id:1,Question:'What is the name of your first pet?'},{id:2,Question:'What is your favorite musical instrument?'},
+                {id:3,Question:'What was the name of your favorite superhero as a child?'},{id:4,Question:'What is the first name of your childhood best friend?'},
+                {id:5,Question:'What was the color of your first car?'},
+                {id:6,Question:'What city were you born in?'},{id:7,Question:'What was the first name of your first roommate?'},
+                {id:8,Question:'What is your favorite cartoon?'},{id:9,Question:'What was your favorite athlete as a child?'},
+                {id:10,Question:'What is your father\'s middle name?'}];
+
  $scope.alert={};
 /*//for testing purposes;
  $scope.completeRequest=function()
