@@ -62,7 +62,10 @@
   <br>
     <p> Fill in the information below to complete the registration: </p><br>
     <!--REGISTRATION FORM-->
-    <uib-pagination direction-links="false" total-items="totalItems" ng-model="currentPage" num-pages="smallnumPages"></uib-pagination>
+    <div class="btn-group">
+    <label class="btn btn-success" ng-model="currentPage" uib-btn-radio="1" uncheckable>1</label>
+    <label class="btn btn-success" ng-model="currentPage" uib-btn-radio="2" ng-disabled="currentPage==1" uncheckable>2</label>
+</div>
 <div ng-show="currentPage==1">
 <form novalidate name="myForm" ng-submit="RegisterFirstPage()">
     <div class="form-group" ng-class="{ 'has-error': myForm.formEmail.$invalid,'has-success':myForm.formPassword.$valid }">
