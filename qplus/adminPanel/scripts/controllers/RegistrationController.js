@@ -28,7 +28,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
 $scope.totalItems=2;
 $scope.pageOneUncompleted=true;
 $scope.currentPage=1;
- $scope.alert={};
+$scope.alert={};
 /*//for testing purposes;
  $scope.completeRequest=function()
   {
@@ -136,7 +136,7 @@ $scope.currentPage=1;
   });
   }
 
-  $scope.Register=function()
+  $scope.RegisterFirstPage=function()
   {
     /**
    * @ngdoc method
@@ -161,7 +161,11 @@ $scope.currentPage=1;
         $scope.alert.type='danger';
         $scope.alert.message="Enter a valid phone number!";
 
-    }else if(typeof $scope.selectedQuestion1=='undefined'||typeof $scope.selectedQuestion2=='undefined'||typeof $scope.selectedQuestion3=='undefined')
+    }
+
+  };
+  $scope.RegisterSecondPage=function(){
+    if(typeof $scope.selectedQuestion1=='undefined'||typeof $scope.selectedQuestion2=='undefined'||typeof $scope.selectedQuestion3=='undefined')
     {
         $scope.alert.type="danger";
         $scope.alert.message="Select questions";

@@ -65,7 +65,7 @@
     <!--REGISTRATION FORM-->
   <div>
 <div ng-show="currentPage==1">
-<form novalidate name="myForm" ng-submit="Register()">
+<form novalidate name="myForm" ng-submit="RegisterFirstPage()">
     <div class="form-group" ng-class="{ 'has-error': myForm.formEmail.$invalid,'has-success':myForm.formPassword.$valid }">
       <span class="glyphicon glyphicon-envelope"></span><label class="control-label"><strong>Email <em>(required)</em></strong></label><br>
       <input type="email" class="form-control" name="formEmail" ng-model="Email" required>
@@ -108,7 +108,7 @@
   </div>
   </div>
   <div class="container" ng-show="currentPage==2">
-    <form novalidate name="myForm2" class="form-css" ng-submit="registerTwo()">
+    <form novalidate name="myForm2" class="form-css" ng-submit="RegisterSecondPage()">
   <h3>Security questions</h3>
   <div  class="well">
   <div class="row">
