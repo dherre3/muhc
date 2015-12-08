@@ -220,6 +220,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
                 objectToSend.Email=$scope.Email;
                 objectToSend.Language=$scope.Language;
                 objectToSend.Alias=$scope.Alias;
+                objectToSend.Password=CryptoJS.SHA256($scope.Password).toString();
                 api.getFieldFromServer(URLs.getBasicURLPHP()+'MysqlRegister.php',objectToSend).then(function(response){
                   console.log(response);
                   $timeout(function(){

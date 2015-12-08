@@ -16,6 +16,7 @@ $EnableSMS=$_POST["EnableSMS"];
 $var=$_POST;
 $SSN=$_POST["SSN"];
 $Alias=$_POST['Alias'];
+$Password=$_POST['Password'];
 // Create DB connection
 include 'config.php';
 $conn = new mysqli("localhost", DB_USERNAME, DB_PASSWORD, MYSQL_DB);
@@ -54,7 +55,7 @@ if(!isset($TelNumForSMS)&&!isset($Alias)){
     $serNum = $conn->query($query);
     $row=$serNum->fetch_assoc();
 
-    $sql="INSERT INTO `Users` (`UserSerNum`, `UserType`, `UserTypeSerNum`, `Username`, `Password`) VALUES (NULL,'Patient',".$row['PatientSerNum'].",'".$loginID."','')";
+    $sql="INSERT INTO `Users` (`UserSerNum`, `UserType`, `UserTypeSerNum`, `Username`, `Password`,`LastUpdated`) VALUES (NULL,'Patient',".$row['PatientSerNum'].",'".$loginID."','".$Password."',NULL)";
   
     if($conn->query($sql) === TRUE)
     {
