@@ -25,8 +25,9 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
                 {id:6,Question:'What city were you born in?'},{id:7,Question:'What was the first name of your first roommate?'},
                 {id:8,Question:'What is your favorite cartoon?'},{id:9,Question:'What was your favorite athlete as a child?'},
                 {id:10,Question:'What is your father\'s middle name?'}];
-$scope.totalItem=2;
+$scope.totalItems=2;
 $scope.pageOneUncompleted=true;
+$scope.currentPage=1;
  $scope.alert={};
 /*//for testing purposes;
  $scope.completeRequest=function()
