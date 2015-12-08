@@ -57,11 +57,14 @@
 </div>
 <!--*******************************************************************************-->
 <!--This part of the form only  shows up if the SSN is found in ARIA -->
+<uib-pager total-items="totalItems" ng-model="currentPage" ng-disabled="currentPage==2&&pageOneUncompleted"></uib-pager>
 <div ng-show="patientFound" align="center" style="padding:0 20px 20px 20px;width:80%;">
   <h3 style="color:#04B45F">Patient Found : {{ariaResponse["0"]["PatientLastName"]}} , {{ariaResponse["0"]["PatientFirstName"]}}</h3>
   <br>
     <p> Fill in the information below to complete the registration: </p><br>
     <!--REGISTRATION FORM-->
+  <div>
+<div ng-show="currentPage==1">
 <form novalidate name="myForm" ng-submit="Register()">
     <div class="form-group" ng-class="{ 'has-error': myForm.formEmail.$invalid,'has-success':myForm.formPassword.$valid }">
       <span class="glyphicon glyphicon-envelope"></span><label class="control-label"><strong>Email <em>(required)</em></strong></label><br>
@@ -100,7 +103,12 @@
     <span class="glyphicon glyphicon-phone"></span>
     <label>Cellular Number <em>(optional)</em></label><br>
     <input type="text" class="form-control" ng-model="TelNumForSMS" placeholder="5144381414"> <br><br>
-    <div class="container">
+  <button type="submit" class="btn btn-success" >Register</button>
+    </form>
+  </div>
+  </div>
+  <div class="container" ng-show="currentPage==2">
+    <form novalidate name="myForm" class="form-css" ng-submit="register()">
   <h3>Security questions</h3>
   <div  class="well">
   <div class="row">
@@ -119,7 +127,7 @@
     </div>
     <div class="col-xs-7">
       <input class="form-control" name="answerQuestion1" ng-model="answerQuestion1" placeholder="Answer to first question"  required>
-      <span style="color:#8A0808" ng-show="myForm.answerQuestion1.$error.required" class="help-inline error">
+      <span class="error" style="color:#8A0808" ng-show="myForm.answerQuestion1.$error.required" class="help-inline">
         *Required</span>
     </div>
   </div>
@@ -142,7 +150,7 @@
     </div>
     <div class="col-xs-7">
       <input class="form-control" name="answerQuestion2" ng-model="answerQuestion2" placeholder="Answer to second question"  required>
-      <span align="left" style="color:#8A0808;text-align:left" ng-show="myForm.answerQuestion2.$error.required" class="help-inline error">
+      <span class="error" style="color:#8A0808" ng-show="myForm.answerQuestion2.$error.required" class="help-inline">
         *Required</span>
     </div>
   </div>
@@ -163,7 +171,7 @@
     </div>
     <div class="col-xs-7">
       <input class="form-control"name="answerQuestion3" ng-model="answerQuestion3" placeholder="Answer to third question"  required>
-      <span style="color:#8A0808" ng-show="myForm.answerQuestion3.$error.required" class="help-inline error">
+      <span class="error" style="color:#8A0808" ng-show="myForm.answerQuestion3.$error.required" class="help-inline">
         *Required</span>
     </div>
   </div>
@@ -171,8 +179,9 @@
 <div class="text-center">
   <button type="submit" class="btn btn-success" >Register</button>
 </div>
+</form>
 </div>
-    </form>
+
 </div>
 
 </div>
