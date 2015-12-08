@@ -101,6 +101,16 @@
     <span class="glyphicon glyphicon-phone"></span>
     <label>Cellular Number <em>(optional)</em></label><br>
     <input type="text" class="form-control" ng-model="TelNumForSMS" placeholder="5144381414"> <br><br>
+    <h5>Security questions</h5>
+<ol class="list-group">
+
+  <li><select ng-options="question in questions" ng-model="selectedQuestion1"></select></li>
+  <li><input class="form-control" ng-model="answerQuestion1" placeholder="Answer to first question"> </li>
+  <li><select ng-options="question in questions" ng-model="selectedQuestion2"></select></li>
+  <li><input class="form-control" ng-model="answerQuestion2" placeholder="Answer to second question"> </li>
+  <li><select ng-options="question as questions" ng-model="selectedQuestion3"></select></li>
+  <li><input class="form-control" ng-model="answerQuestion3" placeholder="Answer to third question"> </li>
+</ol>
     <button type="submit" class="btn btn-success btn-sm" >Register</button>
     </form>
 </div>

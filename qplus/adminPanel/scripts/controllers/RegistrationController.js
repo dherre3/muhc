@@ -19,6 +19,9 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
       }
 
   });
+  $scope.questions=['What is the name of your first pet?','What is your father\'s middle name?','What is your favorite musical instrument?',
+                    'What was the name of your favorite superhero as a child?','What is the first name of your childhood best friend?','What was the color of your first car?',
+                    'What city were you born in?','What was the first name of your first roommate?','What is your favorite cartoon?','What was your favorite athlete as a child?'];
  $scope.alert={};
 /*//for testing purposes;
  $scope.completeRequest=function()
@@ -238,7 +241,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
           });
         }
       });
-         
+
         }
     }
 }]);
