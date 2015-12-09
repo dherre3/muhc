@@ -244,6 +244,12 @@ $scope.alert={};
                 objectToSend.Language=$scope.Language;
                 objectToSend.Alias=$scope.Alias;
                 objectToSend.Password=CryptoJS.SHA256($scope.Password).toString();
+                objectToSend.Question1=$scope.selectedQuestion1;
+                objectToSend.Question2=$scope.selectedQuestion2;
+                objectToSend.Question3=$scope.selectedQuestion3;
+                objectToSend.Answer1=CryptoJS.SHA256($scope.answerQuestion1Server).toString();
+                objectToSend.Answer2=CryptoJS.SHA256($scope.answerQuestion2Server).toString();
+                objectToSend.Answer3=CryptoJS.SHA256($scope.answerQuestion3Server).toString();
                 api.getFieldFromServer(URLs.getBasicURLPHP()+'MysqlRegister.php',objectToSend).then(function(response){
                   console.log(response);
                   $timeout(function(){
