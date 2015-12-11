@@ -70,11 +70,12 @@ $scope.alert={};
 
    $scope.message="";
      if ($scope.SSN.length>11){
+        $scope.SSN=$scope.SSN.toUpperCase();
         var msURL=URLs.getBasicURLPHP()+"FindPatient.php";
         api.getFieldFromServer(msURL,{PatientSSN:ssn}).then(function(response)
         {
           $scope.ariaResponse=response;
-          console.log(response);
+          //console.log(response);
           if(response.response=="Patient has already been registered!")
           {
             $scope.patientFound=false;
@@ -83,7 +84,6 @@ $scope.alert={};
             $scope.patientRegistered=true;
           }
           else if ($scope.ariaResponse!=="PatientNotFound" ) {
-            $scope.Alias="";
             $scope.message = "";
             $scope.Email="";
             $scope.EmailConfirm="";
@@ -230,6 +230,8 @@ $scope.alert={};
 
                 var EnableSMS=0;
                 var objectToSend=$scope.ariaResponse[0];
+                objectToSend.SSN=(objectToSend.SSN.split(' '))[0];
+                console.log(objectToSend.SSN);
                 if(typeof $scope.TelNumForSMS!=='undefined')
                 {
                   objectToSend.TelNumForSMS=$scope.TelNumForSMS;
@@ -244,9 +246,9 @@ $scope.alert={};
                 objectToSend.Language=$scope.Language;
                 objectToSend.Alias=$scope.Alias;
                 objectToSend.Password=CryptoJS.SHA256($scope.Password).toString();
-                objectToSend.Question1=$scope.selectedQuestion1;
-                objectToSend.Question2=$scope.selectedQuestion2;
-                objectToSend.Question3=$scope.selectedQuestion3;
+                objectToSend.Question1=$scope.selectedQuestion1.Question;
+                objectToSend.Question2=$scope.selectedQuestion2.Question;
+                objectToSend.Question3=$scope.selectedQuestion3.Question;
                 objectToSend.Answer1=CryptoJS.SHA256($scope.answerQuestion1Server).toString();
                 objectToSend.Answer2=CryptoJS.SHA256($scope.answerQuestion2Server).toString();
                 objectToSend.Answer3=CryptoJS.SHA256($scope.answerQuestion3Server).toString();
@@ -275,7 +277,7 @@ $scope.alert={};
       $scope.answerQuestion1Server=$scope.answerQuestion1.toUpperCase();
       $scope.answerQuestion2Server=$scope.answerQuestion2.toUpperCase();
       $scope.answerQuestion3Server=$scope.answerQuestion3.toUpperCase();
-      var reg=new RegExp('^[a-zA-Z0-9]*$');
+      var reg=new RegExp('^[a-zA-Z0-9\s]*$');
       if(!reg.test($scope.answerQuestion1Server),!reg.test($scope.answerQuestion2Server),!reg.test($scope.answerQuestion3Server))
       {
         return false;

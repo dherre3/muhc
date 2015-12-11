@@ -43,14 +43,14 @@ $response= array();
 if ($lookupResult->num_rows===0) {
 
 if(!isset($TelNumForSMS)&&!isset($Alias)){
-    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `Alias`,`ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."',NULL,'',NULL,".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
+    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `Alias`,`ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",'".$PatientId."',"."'".$FirstName."','".$LastName."',NULL,'',NULL,".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
 
   }else if(isset($TelNumForSMS)&&!isset($Alias)){
-    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."',NULL,'',".$TelNumForSMS.",".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
+    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",'".$PatientId."',"."'".$FirstName."','".$LastName."',NULL,'',".$TelNumForSMS.",".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
   }else if(!isset($TelNumForSMS)&&isset($Alias)){
-    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `Alias`,`ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."','".$Alias."','',NULL,".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
+    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `Alias`,`ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",'".$PatientId."',"."'".$FirstName."','".$LastName."','".$Alias."','',NULL,".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
   }else{
-    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `Alias`,`ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",".$PatientId.","."'".$FirstName."','".$LastName."','".$Alias."','',".$TelNumForSMS.",".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
+    $sqlInsert="INSERT INTO `Patient`(`PatientSerNum`, `PatientAriaSer`, `PatientId`, `FirstName`, `LastName`, `Alias`,`ProfileImage`, `TelNum`, `EnableSMS`, `Email`, `Language`, `SSN`, `LastUpdated`) VALUES (NULL,".$PatientSerNum.",'".$PatientId."',"."'".$FirstName."','".$LastName."','".$Alias."','',".$TelNumForSMS.",".$EnableSMS.",'".$Email."','".$Language."','".$SSN."', NULL)";
 
   }
   if ($conn->query($sqlInsert) === TRUE)
@@ -64,19 +64,30 @@ if(!isset($TelNumForSMS)&&!isset($Alias)){
 
     if($conn->query($sql) === TRUE)
     {
+
       $queryQuestions="INSERT INTO SecurityQuestion ( `SecurityQuestionSerNum`, `PatientSerNum`,`Question`,`Answer`,`LastUpdated` ) VALUES
                       ( NULL,".$PatientSerNum.",'".$Question1."','".$Answer1."', NULL ), ( NULL,".$PatientSerNum.",'".$Question2."','".$Answer2."', NULL ),( NULL,".$PatientSerNum.",'".$Question3."','".$Answer3."', NULL );";
       if($conn->query($queryQuestions)==TRUE)
       {
-        $response['Type']='success';
-        $response['Response']="Patient has been registered succesfully!";
-        echo json_encode($response);
+
+        $queryPatientControl="INSERT INTO `PatientControl` (`PatientSerNum`,`PatientUpdate`,`LastUpdated`)VALUES (".$PatientSerNum.", 1,NOW())";
+        if($conn->query($queryPatientControl)==TRUE)
+        {
+          $response['Type']='success';
+          $response['Response']="Patient has been registered succesfully!";
+          echo json_encode($response);
+        }else{
+          $response['Type']='danger';
+          $response['Response']="Error adding to patient control table!";
+          echo json_encode($response);
+        }
       }else{
         $response['Type']='danger';
         $response['Response']="Server problem, security questions could not be added to our records!";
         echo json_encode($response);
       }
     }else{
+      //echo 'boom';
       $response['Type']='danger';
       $response['Response']="Server problem, missing fields in request!";
       echo json_encode($response);
@@ -84,6 +95,7 @@ if(!isset($TelNumForSMS)&&!isset($Alias)){
 
   } else
   {
+      echo 'boom';
       $response['Type']='danger';
       $response['Response']="Server problem, missing fields in request!";
       echo json_encode($response);
