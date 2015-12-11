@@ -3,6 +3,7 @@ var filesystem  =require('fs');
 var Q           =require('q');
 var queries=require('./queries.js');
 var credentials=require('./credentials.js');
+var CryptoJS=require('crypto-js');
 
 
 
@@ -231,16 +232,33 @@ exports.updateAccountField=function(requestObject)
 {
   var r=Q.defer();
   var UserID=requestObject.UserID;
+  console.log(requestObject);
   getPatientFromUserID(UserID).then(function(user)
   {
+
     var patientSerNum=user.UserTypeSerNum;
     var field=requestObject.Parameters.FieldToChange;
     var newValue=requestObject.Parameters.NewValue;
-    connection.query(queries.accountChange(patientSerNum,field,newValue),
-    function(error, rows, fields)
+    if(field=='Password')
     {
-      r.resolve(requestObject);
-    });
+      newValue=CryptoJS.SHA256(newValue);
+      console.log(newValue);
+      connection.query(queries.setNewPassword(newValue,patientSerNum),
+      function(error, rows, fields)
+      {
+        delete requestObject.Parameters.NewValue;
+        r.resolve(requestObject);
+      });
+
+    }else{
+      connection.query(queries.accountChange(patientSerNum,field,newValue),
+      function(error, rows, fields)
+      {
+        r.resolve(requestObject);
+      });
+    }
+
+
   });
   return r.promise;
 }
@@ -269,6 +287,16 @@ exports.addToActivityLog=function(requestObject)
     console.log(rows);
   });
 }
+exports.getUsersPassword=function(username)
+{
+  var r=Q.defer();
+  connection.query(queries.userPassword(username),function(error,rows,fields)
+  {
+    if(error) r.reject(error);
+    r.resolve(rows[0].Password);
+  });
+  return r.promise;
+}
 exports.logActivity=function(requestObject)
 {
   var r =Q.defer();
@@ -280,8 +308,36 @@ exports.logActivity=function(requestObject)
   return r.promise;
 }
 
-
-
+exports.getSecurityQuestions=function(PatientSerNum)
+{
+  var r=Q.defer();
+  connection.query(queries.getSecurityQuestions(PatientSerNum),function(error,rows,fields)
+  {
+    if(error) r.reject(error);
+    r.resolve(rows);
+  });
+  return r.promise;
+}
+exports.getPatientFieldsForPasswordReset=function(userID)
+{
+  var r=Q.defer();
+  connection.query(queries.getPatientFieldsForPasswordReset(userID),function(error,rows,fields)
+  {
+    if(error) r.reject(error);
+    r.resolve(rows[0]);
+  });
+  return r.promise;
+}
+exports.setNewPassword=function(password,patientSerNum)
+{
+  var r=Q.defer();
+  connection.query(queries.setNewPassword(password,patientSerNum),function(error,rows,fields)
+  {
+    if(error) r.reject(error);
+    r.resolve(rows);
+  });
+  return r.promise;
+}
 var tableMappings=
 {
   'Messages':exports.getPatientMessages,

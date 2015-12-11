@@ -1,17 +1,15 @@
 var CryptoJS    =require('crypto-js');
-var keysave=require('./key-save.js');
 var exports=module.exports={};
-exports.encryptObject=function(object)
+exports.encryptObject=function(object,secret)
 {
   /*console.log(object.Appointments[0].ScheduledStartTime);
   var dateString=object.Appointments[0].ScheduledStartTime.toISOString();
   console.log(dateString);*/
-
+console.log(secret);
   //var object=JSON.parse(JSON.stringify(object));
   if(typeof object=='string')
   {
-    console.log('Im a string');
-    var ciphertext = CryptoJS.AES.encrypt(object, keysave.masterKey);
+    var ciphertext = CryptoJS.AES.encrypt(object, secret);
     object=ciphertext.toString();
     return object;
   }else{
@@ -24,10 +22,10 @@ exports.encryptObject=function(object)
         if(object[key] instanceof Date )
         {
           object[key]=object[key].toISOString();
-          var ciphertext = CryptoJS.AES.encrypt(object[key], keysave.masterKey);
+          var ciphertext = CryptoJS.AES.encrypt(object[key], secret);
           object[key]=ciphertext.toString();
         }else{
-            exports.encryptObject(object[key]);
+            exports.encryptObject(object[key],secret);
         }
 
       } else
@@ -38,7 +36,7 @@ exports.encryptObject=function(object)
           object[key]=String(object[key]);
         }
         //console.log(object[key]);
-        var ciphertext = CryptoJS.AES.encrypt(object[key], keysave.masterKey);
+        var ciphertext = CryptoJS.AES.encrypt(object[key], secret);
         object[key]=ciphertext.toString();
       }
     }
@@ -46,18 +44,19 @@ exports.encryptObject=function(object)
   }
 
 };
-exports.decryptObject=function(object)
+exports.decryptObject=function(object,secret)
 {
+  var decipherbytes = CryptoJS.AES.decrypt('David', 'David');
   if(typeof object =='string')
   {
-    var decipherbytes = CryptoJS.AES.decrypt(object, keysave.masterKey);
+    var decipherbytes = CryptoJS.AES.decrypt(object, secret);
     object=decipherbytes.toString(CryptoJS.enc.Utf8);
   }else{
     for (var key in object)
     {
       if (typeof object[key]=='object')
       {
-        exports.decryptObject(object[key]);
+        exports.decryptObject(object[key],secret);
       } else
       {
         if (key=='UserID')
@@ -69,7 +68,7 @@ exports.decryptObject=function(object)
         }
         else
         {
-          var decipherbytes = CryptoJS.AES.decrypt(object[key], keysave.masterKey);
+          var decipherbytes = CryptoJS.AES.decrypt(object[key], secret);
           object[key]=decipherbytes.toString(CryptoJS.enc.Utf8);
         }
       }

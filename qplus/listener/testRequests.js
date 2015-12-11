@@ -3,13 +3,11 @@ var utility =require('./utility.js');
 var credentials=require('./credentials.js');
 var ref=new Firebase(credentials.FIREBASE_REQUEST_URL);
 //Refresh request
-var request1={Request:'Refresh'
-,Parameters: "Messages,Tasks, Appointments"
-}
-
-request1=utility.encryptObject(request1);
+var request1={Request:'Login'};
+request1=utility.encryptObject(request1,'5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5');
 request1.UserID='ec00959e-7291-469b-87c8-1d302a676371';
-request1.DeviceId='test';
+request1.DeviceId='';
+
 ref.push(request1,function(ds)
 {
   console.log(ds);

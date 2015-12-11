@@ -1,72 +1,90 @@
 var app=angular.module('MUHCAppListener',[]);
 app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
   $scope.requests=[];
+  $scope.selectTimeline='All';
   setInterval(function(){
     location.reload();
   },1296000000);
-  function uploadToFirebase(requestKey,requestObject,object)
-  {
-
-    console.log('I am about to go to into encrypting');
-    //console.log(request);
-    if(typeof object=='undefined')
-    {
-      completeRequest(requestKey, requestObject);
-    }else{
-      object=encryptObject(object);
-      var deviceId=requestObject.DeviceId;
-      var UserID=requestObject.UserID;
-      var userFieldsPath='Users/'+UserID+'/'+deviceId;
-        console.log('I am about to write to firebase');
-      ref.child(userFieldsPath).update(object, function(){
-        console.log('I just finished writing to firebase');
-        completeRequest(requestKey, requestObject);
-        //logRequest(requestObject);
-      });
-    }
-  }
-  function completeRequest(requestKey, requestObject, invalid)
-  {
-    $scope.selectTimeline="All";
-    //Clear request
-    $timeout(function(){
-      if(invalid)
-      {
-        $scope.requests.push({request:requestObject,time:new Date(), response:'Failure'});
-      }else{
-        $scope.requests.push({request:requestObject,time:new Date(), response:'Success'});
-      }
-    });
-
-
-    ref.child('requests').child(requestKey).set(null);
-    //Log Request
-    if(invalid!==undefined)
-    {
-      //api.logRequest(requestObject);
-    }else{
-      requestObject.reason='Error wrong arguments';
-      //api.logRequest(requestObject);
-    }
-
-
-  }
   var ref=new Firebase('https://brilliant-inferno-7679.firebaseio.com/');
   ref.child('requests').on('child_added',function(request){
     $.post("http://localhost:3000/login",{key: request.key(),objectRequest: request.val()}, function(data){
-      uploadToFirebase(data.key, data.requestObject,data.objectToFirebase);
+      console.log(data);
+      if(data.type=='UploadToFirebase')
+      {
+        uploadToFirebase(data.requestKey, data.encryptionKey,data.requestObject, data.object);
+      }else if(data.type=='CompleteRequest')
+      {
+        completeRequest(data.requestKey,data.requestObject,data.Invalid);
+      }else if(data.type=='ResetPasswordError')
+      {
+        resetPasswordError(data.requestKey,data.requestObject);
+      }
+
     });
   });
-  function encryptObject(object)
+
+
+  function uploadToFirebase(requestKey,encryptionKey,requestObject,object)
+  {
+    console.log('I am about to go to into encrypting');
+    //console.log(request);
+    object=encryptObject(object,encryptionKey);
+    //console.log(object);
+    var deviceId=requestObject.DeviceId;
+    var UserID=requestObject.UserID;
+    var userFieldsPath='Users/'+UserID+'/'+deviceId;
+      console.log('I am about to write to firebase');
+    ref.child(userFieldsPath).update(object, function(){
+      console.log('I just finished writing to firebase');
+      completeRequest(requestKey, requestObject);
+      //logRequest(requestObject);
+    });
+  }
+  function resetPasswordError(requestKey,requestObject)
+  {
+    var response={};
+    response.ResetPassword={};
+    response.ResetPassword.type='error';
+    var deviceId=requestObject.DeviceId;
+    var UserID=requestObject.UserID;
+    var userFieldsPath='Users/'+UserID+'/'+deviceId;
+      console.log('I am about to write to firebase');
+    ref.child(userFieldsPath).update(response, function(){
+      console.log('I just finished writing to firebase');
+      completeRequest(requestKey, requestObject);
+      //logRequest(requestObject);
+    });
+  }
+  function completeRequest(requestKey, requestObject, invalid)
+  {
+    requestObject.Parameters=JSON.stringify(requestObject.Parameters);
+    requestObject.time=new Date();
+
+    if(invalid!==undefined)
+    {
+      requestObject.response='Failure';
+    }else{
+      requestObject.response='Success';
+    }
+    $timeout(function(){
+      $scope.requests.push(requestObject);
+      console.log($scope.requests);
+    });
+    //Clear request
+    ref.child('requests').child(requestKey).set(null);
+    //Log Request
+  }
+
+
+  function encryptObject(object,secret)
   {
     /*console.log(object.Appointments[0].ScheduledStartTime);
     var dateString=object.Appointments[0].ScheduledStartTime.toISOString();
     console.log(dateString);*/
-
     //var object=JSON.parse(JSON.stringify(object));
     if(typeof object=='string')
     {
-      var ciphertext = CryptoJS.AES.encrypt(object, '12345');
+      var ciphertext = CryptoJS.AES.encrypt(object, secret);
       object=ciphertext.toString();
       return object;
     }else{
@@ -79,10 +97,10 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
           if(object[key] instanceof Date )
           {
             object[key]=object[key].toISOString();
-            var ciphertext = CryptoJS.AES.encrypt(object[key], '12345');
+            var ciphertext = CryptoJS.AES.encrypt(object[key], secret);
             object[key]=ciphertext.toString();
           }else{
-              encryptObject(object[key]);
+              encryptObject(object[key],secret);
           }
 
         } else
@@ -93,7 +111,7 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
             object[key]=String(object[key]);
           }
           //console.log(object[key]);
-          var ciphertext = CryptoJS.AES.encrypt(object[key], '12345');
+          var ciphertext = CryptoJS.AES.encrypt(object[key], secret);
           object[key]=ciphertext.toString();
         }
       }

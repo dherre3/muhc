@@ -8,9 +8,11 @@ exports.patientQuery=function(userID)
                       'Patient.LastName,' +
                       'Patient.TelNum,' +
                       'Patient.Email,' +
+                      'Patient.Alias, '+
                       'Patient.Language,' +
                       'Patient.EnableSMS,' +
-                      'Patient.ProfileImage ' +
+                      'Patient.ProfileImage, ' +
+                      'Patient.SSN '+
                     'From ' +
                       'Patient, '+
                       'Users ' +
@@ -174,8 +176,14 @@ exports.notesQuery=function(userID)
                   'patient.PatientSerNum = patientnotes.PatientSerNum AND '+
                   'patient.LoginID Like '+"\'"+ userID+"\'";
 }
-
-
+exports.getPatientFieldsForPasswordReset=function(userID)
+{
+  return 'SELECT Patient.SSN, Patient.PatientSerNum FROM Patient, Users WHERE Users.Username LIKE '+"\'"+ userID+"\'"+'AND Users.UserTypeSerNum = Patient.PatientSerNum';
+}
+exports.setNewPassword=function(password,patientSerNum)
+{
+  return "UPDATE Users SET Password='"+password+"' WHERE UserType LIKE 'Patient' AND UserTypeSerNum="+patientSerNum;
+}
 exports.patientTasksQuery=function(userID)
 {
   return 'SELECT '+
@@ -236,4 +244,13 @@ exports.logActivity=function(requestObject)
   }
   console.log("INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`UserID`, `DeviceID`,`Parameters` ,`DateAdded`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.UserID+ "', '"+requestObject.DeviceId+"', '"+parameters+"' , CURRENT_TIMESTAMP ,CURRENT_TIMESTAMP )");
   return "INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`UserID`, `DeviceID`,`Parameters` ,`DateAdded`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.UserID+ "', '"+requestObject.DeviceId+"', '"+parameters+"' , CURRENT_TIMESTAMP ,CURRENT_TIMESTAMP )";
+}
+
+exports.userPassword=function(username)
+{
+  return "SELECT Password FROM Users WHERE Username LIKE '"+username+"'";
+};
+exports.getSecurityQuestions=function(serNum)
+{
+  return "SELECT Question, Answer FROM SecurityQuestion WHERE PatientSerNum="+serNum;
 }

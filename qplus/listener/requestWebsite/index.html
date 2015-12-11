@@ -9,6 +9,10 @@
       <link href="./styles.css" rel="stylesheet" type="text/css">
       <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"/></script>
       <link href="./bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+      <script src="./bower_components/cryptojs/mode-cfb-min.js"/></script>
+      <script src="./bower_components/cryptojs/sha256.js"/></script>
+      <script src="./bower_components/cryptojs/aes.js"/></script>
+
       <style>
 
       </style>
@@ -56,12 +60,12 @@
         <th>Status</th>
       </tr>
       <tr ng-repeat="request in requests|filterRequests:selectTimeline|filter:searchUser">
-        <td>{{request.request.Request}}</td>
-        <td>{{request.request.UserID}} </td>
-        <td>{{request.request.DeviceId}}</td>
+        <td>{{request.Request}}</td>
+        <td>{{request.UserID}} </td>
+        <td>{{request.DeviceId}}</td>
         <td>{{request.time|date:'M/d/yy h:mm a'}}</td>
         <td style="max-width: 200px;
-    word-wrap: break-word">{{request.request.Parameters}}</td>
+    word-wrap: break-word">{{request.Parameters}}</td>
         <td ng-class="(request.response=='Success')?'success':'danger'" ng-style="(request.response=='Success')?{color:'green'}:{color:'red'}">{{request.response}}</td>
       </tr>
         <!-- On cells (`td` or `th`) -->
