@@ -96,7 +96,7 @@ app.post('/login',function(req,res,next){
                 var firebaseObject={};
                 firebaseObject.requestKey=requestKey;
                 firebaseObject.requestObject={};
-                firbeaseObject.type='CompleteRequest';
+                firebaseObject.type='CompleteRequest';
                 res.send(firebaseObject);
               }).catch(function(response){
                 console.log('Invalid setting password');
@@ -104,7 +104,7 @@ app.post('/login',function(req,res,next){
                   var firebaseObject={};
                   firebaseObject.requestKey=requestKey;
                   firebaseObject.requestObject={};
-                  firbeaseObject.type='CompleteRequest';
+                  firebaseObject.type='CompleteRequest';
                   firebaseObject.Invalid='Invalid';
                   if(firebaseObject.Invalid!==undefined)
                   {
@@ -122,7 +122,7 @@ app.post('/login',function(req,res,next){
         var firebaseObject={};
         firebaseObject.requestKey=requestKey;
         firebaseObject.requestObject={};
-        firbeaseObject.type='CompleteRequest';
+        firebaseObject.type='CompleteRequest';
         firebaseObject.Invalid='Invalid';
         if(firebaseObject.Invalid!==undefined)
         {
@@ -137,13 +137,14 @@ app.post('/login',function(req,res,next){
       sqlInterface.getUsersPassword(requestObject.UserID).then(function(key){
         requestObject.Request=utility.decryptObject(requestObject.Request,key);
         var encryptionKey=key;
-        //console.log(encryptionKey);
+        console.log(requestObject.Request);
+
         if(requestObject.Request=='') {
           console.log('Rejecting request');
           var firebaseObject={};
           firebaseObject.requestKey=requestKey;
           firebaseObject.requestObject={};
-          firbeaseObject.type='CompleteRequest';
+          firebaseObject.type='CompleteRequest';
           firebaseObject.Invalid='Invalid';
           if(firebaseObject.Invalid!==undefined)
           {
@@ -160,6 +161,7 @@ app.post('/login',function(req,res,next){
         {
           updateClient.update(requestObject).then(function(objectToFirebase)
           {
+            console.log(objectToFirebase);
             var firebaseObject={};
             firebaseObject.requestKey=requestKey;
             firebaseObject.requestObject=requestObject;
@@ -172,7 +174,7 @@ app.post('/login',function(req,res,next){
               var firebaseObject={};
               firebaseObject.requestKey=requestKey;
               firebaseObject.requestObject=requestObject;
-              firbeaseObject.type='CompleteRequest';
+              firebaseObject.type='CompleteRequest';
               firebaseObject.Invalid='Invalid';
               if(firebaseObject.Invalid!==undefined)
               {
@@ -197,7 +199,7 @@ app.post('/login',function(req,res,next){
             var firebaseObject={};
             firebaseObject.requestKey=requestKey;
             firebaseObject.requestObject=requestObject;
-            firbeaseObject.type='CompleteRequest';
+            firebaseObject.type='CompleteRequest';
             firebaseObject.Invalid='Invalid';
             if(firebaseObject.Invalid!==undefined)
             {
@@ -215,7 +217,7 @@ app.post('/login',function(req,res,next){
         var firebaseObject={};
         firebaseObject.requestKey=requestKey;
         firebaseObject.requestObject=requestObject;
-        firbeaseObject.type='CompleteRequest';
+        firebaseObject.type='CompleteRequest';
         firebaseObject.Invalid='Invalid';
         if(firebaseObject.Invalid!==undefined)
         {
@@ -270,6 +272,6 @@ app.post('/login',function(req,res,next){
 
 });
 
-app.listen(3000,function(){
+app.listen(8010,function(){
   console.log("Started on PORT 3000");
 })

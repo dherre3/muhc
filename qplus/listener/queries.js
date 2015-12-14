@@ -79,7 +79,7 @@ exports.patientMessagesQuery=function(userID)
                         '(Users.Username Like '+ "'" + userID +"' )" +
                        ' AND '+
                        'Patient.PatientSerNum=Users.UserTypeSerNum AND' +
-                        "( (messages.ReceiverRole='Patient' AND patient.PatientSerNum = messages.ReceiverSerNum) OR (messages.SenderRole='Patient' AND patient.PatientSerNum = messages.SenderSerNum) )";
+                        "( (Messages.ReceiverRole='Patient' AND Patient.PatientSerNum = Messages.ReceiverSerNum) OR (Messages.SenderRole='Patient' AND Patient.PatientSerNum = Messages.SenderSerNum) )";
 }
 
 exports.patientAppointmentsQuery=function(userID)
@@ -131,6 +131,7 @@ exports.patientDocumentsQuery=function(userID)
 
                     'WHERE '+
                       'Document.AliasExpressionSerNum = AliasExpression.AliasExpressionSerNum AND '+
+                      "Document.ValidEntry = 'Y' AND " +
                       'AliasExpression.AliasSerNum = Alias.AliasSerNum AND '+
                       'Patient.PatientSerNum = Document.PatientSerNum AND '+
                       'Users.UserTypeSerNum=Patient.PatientSerNum AND '+

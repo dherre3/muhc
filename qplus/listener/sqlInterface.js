@@ -13,11 +13,46 @@ var CryptoJS=require('crypto-js');
 */
 
 var connection  = mysql.createConnection({
+  host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,
-  socketPath:credentials.MYSQL_SOCKET_PATH,
   database:credentials.MYSQL_DATABASE
 });
+                                          // If you're also serving http, display a 503 error.
+connection.on('error', function(err) {
+  console.log('db error', err);
+  if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
+    handleDisconnect();                         // lost due to either server restart, or a
+  } else {                                      // connnection idle timeout (the wait_timeout
+    throw err;                                  // server variable configures this)
+  }
+});
+handleDisconnect();
+function handleDisconnect() {
+  var connection  = mysql.createConnection({
+  host:credentials.HOST,
+  user:credentials.MYSQL_USERNAME,
+  password:credentials.MYSQL_PASSWORD,
+  database:credentials.MYSQL_DATABASE
+}); // Recreate the connection, since
+                                                  // the old one cannot be reused.
+
+  connection.connect(function(err) {              // The server is either down
+    if(err) {                                     // or restarting (takes a while sometimes).
+      console.log('error when connecting to db:', err);
+      setTimeout(handleDisconnect, 2000); // We introduce a delay before attempting to reconnect,
+    }                                     // to avoid a hot loop, and to allow our node script to
+  });
+  connection.on('error', function(err) {
+  console.log('db error', err);
+  if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
+    handleDisconnect();                         // lost due to either server restart, or a
+  } else {                                      // connnection idle timeout (the wait_timeout
+    throw err;                                  // server variable configures this)
+  }
+});                                     // process asynchronous requests in the meantime.
+
+}
 //Changing string to match montreal time
 Date.prototype.toISOString = function() {
   var a=this.getTimezoneOffset();
@@ -154,9 +189,15 @@ exports.getPatientDocuments=function(UserID)
   var r=Q.defer();
   connection.query(queries.patientDocumentsQuery(UserID),function(error,rows,fields){
       if (error) r.reject(error);
-      LoadDocuments(rows).then(function(rows){
-
+      console.log(error);
+      LoadDocuments(rows).then(function(response){
+      if(response=='All images were loaded!')
+      {
         r.resolve(rows);
+      }else{
+        r.resolve(response);
+      }
+        
       });
   });
   return r.promise;
@@ -437,11 +478,17 @@ function loadImageDoctor(rows){
 
 function loadProfileImagePatient(rows){
   var deferred = Q.defer();
-  var n = rows[0].ProfileImage.lastIndexOf(".");
-  var substring=rows[0].ProfileImage.substring(n+1,rows[0].ProfileImage.length);
-  rows[0].DocumentType=substring;
-  rows[0].ProfileImage=filesystem.readFileSync(__dirname + '/Patients/'+ rows[0].ProfileImage,'base64' );
-  deferred.resolve(rows);
+  if(typeof rows[0].ProfileImage!=='undefined' && rows[0].ProfileImage!=='')
+  {
+    var n = rows[0].ProfileImage.lastIndexOf(".");
+    var substring=rows[0].ProfileImage.substring(n+1,rows[0].ProfileImage.length);
+    rows[0].DocumentType=substring;
+    rows[0].ProfileImage=filesystem.readFileSync(__dirname + '/Patients/'+ rows[0].ProfileImage,'base64' );
+    deferred.resolve(rows);
+  }else{
+    deferred.resolve(rows);
+  }
+  
   return deferred.promise;
 }
 

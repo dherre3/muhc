@@ -1,13 +1,14 @@
 var app=angular.module('MUHCAppListener',[]);
 app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
   $scope.requests=[];
+  console.log(CryptoJS.SHA256('12345').toString());
   $scope.selectTimeline='All';
   setInterval(function(){
     location.reload();
   },1296000000);
   var ref=new Firebase('https://brilliant-inferno-7679.firebaseio.com/');
   ref.child('requests').on('child_added',function(request){
-    $.post("http://localhost:3000/login",{key: request.key(),objectRequest: request.val()}, function(data){
+    $.post("http://172.26.66.41:8010/login",{key: request.key(),objectRequest: request.val()}, function(data){
       console.log(data);
       if(data.type=='UploadToFirebase')
       {
