@@ -187,19 +187,26 @@ exports.setNewPassword=function(password,patientSerNum)
 }
 exports.patientTasksQuery=function(userID)
 {
+
   return 'SELECT '+
-             'AliasExpression.ExpressionName AS TasksName, '+
+             'Alias.AliasName_EN AS TaskName_EN, '+
+             'Alias.AliasName_FR AS TaskName_FR, '+
+             'Alias.AliasDescription_EN AS TaskDescription_EN, '+
+             'Alias.AliasDescription_FR AS TaskDescription_FR, '+
              'Task.DueDateTime '+
            'From '+
              'Task, '+
+             'Alias, '+
              'AliasExpression, '+
              'Patient, '+
              'Users '+
            'WHERE '+
              'Patient.PatientSerNum = Task.PatientSerNum AND ' +
-             'AliasExpression.AliasExpressionSerNum = Task.AliasExpressionSerNum AND '+
+             'AliasExpression.AliasExpressionSerNum =Task.AliasExpressionSerNum AND '+
+             'AliasExpression.AliasSerNum = Alias.AliasSerNum AND '+
              'Users.UserTypeSerNum=Patient.PatientSerNum AND '+
              'Users.Username Like '+"'"+ userID+"'";
+
 }
 exports.readMessage=function(MessageSerNum)
 {

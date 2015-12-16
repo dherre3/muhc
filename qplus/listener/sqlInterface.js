@@ -7,6 +7,7 @@ var CryptoJS=require('crypto-js');
 
 
 
+
 /*
 *Connecting to mysql database
 *
@@ -463,12 +464,14 @@ var LoadAttachments = function (rows )
 function loadImageDoctor(rows){
   var deferred = Q.defer();
   for (var key in rows){
-
+    console.log(rows[key].ProfileImage.length);
     if((typeof rows[key].ProfileImage !=="undefined" )&&rows[key].ProfileImage){
+
       var n = rows[key].ProfileImage.lastIndexOf(".");
       var substring=rows[key].ProfileImage.substring(n+1,rows[key].ProfileImage.length);
       rows[key].DocumentType=substring;
       rows[key].ProfileImage=filesystem.readFileSync(__dirname + '/Doctors/'+rows[key].ProfileImage,'base64' );
+
     }
   }
   deferred.resolve(rows);
