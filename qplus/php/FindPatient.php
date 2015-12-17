@@ -33,17 +33,20 @@ SELECT DISTINCT
 	 Doctor.LastName AS DoctorLastName,
 	 PatientDoctor.PrimaryFlag,
 	 PatientDoctor.OncologistFlag,
+     Photo.Picture, 
 	 Patient.SSN,
 	 Patient.PatientId,
 	 Diagnosis.Description
 	 FROM
 	 variansystem.dbo.Patient Patient,
+     variansystem.dbo.Photo Photo,
 	 variansystem.dbo.Diagnosis Diagnosis,
 	 variansystem.dbo.PatientActuals PatientActuals,
 	 variansystem.dbo.PatientDoctor PatientDoctor,
 	 variansystem.dbo.Doctor Doctor
 	 WHERE
-	 Patient.SSN LIKE '%".$PatientSSN."%'
+	 Patient.SSN LIKE '%".$PatientSSN."%' 
+     AND Photo.PatientSer = Patient.PatientSer 
 	 AND Patient.SSN=PatientActuals.SSN
 	 AND PatientActuals.PatientSer=Diagnosis.PatientSer
 	 AND PatientActuals.PatientSer=PatientDoctor.PatientSer

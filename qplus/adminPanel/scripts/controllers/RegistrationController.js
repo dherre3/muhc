@@ -75,7 +75,7 @@ $scope.alert={};
         api.getFieldFromServer(msURL,{PatientSSN:ssn}).then(function(response)
         {
           $scope.ariaResponse=response;
-          //console.log(response);
+          console.log(response);
           if(response.response=="Patient has already been registered!")
           {
             $scope.patientFound=false;
