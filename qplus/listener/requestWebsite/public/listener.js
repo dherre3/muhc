@@ -12,6 +12,7 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
       console.log(data);
       if(data.type=='UploadToFirebase')
       {
+        var ref=new Firebase('https://brilliant-inferno-7679.firebaseio.com/');
         uploadToFirebase(data.requestKey, data.encryptionKey,data.requestObject, data.object);
       }else if(data.type=='CompleteRequest')
       {

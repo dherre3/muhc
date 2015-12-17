@@ -4,6 +4,7 @@ var Q           =require('q');
 var queries=require('./queries.js');
 var credentials=require('./credentials.js');
 var CryptoJS=require('crypto-js');
+var buffer=require('buffer');
 
 
 
@@ -481,13 +482,19 @@ function loadImageDoctor(rows){
 
 function loadProfileImagePatient(rows){
   var deferred = Q.defer();
-  if(typeof rows[0].ProfileImage!=='undefined' && rows[0].ProfileImage!=='')
+  if(rows[0].ProfileImage && rows[0].ProfileImage!=='')
   {
-    var n = rows[0].ProfileImage.lastIndexOf(".");
+    var buffer=new Buffer(rows[0].ProfileImage,'hex');
+    var base64Buffer=buffer.toString('base64');
+    rows[0].DocumentType='jpg';
+    rows[0].ProfileImage=base64Buffer;
+    console.log(base64Buffer);
+    deferred.resolve(rows);
+    /*var n = rows[0].ProfileImage.lastIndexOf(".");
     var substring=rows[0].ProfileImage.substring(n+1,rows[0].ProfileImage.length);
     rows[0].DocumentType=substring;
     rows[0].ProfileImage=filesystem.readFileSync(__dirname + '/Patients/'+ rows[0].ProfileImage,'base64' );
-    deferred.resolve(rows);
+    deferred.resolve(rows);*/
   }else{
     deferred.resolve(rows);
   }
