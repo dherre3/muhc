@@ -39,11 +39,17 @@ exports.login = function (requestObject) {
 
                                   sqlInterface.getPatientTasks(UserID).then(function (rows) {
                                       objectToFirebase.Tasks = rows;
-                                      /*
+                                      
+                                      sqlInterface.getPatientLabTests(UserID).then(function(rows){
+                                         /*
                                        * Add additional fields for login in here!!!!
                                        */
-                                      sqlInterface.addToActivityLog(requestObject);
-                                      r.resolve(objectToFirebase);
+                                        objectToFirebase.LabTests=rows;
+                                        sqlInterface.addToActivityLog(requestObject);
+                                        r.resolve(objectToFirebase);
+                                      });
+
+                                     
                                   });
                               });
                           });

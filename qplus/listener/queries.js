@@ -262,3 +262,12 @@ exports.getSecurityQuestions=function(serNum)
 {
   return "SELECT Question, Answer FROM SecurityQuestion WHERE PatientSerNum="+serNum;
 }
+
+exports.patientLabResultsQuery=function(userID)
+{
+  return "SELECT ComponentName, FacComponentName, AbnormalFlag, MaxNorm, MinNorm, "+
+  "TestValue, TestValueString, UnitDescription, CAST(TestDate AS char(30)) as `TestDate`"+
+  " FROM TestResult, Users, Patient "+
+  'WHERE Users.UserTypeSerNum=Patient.PatientSerNum AND '+
+  'Users.Username Like '+"'"+ userID+"'";
+}

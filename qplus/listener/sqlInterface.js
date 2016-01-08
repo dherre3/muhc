@@ -145,6 +145,18 @@ exports.getPatient=function(UserID)
   });
   return r.promise;
 }
+
+exports.getPatientLabTests=function(UserID)
+{
+  var r=Q.defer();
+  console.log(queries.patientLabResultsQuery(UserID));
+  connection.query(queries.patientLabResultsQuery(UserID), function(error, rows, fields)
+  {
+    if (error) r.reject(error);
+    r.resolve(rows);
+  });
+  return r.promise;
+}
 exports.getPatientDoctors=function(UserID)
 {
   var r=Q.defer();
@@ -390,7 +402,8 @@ var tableMappings=
   'Appointments':exports.getPatientAppointments,
   'Notifications':exports.getPatientNotifications,
   'Tasks':exports.getPatientTasks,
-  'Documents':exports.getPatientDocuments
+  'Documents':exports.getPatientDocuments,
+  'LabTests':exports.getPatientLabTests
 };
 
 function getPatientFromUserID(UserID)

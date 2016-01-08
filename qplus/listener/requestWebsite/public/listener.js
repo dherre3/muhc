@@ -7,6 +7,7 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
     location.reload();
   },1296000000);
   var ref=new Firebase('https://brilliant-inferno-7679.firebaseio.com/');
+  ref.auth('9HeH3WPYe4gdTuqa88dtE3KmKy7rqfb4gItDRkPF');
   ref.child('requests').on('child_added',function(request){
     $.post("http://172.26.66.41:8010/login",{key: request.key(),objectRequest: request.val()}, function(data){
       console.log(data);
