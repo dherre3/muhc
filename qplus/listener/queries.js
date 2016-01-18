@@ -144,21 +144,22 @@ exports.patientNotificationsQuery=function(userID)
                       'Notifications.NotificationSerNum, '+
                       'Notifications.Type, '+
                       'Notifications.TypeSerNum, '+
-                      'Notifications.NotificationPublishedType_FR, '+
-                      'Notifications.NotificationPublishedType_EN, '+
-                      'Notifications.NotificationContent_FR, '+
-                      'Notifications.NotificationContent_EN, '+
+                      'Notifications.AliasSerNum, '+
                       'Notifications.ReadStatus, '+
                       'Notifications.DateAdded, '+
-                      'Resource.ResourceName '+
+                      'Alias.AliasName_FR, '+
+                      'Alias.AliasDescription_EN, '+
+                      'Alias.AliasName_EN, '+
+                      'Alias.AliasDescription_FR '+
                     'From '+
                       'Notifications, '+
                       'Patient, '+
                       'Resource, '+
-                      'Users ' +
+                      'Users, ' +
+                      'Alias ' +
                     'WHERE '+
+                      'Alias.AliasSerNum = Notifications.AliasSerNum AND '+
                       'Patient.PatientSerNum = Notifications.PatientSerNum AND '+
-                      'Resource.ResourceSerNum = Notifications.ResourceSerNum AND ' +
                       'Users.UserTypeSerNum=Patient.PatientSerNum AND '+
                       'Users.Username Like '+"'"+ userID+"'";
 }

@@ -220,6 +220,7 @@ exports.getPatientNotifications=function(UserID)
 {
   var r=Q.defer();
   connection.query(queries.patientNotificationsQuery(UserID),function(error,rows,fields){
+      console.log(error);
       if (error) r.reject(error);
       r.resolve(rows);
   });
