@@ -21,6 +21,40 @@ var myApp=angular.module('MUHCApp')
 myApp.controller('LoginController', ['ResetPassword','$scope','$timeout', '$rootScope', '$state', 'UserAuthorizationInfo', 'RequestToServer', function (ResetPassword,$scope,$timeout, $rootScope, $state, UserAuthorizationInfo,RequestToServer,UserPreferences) {
   //$scope.platformBoolean=(ons.platform.isAndroid()&&ons.platform.isIOS());
   var myDataRef = new Firebase('https://brilliant-inferno-7679.firebaseio.com');
+  myDataRef.authWithCustomToken("AUTH_TOKEN", function(error, authData) {
+  if (error) {
+    console.log("Authentication Failed!", error);
+  } else {
+    console.log("Authenticated successfully with payload:", authData);
+    
+    UserAuthorizationInfo.setUserAuthData(authData.auth.uid, CryptoJS.SHA256($scope.password).toString(), authData.expires);
+    userId = authData.uid;
+    //Obtaining fields links for patient's firebase
+    var patientLoginRequest='request/'+userId;
+    var patientDataFields='Users/'+userId;
+    //Updating Patients references to signal backend to upload data
+    //myDataRef.child(patientLoginRequest).update({LogIn:true});
+    //Setting The User Object for global Application Use
+    console.log($scope.email);
+    var authenticationToLocalStorage={
+            UserName:authData.uid,
+            Password: CryptoJS.SHA256($scope.password).toString(),
+            Expires:authData.expires,
+            Email:$scope.email
+    }
+    $rootScope.refresh=true;
+    window.localStorage.setItem('UserAuthorizationInfo', JSON.stringify(authenticationToLocalStorage));
+    window.localStorage.setItem('pass', $scope.password);
+    console.log(UserAuthorizationInfo.getUserAuthData());
+    console.log("Authenticated successfully with payload:", authData);
+    RequestToServer.setIdentifier().then(function(uuid)
+    {
+      RequestToServer.sendRequest('Login',userId);
+      $state.go('loading');
+    });
+        
+  }
+});
   console.log(ResetPassword);
   var authInfo=window.localStorage.getItem('UserAuthorizationInfo');
   if(authInfo){
