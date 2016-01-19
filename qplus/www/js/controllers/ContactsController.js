@@ -30,13 +30,7 @@ myApp.controller('ContactsController',['$scope','Doctors','$timeout','UpdateUI',
        });
    }
     $scope.goDoctorContact=function(doctor){
-        if(doctor===undefined){
-
-            myNavigator.pushPage('templates/contacts/individual-contact.html', {param:{doctor:$scope.primaryPhysician,
-                flagInConversation:0}},{ animation : 'slide' } );
-        }else{
-            myNavigator.pushPage('templates/contacts/individual-contact.html', {param:{doctor:doctor,flagInConversation:0}},{ animation : 'slide' } );
-        }
+        myNavigator.pushPage('templates/contacts/individual-contact.html', {param:{doctor:doctor,flagInConversation:0}},{ animation : 'slide' } );
     };
 }]);
 /**

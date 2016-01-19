@@ -39,12 +39,14 @@ myApp.service('UserAuthorizationInfo', function () {
             this.Password=password;
         },
         setPassword:function(password){
+            password=CryptoJS.SHA256(password).toString();
             this.Password=password;
+            console.log(this.Password);
             window.localStorage.setItem('pass',password);
-            var passString=window.localStorage.getItem('MUHCApp');
+            var passString=window.localStorage.getItem('UserAuthorizationInfo');
             passObject=JSON.parse(passString);
-            passObject.UserAuthorizationInfo.Password=password;
-            window.localStorage.setItem('MUHCApp', JSON.stringify(passObject));
+            passObject.Password=password;
+            window.localStorage.setItem('UserAuthorizationInfo', JSON.stringify(passObject));
         },
           /**
         }

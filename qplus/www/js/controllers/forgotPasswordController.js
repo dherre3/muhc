@@ -1,62 +1,47 @@
-angular.module('MUHCApp').controller('forgotPasswordController', ['$scope', '$state', function ($scope, $state) {
-    console.log("boom");
-    //$scope.forgotPassword.email=" ";
-
-    function clearText() {
-        document.getElementById('emailFieldForgot').value = "";
-    }
-
-    function displayChatMessageError(text) {
-        $(".addMe").html("");
-        if (name !== "logged") {
-            $(".addMe").append("<h5 class='bg-danger'><strong>" + text + "</strong></h5>");
-            //$('<div/>').text(text).appendTo($('#addMe'));
-            $('.addMe')[0].scrollTop = $('#addMe')[0].scrollHeight;
-        }
-    }
-
-    function displayChatMessageSuccess(text) {
-        $(".addMe").html("");
-        if (name !== "logged") {
-            $(".addMe").append("<h5 class='bg-success'><strong>" + text + "</strong></h5>");
-            //$('<div/>').text(text).appendTo($('#addMe'));
-            $('.addMe')[0].scrollTop = $('#addMe')[0].scrollHeight;
-        }
-    }
-    $scope.submitPasswordReset = function () {
-
-        var emailUser = $scope.forgotPassword.email;
-
-
-
-        var ref = new Firebase("https://luminous-heat-8715.firebaseio.com");
-        ref.resetPassword({
-            email: emailUser
-        }, function (error) {
+var myApp=angular.module('MUHCApp');
+myApp.controller('ForgotPasswordController', ['$scope', '$state','$timeout', function ($scope, $state,$timeout) {
+    $scope.email="";
+    $scope.alert={};
+    $scope.submitPasswordReset = function (email) {
+        var ref = new Firebase("https://brilliant-inferno-7679.firebaseio.com/");
+        console.log(email);
+        try{
+          ref.resetPassword({
+            email: email
+          }, function(error) {
             if (error) {
-                switch (error.code) {
-                    case "INVALID_USER":
-                        console.log("The specified user account does not exist.");
-                        displayChatMessageError(error);
-                        clearText();
+              switch (error.code) {
+                case "INVALID_USER":
+                  console.log("The specified user account does not exist.");
+                  $timeout(function(){
+                    $scope.alert.type="danger";
+                    $scope.alert.content="The specified user account does not exist.";
+                  });
 
-                        break;
-                    default:
-                        displayChatMessageError(error);
-                        clearText();
-                        console.log("Error resetting password:", error);
-                }
+                  break;
+                default:
+                  console.log(error);
+                  $timeout(function(){
+                    $scope.alert.type="danger";
+                    $scope.alert.content="Enter a valid email address";
+                  });
+              }
             } else {
-                console.log("Password reset email sent successfully!");
-                setTimeout(function () {
-                    $state.go('logIn.enter');
-                }, 5000);
-                displayChatMessageSuccess("Temporary Password has been sent to your email address, you will be redirected to the login page");
-                //$state.go('logIn.enter');
-
-
+              console.log("Password reset email sent successfully!");
+              $timeout(function(){
+                $scope.alert.type="success";
+                $scope.alert.content="Password has been reset sucessfully, check your email for your temporary password!";
+              });
             }
-        });
+          });
+        }catch(err){
+          console.log(err);
+          $timeout(function(){
+            $scope.alert.type="danger";
+            $scope.alert.content="Enter a valid email address";
+          });
+        }
+
 
     };
 }]);

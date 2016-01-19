@@ -9,7 +9,7 @@ var myApp=angular.module('MUHCApp');
 *@requires $cordovaCalendar
 *@description Sets the User appointment objects for the different views.
 **/
-myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserAuthorizationInfo', '$filter', function ($q,RequestToServer, $cordovaCalendar, UserAuthorizationInfo, $filter) {
+myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserAuthorizationInfo', '$filter', 'UserPreferences',function ($q,RequestToServer, $cordovaCalendar, UserAuthorizationInfo, $filter,UserPreferences) {
     /**
     *@ngdoc property
     *@name  UserAppointmentsArray
@@ -55,44 +55,90 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
         return -1;
 
       }
-        function findAppointmentInNativeCalendar(app)
+      function manageAppointmentsInNativeCalendar(appointments,index)
+      {
+        //var appointments=this.UserAppointmentsArray;
+        var indexValue=index;
+        var r=$q.defer();
+        var today=new Date();
+        if(index===appointments.length||typeof index=='undefined')
         {
-            var r=$q.defer();
-            var appointmentsString=window.localStorage.getItem('NativeCalendarAppoinments');
-
-            if(!appointmentsString){
-                r.reject(app);
+          r.resolve('Done adding all appointments');
+        }else{
+          var startDate=appointments[indexValue].ScheduledStartTime;
+          console.log(appointments[indexValue]);
+          if(today<startDate)
+          {
+            var eventToCalendar={};
+            var tmp=new Date(appointments[indexValue].ScheduledStartTime);
+            var endDate = tmp.setHours(startDate.getHours()+1);
+            eventToCalendar.startDate=startDate;
+            eventToCalendar.endDate=endDate;
+            (UserPreferences.getLanguage()=='EN')?eventToCalendar.title=appointments[indexValue].AppointmentType_EN:eventToCalendar.title=appointments[indexValue].AppointmentType_FR;
+            eventToCalendar.location=appointments[index].Location;
+            eventToCalendar.notes='Source: ' +appointments[indexValue].ResourceName;
+            if(isAppointmentInNativeCalendar(appointments[indexValue].AppointmentSerNum))
+            {
+              console.log('Found event in Calendar');
+              var newIndex=indexValue+1;
+              r.resolve(manageAppointmentsInNativeCalendar(appointments,newIndex));
             }else{
-                console.log(appointmentString);
-                appointmentsObject=JSON.parse(appointmentsString);
-                var appointments=appointmentsObject.AppointmentList;
-                for(var i=0;i<appointments.length;i++){
-                     var startDateApp=appointments[i].AppointmentSerNum;
-                     if(startDateApp==app.AppointmentSerNum){
-                        r.resolve(true);
-                        return r.promise;
-                     }
-                }
-                r.reject(app);
+              $cordovaCalendar.createEvent(eventToCalendar).then(function (result) {
+                  addEventToNativeCalendar(appointments[indexValue].AppointmentSerNum);
+                  var newIndex=indexValue+1;
+                  r.resolve(manageAppointmentsInNativeCalendar(appointments,newIndex));
+              }, function (err) {
+                  console.log(err);
+                   navigator.notification.alert(
+                      'An error occured while adding your appointments',  // message
+                      function(error){
+                        console.log(error);
+                      },         // callback
+                      'Error',            // title
+                      'OK'                  // buttonName
+                  );
+                  var newIndex=indexValue+1;
+                  r.resolve(manageAppointmentsInNativeCalendar(appointments,newIndex));
+              });
             }
 
-            return r.promise;
+          }else{
+            var newIndex=indexValue+1;
+            r.resolve(manageAppointmentsInNativeCalendar(appointments,newIndex));
+          }
         }
-        function addEventToNativeCalendar(app){
+        return r.promise;
+      }
+        function isAppointmentInNativeCalendar(serNum)
+        {
+            var appointmentsString=window.localStorage.getItem('NativeCalendarAppoinments');
+            if(!appointmentsString){
+                return false;
+            }else{
+                console.log(appointmentsString);
+                appointmentsObject=JSON.parse(appointmentsString);
+                var appointmentList=appointmentsObject.AppointmentList;
+                for(var i=0;i<appointmentList.length;i++){
+                     if(appointmentList[i]===serNum){
+                        return true;
+                     }
+                }
+                return false;
+            }
+        }
+        function addEventToNativeCalendar(serNum){
             var appointmentsString=window.localStorage.getItem('NativeCalendarAppoinments');
             if(appointmentsString){
                 appointmentsObject=JSON.parse(appointmentsString);
-                appointmentsObject.AppointmentList.push(app);
+                appointmentsObject.AppointmentList.push(serNum);
                 appointmentString=JSON.stringify(appointmentsObject);
                 window.localStorage.setItem('NativeCalendarAppoinments',appointmentString);
             }else{
                 objectToLocalStorage={};
-                objectToLocalStorage.AppointmentList=[];
-                objectToLocalStorage.AppointmentList.push(app);
+                objectToLocalStorage.AppointmentList=[serNum];
                 appointmentString=JSON.stringify(objectToLocalStorage);
                 window.localStorage.setItem('NativeCalendarAppoinments',appointmentString);
             }
-
         }
     return {
 
@@ -362,56 +408,30 @@ myApp.service('Appointments', ['$q', 'RequestToServer','$cordovaCalendar','UserA
         },
         checkinNextAppointment:function()
         {
+          console.log()
           this.FutureAppointments[0].Checkin='1';
           var nextAppointmentSerNum=this.FutureAppointments[0].AppointmentSerNum;
+          console.log(this.FutureAppointments[0].AppointmentSerNum);
+          console.log(this.TodayAppointments);
           var index=findAppointmentIndexInArray(this.TodayAppointments, nextAppointmentSerNum);
-          this.TodayAppointments[index].Checkin='1'
+
+          this.TodayAppointments[index].Checkin='1';
           this.UserAppointmentsArray[this.NextAppointment.Index].Checkin='1';
 
         },
         checkAndAddAppointmentsToCalendar:function(){
-            var appointments=this.UserAppointmentsArray;
-            for(var i=0;i<appointments.length;i++){
-                var startDate=appointments[i].ScheduledStartTime;
-                var endDate = appointments[i].ScheduledEndTime;
-                var title=appointments[i].AppointmentType_EN;
-                var location=appointments[i].Location;
-                var notes='Source: ' +appointments[i].ResourceName;
-                var eventToCalendar={};
-                eventToCalendar={
-                    title: title,
-                    location: location,
-                    notes: notes,
-                    startDate: startDate,
-                    endDate: endDate,
-                    AppointmentSerNum:appointments[i].AppointmentSerNum
-                    };
-                findAppointmentInNativeCalendar(eventToCalendar).then(function(success){
-                    console.log('Found events in Calendar');
-                },function(app){
-                    eventToNative={};
-                    eventToNative.title=app.title;
-                    eventToNative.location=app.location;
-                    eventToNative.notes=app.notes;
-                    eventToNative.startDate=app.startDate;
-                    eventToNative.endDate=app.endDate;
-                    console.log('Did not find the event, procceding to adding event');
-                    addEventToNativeCalendar(app);
-                    $cordovaCalendar.createEvent(eventToNative).then(function (result) {
-                        console.log('appointment added');
-                    }, function (err) {
-                         navigator.notification.alert(
-                            'An error occured while adding your appointments',  // message
-                            alertDismissed,         // callback
-                            'Error',            // title
-                            'OK'                  // buttonName
-                        );
-                });
-                });
-
-
-            }
-
+          var r=$q.defer();
+          if(this.UserAppointmentsArray.length>0)
+          {
+            console.log(this.UserAppointmentsArray.length);
+            manageAppointmentsInNativeCalendar(this.UserAppointmentsArray,0).then(
+              function(app){
+                r.resolve(app);
+              });
+          }else{
+            r.resolve('No appointments');
+          }
+          return r.promise;
         }
     };
 }]);

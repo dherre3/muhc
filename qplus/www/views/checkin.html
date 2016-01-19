@@ -29,10 +29,15 @@
   <div >
   <div align="center" style="width:100%;padding-top:25vh" class="container">
     <p style="color:grey;font-size:13px">{{shownAppointmentText}}</p>
-    <ons-icon ng-show="sameDay && !infoReady" icon="spinner" size="40px" spin="true" fixed-width="true"></ons-icon>
     <button type="button" ng-disabled='!enableCheckin' class="btn btn-primary btn-circle btn-xl" ng-click="checkin()"><i class="fa fa-check-square-o"></i>
       <br>Checkin</button>
     <p style="font-size:13px">{{alert.message}}</p>
+    <div ng-show="loading">
+      <div class="progress-bar progress-bar--indeterminate">
+        <div class="progress-bar__primary"></div>
+        <div class="progress-bar__secondary"></div>
+      </div>
+    </div>
   </div>
 </div>
 </ons-page>

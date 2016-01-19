@@ -40,7 +40,10 @@ function ($rootScope, UserPreferences, Appointments,$cordovaCalendar,$scope) {
                 navigator.notification.confirm(message, confirmCallback, 'Access Calendar', ["Don't allow",'Ok'] );
             }else if( Number(nativeCalendarOption)===1){
                 console.log('option was one!')
-                Appointments.checkAndAddAppointmentsToCalendar();
+                Appointments.checkAndAddAppointmentsToCalendar().then(function(eventSuccession)
+                {
+                  console.log(eventSuccession);
+                });
             }else{
                 console.log('Opted out of appointments in native calendar');
             }
@@ -57,7 +60,10 @@ function ($rootScope, UserPreferences, Appointments,$cordovaCalendar,$scope) {
         console.log(index);
         window.localStorage.setItem('NativeCalendar', 1);
         console.log('Allowed!');
-        Appointments.checkAndAddAppointmentsToCalendar();
+        Appointments.checkAndAddAppointmentsToCalendar().then(function(eventSuccession)
+        {
+          console.log(eventSuccession);
+        });
     }
     }
 

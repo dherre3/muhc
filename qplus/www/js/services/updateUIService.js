@@ -1,38 +1,70 @@
 var myApp=angular.module('MUHCApp');
 
 
-myApp.service('UpdateUI', ['EncryptionService','$http', 'Patient','Doctors','Appointments','Messages','Documents','UserPreferences', 'UserAuthorizationInfo', '$q', 'Notifications', 'UserPlanWorkflow','$cordovaNetwork', 'Notes', 'LocalStorage','RequestToServer',function (EncryptionService,$http, Patient,Doctors, Appointments,Messages, Documents, UserPreferences, UserAuthorizationInfo, $q, Notifications, UserPlanWorkflow,$cordovaNetwork,Notes,LocalStorage,RequestToServer) {
-    function updateAllServices(dataUserObject,mode){
-        function setDocuments(dataUserObject){
-            var setDocProm=$q.defer();
-            console.log(dataUserObject.Documents);
-            Documents.setDocuments(dataUserObject.Documents,mode);
-            setDocProm.resolve(true);
-            return setDocProm.promise;
+myApp.service('UpdateUI', ['EncryptionService','$http', 'Patient','Doctors','Appointments','Messages','Documents','UserPreferences', 'UserAuthorizationInfo', '$q', 'Notifications', 'UserPlanWorkflow','$cordovaNetwork', 'Notes', 'LocalStorage','RequestToServer','$filter','LabResults',function (EncryptionService,$http, Patient,Doctors, Appointments,Messages, Documents, UserPreferences, UserAuthorizationInfo, $q, Notifications, UserPlanWorkflow,$cordovaNetwork,Notes,LocalStorage,RequestToServer,$filter,LabResults) {
+    function updateTestResultsService(){
+      var testResultFirebaseLink = new Firebase('https://blinding-fire-4647.firebaseio.com/m/requests');
+      testResultFirebaseLink.once('value', function (snapshot) {
+          var data = snapshot.val();
+          LabResults.setTestResults(data);
+      });
+    }
 
+    function updateAllServices(dataUserObject,mode){
+        console.log(mode);
+        var promises=[];
+        console.log(dataUserObject);
+        if(mode=='Online')
+        {
+          var documents=dataUserObject.Documents;
+          var documentProm=Documents.setDocumentsOnline(documents);
+          var doctors=dataUserObject.Doctors;
+          var doctorProm=Doctors.setUserContactsOnline(doctors);
+          var patientFields=dataUserObject.Patient;
+          var patientProm=Patient.setUserFieldsOnline(patientFields, dataUserObject.Diagnosis);
+          console.log(patientProm);
+          promises=[doctorProm,documentProm,patientProm];
+        }else{
+          var documentProm=Documents.setDocumentsOffline(dataUserObject.Documents);
+          var doctorProm=Doctors.setUserContactsOffline(dataUserObject.Doctors);
+          var patientProm=Patient.setUserFieldsOffline(dataUserObject.Patient, dataUserObject.Diagnosis);
+          promises=[documentProm,doctorProm,patientProm];
         }
-        setDocuments(dataUserObject).then(function(){
-            UserPlanWorkflow.setUserPlanWorkflow({
-                '1':{'Name':'CT for Radiotherapy Planning','Date':'2015-10-19T09:00:00Z','Description':'stage1','Type': 'Appointment'},
-                '2':{'Name':'Physician Plan Preparation','Date':'2015-10-21T09:15:00Z','Description':'stage2','Type':'Task'},
-                '3':{'Name':'Calculation of Dose','Date':'2015-10-23T09:15:00Z','Description':'stage3','Type':'Task'},
-                '4':{'Name':'Physician Review','Date':'2015-10-26T09:15:00Z','Description':'stage4','Type':'Task'},
-                '5':{'Name':'Quality Control','Date':'2015-10-28T10:15:00Z','Description':'stage5','Type':'Task'},
-                '6':{'Name':'Scheduling','Date':'2015-10-30T09:15:00Z','Description':'stage6','Type':'Task'},
-                '7':{'Name':'First Treatment','Date':'2015-11-02T09:15:00Z','Description':'stage6','Type':'Task'}
-            });
+        $q.all(promises).then(function(){
+          console.log('I am inside!!!');
+          console.log(dataUserObject);
+          Messages.setUserMessages(dataUserObject.Messages);
+          Notifications.setUserNotifications(dataUserObject.Notifications);
+          UserPlanWorkflow.setTreatmentPlan(dataUserObject.Tasks, dataUserObject.Appointments);
+          var plan={
+              '1':{'Name':'CT for Radiotherapy Planning','Date':'2015-10-19T09:00:00Z','Description':'stage1','Type': 'Appointment'},
+              '2':{'Name':'Physician Plan Preparation','Date':'2015-10-21T09:15:00Z','Description':'stage2','Type':'Task'},
+              '3':{'Name':'Calculation of Dose & Physician Review','Date':'2015-10-23T09:15:00Z','Description':'stage3','Type':'Task'},
+              '4':{'Name':'Quality Control','Date':'2015-10-28T10:15:00Z','Description':'stage5','Type':'Task'},
+              '5':{'Name':'Scheduling','Date':'2015-10-30T09:15:00Z','Description':'stage6','Type':'Task'},
+              '6':{'Name':'First Treatment','Date':'2015-11-02T09:15:00Z','Description':'stage6','Type':'Task'}
+          };
+          var newDate=new Date();
+          var valAdded=-6;
+
+          for (var key in plan) {
+            var tmp=new Date(newDate);
+            tmp.setDate(tmp.getDate()+valAdded);
+            valAdded+=2;
+            plan[key].Date=$filter('formatDateToFirebaseString')(tmp);
+          }
+          	LabResults.setTestResults(dataUserObject.LabTests);
+            console.log(plan);
+            UserPlanWorkflow.setUserPlanWorkflow(plan);
             UserPreferences.setUserPreferences(dataUserObject.Patient.Language,dataUserObject.Patient.EnableSMS);
-            Doctors.setUserContacts(dataUserObject.Doctors);
-            Patient.setUserFields(dataUserObject.Patient, dataUserObject.Diagnosis);
             Appointments.setUserAppointments(dataUserObject.Appointments);
-            setUpForNews().then( Notifications.setUserNotifications(dataUserObject.Notifications));
             Notes.setNotes(dataUserObject.Notes);
-            function setUpForNews(){
-                var r=$q.defer();
-                Messages.setUserMessages(dataUserObject.Messages);
-                r.resolve(true);
-                return r.promise;
+            console.log(dataUserObject);
+            if(mode=='Online')
+            {
+              LocalStorage.WriteToLocalStorage('All',dataUserObject);
             }
+
         });
     }
 
@@ -78,29 +110,25 @@ myApp.service('UpdateUI', ['EncryptionService','$http', 'Patient','Doctors','App
         var userName=UserAuthorizationInfo.getUserName();
         var dataUserString=window.localStorage.getItem(userName);
         var dataUserObject=JSON.parse(dataUserString);
-        updateAllServices(dataUserObject,'Offline');
-        r.resolve(true);
+        r.resolve(updateAllServices(dataUserObject,'Offline'));
         return r.promise;
     }
     function UpdateSectionOffline(section)
     {
         var r=$q.defer();
         var data='';
-        if(section!='UserPreferences'){
-            data=LocalStorage.ReadLocalStorage(section);
-        }else{
-            data=LocalStorage.ReadLocalStorage('Patient');
-        }
+        console.log(section);
+        data=LocalStorage.ReadLocalStorage(section);
+        console.log(data);
         switch(section){
             case 'All':
-                updateAllServices(data,'Offline');
-
+                updateAllServices(data, 'Offline');
                 break;
             case 'Doctors':
-                Doctors.setUserContacts(data);
+                Doctors.setUserContactsOnline(data);
                 break;
             case 'Patient':
-                Patient.setUserFields(data);
+                Patient.setUserFieldsOnline(data);
                 break;
             case 'Appointments':
                 Appointments.setUserAppointments(data);
@@ -109,7 +137,7 @@ myApp.service('UpdateUI', ['EncryptionService','$http', 'Patient','Doctors','App
                 Messages.setUserMessages(data);
                 break;
             case 'Documents':
-                Documents.setDocuments(data,'Offline');
+                Documents.setDocumentsOffline(data);
                 break;
             case 'UserPreferences':
                 UserPreferences.setUserPreferences(data.Language,data.EnableSMS);
@@ -120,11 +148,16 @@ myApp.service('UpdateUI', ['EncryptionService','$http', 'Patient','Doctors','App
             case 'Notes':
                 Notes.setNotes(data);
                 break;
+            case 'LabTests':
+                LabResults.setTestResults(data);
+                break;
             case 'UserPlanWorkflow':
             //To be done eventually!!!
             break;
-        }
-        r.resolve(true);
+          }
+          setTimeout(function () {
+              r.resolve(true);
+          }, 7000);
         return r.promise;
     }
     function UpdateSectionOnline(section)
@@ -150,16 +183,15 @@ myApp.service('UpdateUI', ['EncryptionService','$http', 'Patient','Doctors','App
             if(data!=undefined){
                 console.log(data);
                 data=EncryptionService.decryptData(data);
-                LocalStorage.WriteToLocalStorage(section,data);
                 switch(section){
                     case 'All':
                         updateAllServices(data, 'Online');
+                        break;
                     case 'Doctors':
-                        console.log(data);
-                        Doctors.setUserContacts(data);
+                        Doctors.setUserContactsOnline(data);
                         break;
                     case 'Patient':
-                        Patient.setUserFields(data);
+                        Patient.setUserFieldsOnline(data);
                         break;
                     case 'Appointments':
                         Appointments.setUserAppointments(data);
@@ -168,7 +200,7 @@ myApp.service('UpdateUI', ['EncryptionService','$http', 'Patient','Doctors','App
                         Messages.setUserMessages(data);
                         break;
                     case 'Documents':
-                        Documents.setDocuments(data,'Online');
+                        Documents.setDocumentsOnline(data,'Online');
                         break;
                     case 'UserPreferences':
                         UserPreferences.setUserPreferences(data.Language,data.EnableSMS);
@@ -178,6 +210,9 @@ myApp.service('UpdateUI', ['EncryptionService','$http', 'Patient','Doctors','App
                         break;
                     case 'Notes':
                         Notes.setNotes(data);
+                        break;
+                    case 'LabTests':
+                        LabResults.setTestResults(data);
                         break;
                     case 'UserPlanWorkflow':
                     //To be done eventually!!!
@@ -193,6 +228,8 @@ myApp.service('UpdateUI', ['EncryptionService','$http', 'Patient','Doctors','App
 
         return r.promise;
     }
+
+    this.internetConnection=false;
     return {
         UpdateUserFields:function(){
             //Check if its a device or a computer
@@ -215,28 +252,44 @@ myApp.service('UpdateUI', ['EncryptionService','$http', 'Patient','Doctors','App
                 }
              }
         },
-
+        UpdateOffline:function(section)
+        {
+          return UpdateSectionOffline(section);
+        },
+        UpdateOnline:function(section)
+        {
+          return UpdateSectionOnline(section);
+        },
         UpdateSection:function(section)
         {
-
             var r=$q.defer();
             var app = document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1;
             if(app){
                 if($cordovaNetwork.isOnline()){
+                    this.internetConnection=true;
                     return UpdateSectionOnline(section);
                 }else{
+                    this.internetConnection=false;
+                    //navigator.notification.alert('Connect to the internet for your most recent data, loading last saved data from device. Your documents will not be available',function(){},'Internet Connectivity','Ok');
                     return UpdateSectionOffline(section);
                 }
             }else{
                 //Computer check if online
                 if(navigator.onLine){
                     console.log('online website');
+                    this.internetConnection=true;
                     return UpdateSectionOnline(section);
                 }else{
+                    this.internetConnection=false;
                     console.log('offline website');
                     return UpdateSectionOffline(section);
                 }
              }
+            return r.promise;
+        },
+        getInternetConnection:function()
+        {
+          return this.internetConnection;
         }
 
     };

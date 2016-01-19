@@ -13,6 +13,7 @@ angular.module('MUHCApp')
                 UserData.then(function(){
                             $scope.FirstName = Patient.getFirstName();
                             $scope.LastName = Patient.getLastName();
+                            $scope.Alias=Patient.getAlias();
                             $scope.Email = Patient.getEmail();
                             $scope.TelNum = Patient.getTelNum();
                             $scope.smsPreference=UserPreferences.getEnableSMS();
@@ -31,14 +32,21 @@ angular.module('MUHCApp')
           }, 3000);
         };
     accountInit();
+    myNavigatorAccount.on('postpop',function(){
+      $timeout(function(){
+        accountInit();
+      });
+
+    });
     function accountInit(){
-      var nativeCalendar=window.localStorage.getItem('NativeCalendar');
+      var nativeCalendar=Number(window.localStorage.getItem('NativeCalendar'));
       $scope.passFill='********';
       $scope.mobilePlatform=(ons.platform.isIOS()||ons.platform.isAndroid());
       (nativeCalendar)?$scope.checkboxModelCalendar=nativeCalendar:$scope.checkboxModelCalendar=0;
       $scope.checkboxModel=UserPreferences.getEnableSMS();
       $scope.FirstName = Patient.getFirstName();
       $scope.LastName = Patient.getLastName();
+      $scope.Alias=Patient.getAlias();
       $scope.Email = Patient.getEmail();
       $scope.TelNum = Patient.getTelNum();
       $scope.Language=UserPreferences.getLanguage();
@@ -112,6 +120,7 @@ angular.module('MUHCApp')
 
 
 myApp.controller('ChangingSettingController',function(tmhDynamicLocale, $translate, UserPreferences,Patient,RequestToServer,$scope,$timeout,UpdateUI, UserAuthorizationInfo){
+  console.log(UserAuthorizationInfo);
 
     accountChangeSetUp();
 
@@ -123,9 +132,9 @@ myApp.controller('ChangingSettingController',function(tmhDynamicLocale, $transla
     $scope.personal=true;
     $scope.type1='text';
     $scope.updateMessage='Your '+ $scope.value+' has been updated!';
-    if(parameters==='First Name'){
-        $scope.newValue=Patient.getFirstName();
-        $scope.instruction='Enter your new first name:'
+    if(parameters==='Alias'){
+        $scope.newValue=Patient.getAlias();
+        $scope.instruction='Enter your new alias:'
     }else if(parameters==='Last Name'){
         $scope.newValue=Patient.getLastName();
         $scope.instruction='Enter your new last name:'
@@ -203,49 +212,49 @@ myApp.controller('ChangingSettingController',function(tmhDynamicLocale, $transla
 
 
     function changePassword() {
-        var ref = new Firebase("https://luminous-heat-8715.firebaseio.com");
-
+        var ref = new Firebase("https://brilliant-inferno-7679.firebaseio.com/");
             ref.changePassword({
                 email: Patient.getEmail(),
                 oldPassword: $scope.oldValue,
                 newPassword: $scope.newValue
-            }, function (error) {
+            }, function(error) {
                 if (error) {
-                    switch (error.code) {
-                        case "INVALID_PASSWORD":
-                            $timeout(function(){
-                                $scope.alertClass="bg-danger updateMessage-error";
-                                $scope.newUpdate=true;
-                                $scope.updateMessage='Password is invalid!';
-                            });
-                            console.log("The specified user account password is incorrect.");
-                            break;
-                        default:
-                            $timeout(function(){
-                                $scope.alertClass="bg-danger updateMessage-error";
-                               $scope.newUpdate=true;
-                               $scope.updateMessage='Error changing your Password!';
-                            });
-
-                            console.log("Error changing password:", error);
-                    }
+                  switch (error.code) {
+                    case "INVALID_PASSWORD":
+                      console.log("The specified user account password is incorrect.");
+                      $timeout(function(){
+                          $scope.alertClass="danger";
+                          $scope.updateMessage='Password is invalid!';
+                      });
+                      break;
+                    case "INVALID_USER":
+                      console.log("The specified user account does not exist.");
+                      break;
+                    default:
+                      console.log("Error changing password:", error);
+                      $timeout(function(){
+                          $scope.alertClass="danger";
+                         $scope.updateMessage='Error changing your Password!';
+                      });
+                  }
                 } else {
-                    var objectToSend={};
-                    objectToSend.FieldToChange='Password';
-                    objectToSend.NewValue=$scope.newValue;
-                    RequestToServer.sendRequest('AccountChange',objectToSend);
-                    UserAuthorizationInfo.setPassword($scope.newValue);
-                    $timeout(function(){
-                        $scope.updateMessage='User password was successfully changed!';
-                        $scope.newUpdate=true;
-                    });
-                    console.log("User password changed successfully!");
+                  console.log("User password changed successfully!");
+                  var objectToSend={};
+                  objectToSend.FieldToChange='Password';
+                  objectToSend.NewValue=$scope.newValue;
+                  RequestToServer.sendRequest('AccountChange',objectToSend);
+                  UserAuthorizationInfo.setPassword($scope.newValue);
+                  $timeout(function(){
+                      $scope.alertClass="bg-success updateMessage-success";
+                      $scope.updateMessage='User password was successfully changed!';
+                      $scope.newUpdate=true;
+                  });
                 }
-            });
-    }
+              });
+            };
 
     function changeEmail() {
-        var ref = new Firebase("https://luminous-heat-8715.firebaseio.com");
+        var ref = new Firebase("https://brilliant-inferno-7679.firebaseio.com/");
 
         ref.changeEmail({
             oldEmail: Patient.getEmail(),

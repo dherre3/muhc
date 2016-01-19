@@ -5,27 +5,27 @@
 /**
  * @author MUHC Hospital, David Herrera, John Kildea
  * @copyright 2015 MUHC Hospital
- * 
+ *
  */
-/** 
+/**
  * @ngdoc overview
  * @name MUHCPatientApp
- * @description 
- * A multiplatform application built using {@link https://cordova.apache.org Apache Cordova}. The project was  written using {@link https://angularjs.org/ AngularJS} framework , and {@link https://onsen.io/ OnsenUI} Framework. This project aims to aid patients in radiation oncology 
- * at the Glen Hospital in Montreal, Quebec. The app features: Ability for patients to obtain their documents, such as their images, and test results. Look up of their Appointment calendar and details with a checkin for appointment capability, patient message system with their doctors, a treatment plan overview and progress, 
+ * @description
+ * A multiplatform application built using {@link https://cordova.apache.org Apache Cordova}. The project was  written using {@link https://angularjs.org/ AngularJS} framework , and {@link https://onsen.io/ OnsenUI} Framework. This project aims to aid patients in radiation oncology
+ * at the Glen Hospital in Montreal, Quebec. The app features: Ability for patients to obtain their documents, such as their images, and test results. Look up of their Appointment calendar and details with a checkin for appointment capability, patient message system with their doctors, a treatment plan overview and progress,
     educational material about the hospital and specific to their illness, maps of the hospitals.
    Additionally the patient can make changes to their personal account, and request changes to appointments.
    They will also be able to add their upcoming appointments to their native device calendar.
-   The main module for the project: {@link MUHCApp}. 
+   The main module for the project: {@link MUHCApp}.
    The external dependecies for the project: {@link ProjectDependencies}.
- * 
  *
- * 
+ *
+ *
  **/
 /**
 *@ngdoc object
 *@name MUHCApp
-*@description 
+*@description
 *      Main module for the app, all the external angular dependencies of the application are loaded here.
 *      The routes for the first initial login, loading, forgot password, and home templates are also defined here.
 *@requires ProjectDependencies.lueggdirectives
@@ -48,7 +48,7 @@
 /**
 *@ngdoc object
 *@name ProjectDependencies.ngAnimate
-*@description Depencency used to create jQuery like animations, but within the Angular framework in the project. 
+*@description Depencency used to create jQuery like animations, but within the Angular framework in the project.
 *Link to external reference {@link https://github.com/angular/bower-angular-animate}.
 */
 
@@ -108,7 +108,7 @@ NOTE: Once in the Home page, the routing is dealt by onsen functions. Link to ex
 //Routes for angular views
 var myApp = angular.module('MUHCApp', ['tmh.dynamicLocale','pascalprecht.translate','ngAnimate','luegg.directives','ngSanitize','ui.select','ui.router', 'onsen', 'firebase','ui.bootstrap','MUHCApp.filters','ngCordova','monospaced.elastic'])
     .config(['$urlRouterProvider', 'tmhDynamicLocaleProvider','$stateProvider', '$translateProvider', '$translatePartialLoaderProvider', function ($urlRouterProvider, tmhDynamicLocaleProvider, $stateProvider, $translateProvider, $translatePartialLoaderProvider) {
-    
+
     $urlRouterProvider.otherwise('/');
     $stateProvider.state('logIn', {
         url: '/',
@@ -123,18 +123,6 @@ var myApp = angular.module('MUHCApp', ['tmh.dynamicLocale','pascalprecht.transla
       }]
     }
 
-    }).state('forgotPassword', {
-        url: '/ForgotPassword',
-        templateUrl: 'views/logIn.forgot.html',
-        controller: 'forgotPasswordController',
-        resolve: {
-      // controller will not be loaded until $waitForAuth resolves
-      // Auth refers to our $firebaseAuth wrapper in the example above
-      "currentAuth": ["Auth", function(Auth) {
-        // $waitForAuth returns a promise so the resolve waits for it to complete
-        return Auth.$waitForAuth();
-      }]
-    }
     })
     .state('loading', {
         url: '/loading',
@@ -161,7 +149,7 @@ var myApp = angular.module('MUHCApp', ['tmh.dynamicLocale','pascalprecht.transla
         return Auth.$requireAuth();
       }]
     }
-       
+
     }).state('logOut', {
         url: '/LogOut',
         templateUrl: 'templates/logOut.html',
@@ -174,19 +162,7 @@ var myApp = angular.module('MUHCApp', ['tmh.dynamicLocale','pascalprecht.transla
         return Auth.$requireAuth();
       }]
     }
-    }).state('Portal', {
-        url: '/Portal',
-        templateUrl: 'templates/patientPortal.html',
-        controller: 'PatientPortalController',
-           resolve: {
-      // controller will not be loaded until $waitForAuth resolves
-      // Auth refers to our $firebaseAuth wrapper in the example above
-      "currentAuth": ["Auth", function(Auth) {
-        // $waitForAuth returns a promise so the resolve waits for it to complete
-        return Auth.$requireAuth();
-      }]
-    }
-    });
+  });
     $translatePartialLoaderProvider.addPart('home');
     $translateProvider.useLoader('$translatePartialLoader', {
       urlTemplate: './Languages/appTranslationTablesViews/{part}/{lang}.json'
@@ -234,7 +210,7 @@ myApp.run(function ($rootScope, $state, $stateParams,$q, $rootScope,$translate) 
 
         var redirect=redirectPage();
         redirect.then(setTimeout(function(){location.reload()},100));
-        
+
 }
 });
 });

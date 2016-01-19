@@ -1,6 +1,6 @@
 angular.module('MUHCApp')
     .controller('CheckInController', ['$scope', 'CheckinService','$timeout','Appointments', '$filter', 'RequestToServer','UpdateUI', function ($scope, CheckinService,$timeout,Appointments,$filter,RequestToServer,UpdateUI) {
-      
+
       initCheckin();
       $scope.load = function($done) {
         $timeout(function() {
@@ -19,26 +19,38 @@ angular.module('MUHCApp')
         $scope.alert={};
         if(Appointments.isThereNextAppointment())
         {
-          $scope.shownAppointmentText='The date and time of your next appointment is:'+$filter('formatDateAppointmentTask')((Appointments.getUpcomingAppointment()).ScheduledStartTime);
+          $scope.shownAppointmentText='The date and time of your next appointment is, '+$filter('formatDateAppointmentTask')((Appointments.getUpcomingAppointment()).ScheduledStartTime);
         }else{
           if(Appointments.isThereAppointments())
           {
-            $scope.shownAppointmentText='The date and time of your last appointment is:'+"\n"+ $filter('formatDateAppointmentTask')((Appointments.getLastAppointmentCompleted()).ScheduledStartTime);
+            $scope.shownAppointmentText='The date and time of your last appointment is, '+"\n"+ $filter('formatDateAppointmentTask')((Appointments.getLastAppointmentCompleted()).ScheduledStartTime);
           }else{
             $scope.shownAppointmentText='No appointments available';
           }
         }
-
+        $scope.enableCheckin=false;
         if(CheckinService.haveNextAppointmentToday())
         {
-          $scope.alert.message='You have an appointment today, checkin allowed in the vecinity of the hospital';
           if(!CheckinService.isAlreadyCheckedin())
           {
-              if(CheckinService.isAllowedToCheckin())
+            $scope.alert.message='You have an appointment today, checking your location...';
+            $scope.loading=true;
+            CheckinService.isAllowedToCheckin().then(function(response)
+            {
+              if(response)
               {
-                $scope.enableCheckin=true;
-                $scope.alert.message='Checkin to your appointment';
+                console.log(response);
+                $timeout(function(){
+                  $scope.enableCheckin=true;
+                  $scope.loading=false;
+                  $scope.alert.message='Checkin to your appointment';
+                });
+              }else{
+                $scope.alert.message='You have an appointment today, checkin allowed in the vecinity of the cancer center';
+                $scope.loading=false;
+                $scope.enableCheckin=false;
               }
+            });
           }else{
             $scope.enableCheckin=false;
             $scope.alert.message='You have checked in to your appointment, procceed to waiting room';

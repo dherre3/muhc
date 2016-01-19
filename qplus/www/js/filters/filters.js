@@ -95,6 +95,17 @@ myApp.filter('dateEmail',function($filter){
   };
 
 });
+myApp.filter('limitLetters',function($filter){
+	return function(string,num)
+	{
+		if(typeof string!=='undefined'&&string.length>num)
+		{
+			string=$filter('limitTo')(string,num);
+			string=string+'...';
+		}
+		return string;
+	}
+});
 myApp.filter('propsFilter', function() {
   return function(items, props) {
     var out = [];
@@ -124,4 +135,55 @@ myApp.filter('propsFilter', function() {
 
     return out;
   }
+});
+myApp.filter('filterDateLabTests',function()
+{
+return function(items,option)
+{
+	var ret=[];
+	if(option=='All')
+	{
+		return items;
+	}else if(option=='LastTwoMonths'){
+		var lastTwoMonths=new Date();
+		lastTwoMonths.setMonth(lastTwoMonths.getMonth()-2);
+		for (var i = 0; i < items.length; i++) {
+			if(items[i].testDateFormat > lastTwoMonths)
+			{
+				ret.push(items[i]);
+			}
+		}
+		return ret;
+}else if(option=='LastTwelveMonths'){
+	var lastTwelveMonths=new Date();
+	lastTwelveMonths.setFullYear(lastTwelveMonths.getFullYear()-1);
+	for (var i = 0; i < items.length; i++) {
+		if(items[i].testDateFormat>lastTwelveMonths)
+		{
+			ret.push(items[i]);
+		}
+	}
+	return ret;
+	}
+};
+});
+
+myApp.filter('FormatPhoneNumber',function(){
+	return function(phone)
+	{
+		console.log(typeof(phone));
+		if(typeof phone =='string'&&phone.length==10)
+		{
+			console.log('Inside string equal ten');
+			var firstDigits=phone.substring(0,3);
+			var secondDigits=phone.substring(3,6);
+			var thirdDigits=phone.substring(6,phone.length);
+			console.log("("+firstDigits+")"+" "+secondDigits+"-"+thirdDigits);
+			return "("+firstDigits+")"+" "+secondDigits+"-"+thirdDigits;
+		}else{
+			console.log(phone)
+			return phone;
+		}
+	};
+
 });

@@ -26,11 +26,11 @@
     <div hm-tap="chedkboxModel=1">
       <ons-row class="profile-wrapper">
         <ons-col width="60px" class="profile-image-wrapper">
-          <img src="{{ProfilePicture}}" class="profile-image-account">
+          <img ng-src="{{ProfilePicture}}" class="profile-image-account">
         </ons-col>
 
         <ons-col>
-          <div class="profile-name-account">{{FirstName}} {{LastName}}</div>
+          <div class="profile-name-account" style="color:#2B6197"><strong>{{FirstName}} {{LastName}}</strong></div>
           <div class="profile-email-account">{{Email}}</div>
         </ons-col>
 
@@ -40,23 +40,17 @@
       <div class="settings-header">Personal</div>
 
       <ons-list modifier="inset" class="settings-list">
-       <ons-list-item modifier="chevron" ng-click="myNavigatorAccount.pushPage('pageAccount.html', {param:'First Name'},{ animation : 'slide' } )">
-          First Name
-          <span class="list-item-note lucent">{{FirstName|limitTo:7}}</span>
+       <ons-list-item modifier="chevron" ng-click="myNavigatorAccount.pushPage('pageAccount.html', {param:'Alias'},{ animation : 'slide' } )">
+          Alias
+          <span class="list-item-note lucent">{{Alias|limitLetters:7}}</span>
         </ons-list-item>
-
-        <ons-list-item modifier="chevron" ng-click="myNavigatorAccount.pushPage('pageAccount.html', {param:'Last Name'},{ animation : 'slide' } )">
-          Last Name
-          <span class="list-item-note lucent">{{LastName|limitTo:7}}</span>
-        </ons-list-item>
-
         <ons-list-item modifier="chevron" ng-click="myNavigatorAccount.pushPage('pageAccount.html', {param:'Email'},{ animation : 'slide' } )">
           Email
-          <span class="list-item-note lucent">{{Email|limitTo:7}}...</span>
+          <span class="list-item-note lucent">{{Email|limitLetters:7}}</span>
         </ons-list-item>
         <ons-list-item modifier="chevron" ng-click="myNavigatorAccount.pushPage('pageAccount.html', {param:'Password'},{ animation : 'slide' } )">
           Password
-          <span type="password" class="list-item-note lucent">{{passFill|limitTo:passwordLength}}</span>
+          <span type="password" class="list-item-note lucent">{{passFill|limitTo:7}}</span>
         </ons-list-item>
         <ons-list-item modifier="chevron" ng-click="myNavigatorAccount.pushPage('pageAccount.html', {param:'Tel. Number'},{ animation : 'slide' } )">
           Phone Number

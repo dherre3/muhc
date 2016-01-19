@@ -313,15 +313,24 @@ myApp.controller('MessagePageController',function(RequestToServer,$filter, Patie
  $scope.conversationName=$scope.messages[$scope.selectedIndex].MessageRecipient;
  $scope.sendButtonDisabled=true;
  $scope.newMessageMobile='';
- $scope.heightContainer=document.documentElement.clientHeight * 0.60;
+
+ $scope.heightContainerTextArea=120;
+ $scope.heightContainerConversation=document.documentElement.clientHeight-190;
  $scope.glue=true;
  $scope.$on('elastic:resize', function(event, element, oldHeight, newHeight) {
   if(oldHeight>newHeight){
-    $scope.heightContainer=$scope.heightContainer+(oldHeight-newHeight);
+    $scope.heightContainerTextArea=$scope.heightContainerTextArea-(oldHeight-newHeight);
+    $scope.heightContainerConversation=$scope.heightContainerConversation+(oldHeight-newHeight);
   }else if(oldHeight<newHeight){
-    $scope.heightContainer=$scope.heightContainer-(newHeight-oldHeight);
+    $scope.heightContainerTextArea=$scope.heightContainerTextArea+(newHeight-oldHeight);
+    $scope.heightContainerConversation=$scope.heightContainerConversation-(newHeight-oldHeight);
   }
 });
+window.addEventListener("resize", function(){
+  $scope.heightContainerConversation=document.documentElement.clientHeight-190;
+});
+
+
 $scope.messageAttachmentOpener=function(mes){
   var ref = window.open(mes.Attachment, '_blank', 'location=yes');
 };

@@ -36,23 +36,10 @@
   <!--List Of Conversations Mobile View-->
   <div class="alert-dialog-mask" style="z-index:1231231" ng-show="searchingMask"></div>
   <div class="visible-xs" ng-controller="ListOfConversationMobileController" style="height:100vh">
-
-    <div class="navigation-bar" style="width:100%">
-      <div class="navigation-bar__left">
-        <ui-select reset-search-input="true" style="z-index:12312312;margin-left:3vw;margin-top:1vh;width:94vw;min-width: 200px;" ng-model="person.selected" theme="bootstrap" ng-disabled="disabled">
-          <ui-select-match placeholder="Search...">{{$select.selected.name}}</ui-select-match>
-          <ui-select-choices repeat="person in people | propsFilter: {name: $select.search}" refresh="refreshInfo($select.search)" refresh-delay="0">
-            <div ng-bind-html="person.name | highlight: $select.search"></div>
-          </ui-select-choices>
-        </ui-select>
-
-
-      </div>
-    </div>
     <div style="overflow-y:scroll">
       <ons-list class="plan-list">
         <ons-list class="plan-list">
-          <ons-list-item style="1px solid black" ng-click="personClicked($index)" class="plan list__item list__item--tappable" ng-repeat="conversation in messages">
+          <ons-list-item style="1px solid black" ng-click="personClicked($index)" class="plan list__item list__item--tappable" ng-repeat="conversation in messages|filter:searchPerson">
             <ons-row>
               <ons-col width="12px" style="padding:20px margin-left:5px">
               </ons-col>

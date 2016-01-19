@@ -11,38 +11,30 @@ myApp.factory('CheckinService', ['$q', 'RequestToServer', 'Appointments', '$time
     function isWithinAllowedRange()
     {
       var r=$q.defer();
-      var app = document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1;
-      if(app){
-        r.resolve(navigator.geolocation.getCurrentPosition(onLocationSuccess, onError));
-      }else{
-        r.resolve(onLocationSuccess(-1));
-      }
+        navigator.geolocation.getCurrentPosition(function(position){
+          var distanceMeters = 1000 * getDistanceFromLatLonInKm(position.coords.latitude, position.coords.longitude, 45.473127399999996, -73.6028402);
+          //var distanceMeters=1000*getDistanceFromLatLonInKm(position.coords.latitude, position.coords.longitude,45.5072138,-73.5784825);
+          //var distanceMeters = 100;
+          /*alert('Distance: '+ distanceMeters+
+              'Latitude: '          + position.coords.latitude          + '\n' +
+            'Longitude: '         + position.coords.longitude         + '\n' +
+            'Altitude: '          + position.coords.altitude          + '\n' +
+            'Accuracy: '          + position.coords.accuracy          + '\n' +
+            'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
+            'Heading: '           + position.coords.heading           + '\n' +
+            'Speed: '             + position.coords.speed             + '\n' +
+            'Timestamp: '         + position.timestamp                + '\n');*/
+            if (distanceMeters <= 300) {
+              r.resolve(true);
+          } else {
+              r.resolve(false);
+          }
+
+        }, function(error){
+          r.reject(error.code);
+        });
       return r.promise;
     }
-    function onLocationSuccess(position) {
-        //var distanceMeters = 1000 * getDistanceFromLatLonInKm(position.coords.latitude, position.coords.longitude, 45.4745561, -73.5999842);
-        //var distanceMeters=1000*getDistanceFromLatLonInKm(position.coords.latitude, position.coords.longitude,45.5072138,-73.5784825);
-        var distanceMeters = 100;
-        /*alert('Distance: '+ distanceMeters+
-            'Latitude: '          + position.coords.latitude          + '\n' +
-          'Longitude: '         + position.coords.longitude         + '\n' +
-          'Altitude: '          + position.coords.altitude          + '\n' +
-          'Accuracy: '          + position.coords.accuracy          + '\n' +
-          'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
-          'Heading: '           + position.coords.heading           + '\n' +
-          'Speed: '             + position.coords.speed             + '\n' +
-          'Timestamp: '         + position.timestamp                + '\n');*/
-        if (distanceMeters <= 200) {
-            return true;
-        } else {
-            return false;
-        }
-
-    };
-    function onError(error) {
-        alert('code: ' + error.code + '\n' +
-            'message: ' + 'Unable to get your location, proceed to the checkin kiosks' + '\n');
-    };
     //Checks if there are appointments today
     function haveNextAppointmentToday(){
       //Checks if the user has appointments
@@ -103,9 +95,9 @@ myApp.factory('CheckinService', ['$q', 'RequestToServer', 'Appointments', '$time
         var r =$q.defer();
         if(haveNextAppointmentToday())
         {
-              r.resolve(isWithinAllowedRange());
+            r.resolve(isWithinAllowedRange());
         }else{
-          return false;
+            r.resolve(false);
         }
         return r.promise;
       },

@@ -6,7 +6,7 @@
      <div class="profile-cardContact">
 
         <!--<img ng-show="!doctor.Image" src="img/logo.png" class="profile-image">-->
-        <img ng-src="data:image/jpg;base64,{{doctor.ProfileImage}}" class="profile-image">
+        <div ng-show="doctor.ProfileImage"><img ng-src="{{doctor.ProfileImage}}" class="profile-image"></div>
         <div class="profile-name">{{doctor.FirstName}} {{doctor.LastName}}</div>
         <div class="profile-desc">{{header}}</div>
 
@@ -21,10 +21,10 @@
           </ons-list-item>
 
           <ons-list-item ng-show="doctor.Phone" modifier="chevron">
-             <a href="tel:{{doctor.phone}}" style="text-decoration:none"><div class="prop-desc">
+             <a href="tel:{{doctor.Phone}}" style="text-decoration:none"><div class="prop-desc">
               <ons-icon icon="fa-mobile" size="25px"></ons-icon>
 
-               <span style="color:black" >{{doctor.Phone}}</span>
+               <span style="color:black" >{{doctor.Phone|FormatPhoneNumber}}</span>
             </div></a>
           </ons-list-item>
 

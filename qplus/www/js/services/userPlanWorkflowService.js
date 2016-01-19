@@ -30,6 +30,48 @@ myApp.service('UserPlanWorkflow',['$filter',function($filter){
             }
         };
     }
+    function previousStages(stage,tracker)
+    {
+        var prevStages=planStages.slice(0,tracker);
+        console.log(prevStages);
+        var state=$filter('filter')(prevStages, stage.Name);
+        if(state.length==0)
+        {
+          return false;
+        }else{
+          return true;
+        }
+
+    }
+    function lookForNextCtSim(plan,index)
+    {
+      for (var i = index; i < plan.length; i++) {
+        if(plan[i].Name=='CT for Radiotherapy Planning')
+        {
+          return i;
+        }
+      }
+      return -1;
+    }
+    var planStages=['CT for Radiotherapy Planning','Physician Plan Preparation','Calculation of Dose','Quality Control','Scheduling','First Radiotherapy Treatment Session'];
+    var treatmentPlan=[];
+    var futureStages=[];
+    var pastStages=[];
+    var treatmentPlansArray=[];
+
+    function fillStagesLeft(tracker, planSoFar)
+    {
+      for (var i = tracker; i < planStages.length; i++) {
+        var objectStage={};
+        objectStage.Name=planStages[i];
+        objectStage.Status='Future';
+        objectStage.Description='';
+        planSoFar[i]=objectStage;
+      }
+    }
+
+
+
 
 
     return{
@@ -41,6 +83,116 @@ myApp.service('UserPlanWorkflow',['$filter',function($filter){
         *@description Obtains plan workflow object from Firebase through the {@link MUHCApp.services:UpdateUI UpdateUI} service. Defines the TasksAndAppointmentsArray
         *by organizing the stages chronologically. Sets the current stage by finding the min time between today and the available stages, and setting CurrentTaskOrAppointmentIndex.
         **/
+        setTreatmentPlan:function(tasks, appointments)
+        {
+          /*var plan={
+              '1':{'Name':'CT for Radiotherapy Planning','Date':'2015-10-19T09:00:00Z','Description':'stage1','Type': 'Appointment'},
+              '2':{'Name':'Physician Plan Preparation','Date':'2015-10-21T09:15:00Z','Description':'stage2','Type':'Task'},
+              '3':{'Name':'Calculation of Dose & Physician Review','Date':'2015-10-23T09:15:00Z','Description':'stage3','Type':'Task'},
+              '4':{'Name':'Quality Control','Date':'2015-10-28T10:15:00Z','Description':'stage5','Type':'Task'},
+              '5':{'Name':'Scheduling','Date':'2015-10-30T09:15:00Z','Description':'stage6','Type':'Task'},
+              '6':{'Name':'First Treatment','Date':'2015-11-02T09:15:00Z','Description':'stage6','Type':'Task'}
+          };*/
+
+
+          console.log(tasks);
+          console.log(appointments);
+          var today=new Date();
+          if(typeof appointments!=='undefined')
+          {
+            for (var i = 0; i < appointments.length; i++) {
+              appointments[i].Date=$filter('formatDate')( appointments[i].ScheduledStartTime);
+              appointments[i].Name=appointments[i].AppointmentType_EN;
+              appointments[i].Type='Appointment';
+            }
+            if(typeof tasks !=='undefined')
+            {
+              for (var i = 0; i < tasks.length; i++) {
+
+                tasks[i].Date=$filter('formatDate')( tasks[i].DueDateTime);
+                tasks[i].Name=tasks[i].TaskName_EN;
+                tasks[i].Type='Task';
+              }
+              var stages=appointments.concat(tasks);
+              var ctsim=$filter('filter')(stages, 'CT for Radiotherapy Planning');
+              var planPrep=$filter('filter')(stages,'Physician Plan Preparation');
+              var calcDoseAndPhysReview=$filter('filter')(stages,'Calculation of Dose');
+              var qualityControl=$filter('filter')(stages,'Quality Control');
+              var scheduling=$filter('filter')(stages,'Scheduling');
+              var firstTreatment=$filter('filter')(stages,'First Radiotherapy Treatment Session');
+              var lastTreatment=$filter('filter')(stages,"Final Radiotherapy Treatment Session");
+              var plan=ctsim.concat(planPrep,calcDoseAndPhysReview,qualityControl,scheduling,firstTreatment,lastTreatment);
+              plan=$filter('date')(plan,'DueDateTime');
+              console.log(plan);
+              var tracker=0;
+              var treatmentPlanBuild=[];
+              //Plan contains the stages for appointments and tasks that are contained within the plan stages in chrono order
+              for (var i = 0; i < plan.length; i++) {
+                if(tracker!==0&&previousStages(plan[i],tracker))
+                {
+                  var nextIndex=lookForNextCtSim(plan,i);
+                  if(nextIndex==-1)
+                  {
+                    return;
+                  }else{
+                    tracker=0;
+                    treatmentPlanBuild=[];
+                    i=nextIndex;
+                    continue;
+                  }
+                }
+                if(tracker==planStages.length-1)
+                {
+                  treatmentPlansArray.push(treatmentPlanBuild);
+                  console.log(treatmentPlansArray);
+                }
+                if(plan[i].Name==planStages[tracker])
+                {
+                  console.log(plan[i].Name);
+                  console.log(tracker);
+                  if(plan[i].Date<today)
+                  {
+                    plan[i].Status='Past';
+                  }else{
+                    plan[i].Status='Future';
+                  }
+                  treatmentPlanBuild[tracker]=plan[i];
+                }else if(plan[i].Name==planStages[tracker+1])
+                {
+                  tracker++;
+                  console.log(plan[i].Name);
+                  console.log(tracker);
+                  if(plan[i].Date<today)
+                  {
+                    plan[i].Status='Past';
+                  }else{
+                    plan[i].Status='Future';
+                  }
+                  treatmentPlanBuild[tracker]=plan[i];
+                }
+
+              }
+              console.log(plan);
+
+              var physicianPlanPrep=$filter('filter')(tasks, 'Physician Plan Preparation');
+              if(physicianPlanPrep.length!==0)
+              {
+                console.log(physicianPlanPrep);
+
+              }else{
+                return;
+              }
+
+
+
+
+            }
+          }
+        },
+        getTreatmentPlansArray:function()
+        {
+          return treatmentPlansArray;
+        },
         setUserPlanWorkflow:function(tasksAndAppointments){
             this.TasksAndAppointmentsArray=[];
             this.FutureStages=[];
@@ -107,6 +259,7 @@ myApp.service('UserPlanWorkflow',['$filter',function($filter){
 
 
         },
+
         /**
         *@ngdoc method
         *@name setUserPlanWorkflow
@@ -171,6 +324,10 @@ myApp.service('UserPlanWorkflow',['$filter',function($filter){
         },
         getPastStages:function(){
             return this.PastStages;
+        },
+        getTreatmentPlans:function()
+        {
+          return treatmentPlansArray;
         },
         isEmpty:function()
         {

@@ -2,6 +2,26 @@ var myApp=angular.module('MUHCApp');
 myApp.controller('TreatmentPlanController',['$rootScope','$scope','$timeout', 'UserPlanWorkflow',function($rootScope,$scope,$timeout, UserPlanWorkflow){
   initTreatmentPlanStatus();
   initTreatmentList();
+  $scope.indexPage=0;
+  $scope.numberPlans=2;
+
+  document.addEventListener('ons-carousel:init', function(e) {
+  var mycarousel= e.component;
+  mycarousel.on('postchange',function(event){
+      $timeout(function(){
+        $scope.indexPage=event.activeIndex;
+      });
+  });
+});
+$scope.pickPagePagination=function(index)
+{
+  if(index==$scope.indexPage)
+  {
+    return "iconHomeView fa fa-circle";
+  }else{
+    return "iconHomeView fa fa-circle-o";
+  }
+}
   $scope.load = function($done) {
     $timeout(function() {
       RequestToServer.sendRequest('Refresh','All');
@@ -26,7 +46,7 @@ myApp.controller('TreatmentPlanController',['$rootScope','$scope','$timeout', 'U
     }
 
 
-    $scope.$watch('treatment.choice',function(){
+    /*$scope.$watch('treatment.choice',function(){
         if($scope.treatment.choice=='Past'){
             $scope.stages=UserPlanWorkflow.getPastStages();
         }else if($scope.treatment.choice=='Next'){
@@ -37,7 +57,7 @@ myApp.controller('TreatmentPlanController',['$rootScope','$scope','$timeout', 'U
         }else{
             $scope.stages=UserPlanWorkflow.getPlanWorkflow();
         }
-    });
+    });*/
     $scope.getStyle=function($index){
         if($scope.stages[$index].Status==='Next'){
             return '#3399ff';

@@ -67,7 +67,7 @@ myApp.controller('NotificationsController', ['RequestToServer','Notifications', 
             }else if(notification.Type==='Appointment'){
                 var app=Appointments.getAppointmentBySerNum(notification.TypeSerNum);
                 myNavigator.pushPage('./templates/appointments/individual-appointment.html', {param:app},{ animation : 'slide' } );
-            }else if(notification.Type==='Image'){
+            }else if(notification.Type==='Document'){
                 console.log('doing it');
                 var doc=Documents.getDocumentBySerNum(notification.TypeSerNum);
                 myNavigator.pushPage('./templates/documents/individual-document.html',{param:doc},{ animation : 'slide' } );

@@ -5,18 +5,16 @@
 //
 angular.module('MUHCApp').controller('logOutController',['Auth','$rootScope','UserAuthorizationInfo', '$state','$q','RequestToServer', function(Auth, $rootScope, UserAuthorizationInfo,$state,$q,RequestToServer){
 		console.log(Auth);
-		if($rootScope.refresh!==true){
+		/*if($rootScope.refresh!==true){
 			var redirect=redirectPage();
 			redirect.then(setTimeout(function(){location.reload()},100));
-		}
+		}*/
 	//this.firebaseLink.set({logged: 'false'});
-		var firebaseLink=new Firebase('https://luminous-heat-8715.firebaseio.com/');
+		var firebaseLink=new Firebase('https://brilliant-inferno-7679.firebaseio.com/');
 
 		//firebaseLink.child('Users/'+UserAuthorizationInfo.UserName).set({Logged: 'false'});
 		var authData = firebaseLink.getAuth();
 		firebaseLink.unauth();
-		delete UserDataMutable;
-		delete UserAuthorizationInfo;
 		window.localStorage.removeItem('UserAuthorizationInfo');
 		window.localStorage.removeItem('pass');
 		window.localStorage.removeItem(UserAuthorizationInfo.UserName);
@@ -28,12 +26,9 @@ angular.module('MUHCApp').controller('logOutController',['Auth','$rootScope','Us
 			return r.promise;
 		}
 		RequestToServer.sendRequest('Logout');
-		if(authData){
-			var redirect=redirectPage();
-			$rootScope.refresh=null;
-			redirect.then(setTimeout(function(){location.reload()},100));
-		}
-
+		var redirect=redirectPage();
+		$rootScope.refresh=null;
+		redirect.then(setTimeout(function(){location.reload()},100));
 		/*if(!authData){
 			setTimeout(function(){
 				location.reload();
