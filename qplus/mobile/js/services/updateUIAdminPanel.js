@@ -1,12 +1,11 @@
 var myApp=angular.module('MUHCApp');
-myApp.service('UpdateUIPhp',[function(){
+myApp.service('UpdateUI',['$http', 'Patient','Doctors','Appointments','Messages','Documents','UserPreferences', 'UserAuthorizationInfo', '$q', 'Notifications', 'UserPlanWorkflow','$cordovaNetwork', 'Notes', 'LocalStorage','RequestToServer','$filter','LabResults',
+  function ($http, Patient,Doctors, Appointments,Messages, Documents, UserPreferences, UserAuthorizationInfo, $q, Notifications, UserPlanWorkflow,$cordovaNetwork,Notes,LocalStorage,RequestToServer,$filter,LabResults) {
   //Enter code here!!
   function updateAllServices(dataUserObject,mode){
       console.log(mode);
       var promises=[];
       console.log(dataUserObject);
-      if(mode=='Online')
-      {
         var documents=dataUserObject.Documents;
         var documentProm=Documents.setDocumentsOnline(documents);
         var doctors=dataUserObject.Doctors;
@@ -15,12 +14,6 @@ myApp.service('UpdateUIPhp',[function(){
         var patientProm=Patient.setUserFieldsOnline(patientFields, dataUserObject.Diagnosis);
         console.log(patientProm);
         promises=[doctorProm,documentProm,patientProm];
-      }else{
-        var documentProm=Documents.setDocumentsOffline(dataUserObject.Documents);
-        var doctorProm=Doctors.setUserContactsOffline(dataUserObject.Doctors);
-        var patientProm=Patient.setUserFieldsOffline(dataUserObject.Patient, dataUserObject.Diagnosis);
-        promises=[documentProm,doctorProm,patientProm];
-      }
       $q.all(promises).then(function(){
         console.log('I am inside!!!');
         console.log(dataUserObject);
@@ -57,12 +50,34 @@ myApp.service('UpdateUIPhp',[function(){
           }
 
       });
+
   }
   return {
     updateUserFields:function()
     {
-      
+      var username=UserAuthorizationInfo.getUsername();
+      var url='http://172.26.66.41/devDocuments/david/muhc/qplus/php/mobile/fetchPatientData.php';
+      var r=$q.defer();
+      var req = {
+       method: 'POST',
+       url: url,
+       headers: {
+         'Content-Type': undefined
+       },
+       data: username
+      }
+
+      $http(req).then(function(data){
+          console.log(data);
+          r.resolve(updateAllServices(data.data));
+
+      }, function(error){
+        r.reject(error);
+
+      });
+      return r.promise;
     }
+      
 
 
 

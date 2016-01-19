@@ -20,7 +20,7 @@ myApp.controller('DocumentsController', ['Patient', 'Documents', 'UpdateUI', '$s
   }
 
   function loadDocuments() {
-    var UserData = UpdateUI.UpdateSection('Documents');
+    var UserData = UpdateUI.updateUserFields();
     UserData.then(function() {
       documentsInit();
     });
@@ -28,7 +28,7 @@ myApp.controller('DocumentsController', ['Patient', 'Documents', 'UpdateUI', '$s
 
 
   $scope.refreshDocuments = function($done) {
-    RequestToServer.sendRequest('Refresh', 'Documents')
+    //RequestToServer.sendRequest('Refresh', 'Documents')
     $timeout(function() {
       loadDocuments();
       $done();

@@ -113,42 +113,17 @@ var myApp = angular.module('MUHCApp', ['tmh.dynamicLocale','pascalprecht.transla
     $stateProvider.state('logIn', {
         url: '/',
         templateUrl: 'templates/logIn.html',
-        controller: 'LoginController',
-        resolve: {
-      // controller will not be loaded until $waitForAuth resolves
-      // Auth refers to our $firebaseAuth wrapper in the example above
-      "currentAuth": ["Auth", function(Auth) {
-        // $waitForAuth returns a promise so the resolve waits for it to complete
-        return Auth.$waitForAuth();
-      }]
-    }
-
+        controller: 'LoginController'
     })
     .state('loading', {
         url: '/loading',
         templateUrl: 'templates/loading.html',
-        controller: 'LoadingController',
-        resolve: {
-      // controller will not be loaded until $waitForAuth resolves
-      // Auth refers to our $firebaseAuth wrapper in the example above
-      "currentAuth": ["Auth", function(Auth) {
-        // $waitForAuth returns a promise so the resolve waits for it to complete
-        return Auth.$requireAuth();
-      }]
-    }
+        controller: 'LoadingController'
     })
         .state('Home', {
         url: '/Home',
         templateUrl: 'templates/menu.html',
-        controller: 'HomeController',
-           resolve: {
-      // controller will not be loaded until $waitForAuth resolves
-      // Auth refers to our $firebaseAuth wrapper in the example above
-      "currentAuth": ["Auth", function(Auth) {
-        // $waitForAuth returns a promise so the resolve waits for it to complete
-        return Auth.$requireAuth();
-      }]
-    }
+        controller: 'HomeController'
 
     }).state('logOut', {
         url: '/LogOut',

@@ -2,7 +2,6 @@ var myApp = angular.module('MUHCApp');
 myApp.controller('LabResultsControllerCopy', ['RequestToServer','Notifications', 'UpdateUI', '$scope', '$timeout','$rootScope', 'UserPreferences', 'LabResults', function (RequestToServer, Notifications, UpdateUI, $scope,$timeout,$rootScope, UserPreferences, LabResults) {
 
   $scope.load = function($done) {
-    RequestToServer.sendRequest('Refresh','LabTests');
     $timeout(function() {
       loadInfo();
           $done();
@@ -10,7 +9,7 @@ myApp.controller('LabResultsControllerCopy', ['RequestToServer','Notifications',
   };
 
   function loadInfo(){
-    UpdateUI.UpdateSection('LabTests').then(function()
+    UpdateUI.updateUserFields().then(function()
     {
       $scope.init();
     });

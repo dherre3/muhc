@@ -16,7 +16,6 @@ myApp.controller('ContactsController',['$scope','Doctors','$timeout','UpdateUI',
     }
     console.log($scope.oncologists);
     $scope.load = function($done) {
-      RequestToServer.sendRequest('Refresh','Doctors');
       $timeout(function() {
         loadInfo();
         $done();
@@ -24,7 +23,7 @@ myApp.controller('ContactsController',['$scope','Doctors','$timeout','UpdateUI',
     };
 
     function loadInfo(){
-       var dataVal= UpdateUI.UpdateSection('Doctors').
+       var dataVal= UpdateUI.updateUserFields().
        then(function(){
             doctorsInit();
        });

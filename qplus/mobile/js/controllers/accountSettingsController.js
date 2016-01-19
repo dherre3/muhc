@@ -9,7 +9,7 @@ angular.module('MUHCApp')
         $rootScope.showAlert=false;
     };
         function loadInfo(){
-                var UserData=UpdateUI.UpdateSection('Patient');
+                var UserData=UpdateUI.updateUserFields();
                 UserData.then(function(){
                             $scope.FirstName = Patient.getFirstName();
                             $scope.LastName = Patient.getLastName();
@@ -25,7 +25,6 @@ angular.module('MUHCApp')
 
 
          $scope.load2 = function($done) {
-        RequestToServer.sendRequest('Refresh','Patient');
           $timeout(function() {
             loadInfo();
                 $done();

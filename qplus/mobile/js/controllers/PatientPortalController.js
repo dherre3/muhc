@@ -9,7 +9,7 @@ myApp.controller('PatientPortalController',function(UpdateUI, RequestToServer, $
   $scope.sendButtonDisabled=true;
   $scope.newMessage='';
  function loadInfo(){
-           var dataVal= UpdateUI.UpdateSection('Messages');
+           var dataVal= UpdateUI.updateUserFields();
            dataVal.then(function(){
                 $timeout(function(){
                   $scope.messages=Messages.getUserMessages();
@@ -20,7 +20,6 @@ myApp.controller('PatientPortalController',function(UpdateUI, RequestToServer, $
 
         };
          $scope.load = function($done) {
-          RequestToServer.sendRequest('Refresh','Messages');
           $timeout(function() {
             loadInfo();
                 $done();

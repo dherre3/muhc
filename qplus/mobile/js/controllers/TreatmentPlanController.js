@@ -24,14 +24,13 @@ $scope.pickPagePagination=function(index)
 }
   $scope.load = function($done) {
     $timeout(function() {
-      RequestToServer.sendRequest('Refresh','All');
       loadInfo();
           $done();
     }, 3000);
   };
 
   function loadInfo(){
-
+    UpdateUI.updateUserFields();
   }
    $scope.closeAlert = function () {
         $rootScope.showAlert=false;

@@ -7,13 +7,12 @@ myApp.controller('NotificationsController', ['RequestToServer','Notifications', 
     */
         setViewNotifications();
        function loadInfo(){
-                var UserData=UpdateUI.UpdateSection('Notifications');
+                var UserData=UpdateUI.updateUserFields();
                 UserData.then(function(){
                             setViewNotifications()
                 });
         };
          $scope.load = function($done) {
-           RequestToServer.sendRequest('Refresh','Notifications');
           $timeout(function() {
             loadInfo();
                 $done();

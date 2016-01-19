@@ -4,13 +4,12 @@ angular.module('MUHCApp')
       initCheckin();
       $scope.load = function($done) {
         $timeout(function() {
-          RequestToServer.sendRequest('Refresh','Appointments');
           loadInfo();
               $done();
         }, 3000);
       };
       function loadInfo(){
-        UpdateUI.UpdateSection('Appointments').then(function()
+        UpdateUI.updateUserFields().then(function()
         {
           initCheckin();
         });

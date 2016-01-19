@@ -39,7 +39,7 @@ myApp.controller('HomeController', ['$state','Appointments', 'CheckinService','$
 
         homePageInit();
         $scope.load = function($done) {
-          RequestToServer.sendRequest('Refresh','All');
+          
           $timeout(function() {
             loadInfo();
                 $done();
@@ -47,7 +47,7 @@ myApp.controller('HomeController', ['$state','Appointments', 'CheckinService','$
         };
 
         function loadInfo(){
-          UpdateUI.UpdateSection('All').then(function()
+          UpdateUI.updateUserFields().then(function()
           {
             homePageInit();
           });
