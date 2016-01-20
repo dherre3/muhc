@@ -98,7 +98,7 @@ myApp.filter('dateEmail',function($filter){
 myApp.filter('limitLetters',function($filter){
 	return function(string,num)
 	{
-		if(typeof string!=='undefined'&&string.length>num)
+		if(string&&typeof string!=='undefined'&&string.length>num)
 		{
 			string=$filter('limitTo')(string,num);
 			string=string+'...';

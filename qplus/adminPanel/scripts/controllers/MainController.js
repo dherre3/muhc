@@ -25,7 +25,7 @@ app.controller('MainController',function ($rootScope, $scope, User,LoginModal,$t
     $rootScope.about=true;
     $rootScope.currentUser=undefined;
     $rootScope.NumberOfNewMessages=0;
-    window.localStorage.removeItem('OpalPanelUser');
+    window.localStorage.removeItem('OpalAdminPanelUser');
     location.reload();
 
   }

@@ -10,6 +10,7 @@ app.controller('AccountController',function ($rootScope, $scope,User, $timeout, 
   $scope.password=User.getUserPassword();
   $scope.username=User.AccountObject['Username'];
   var fields=User.getUserFields();
+  console.log(fields);
   if(fields.DoctorAriaSer){
     $scope.doctorAriaSer=fields.DoctorAriaSer;
   }

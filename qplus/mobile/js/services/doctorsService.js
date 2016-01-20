@@ -28,45 +28,14 @@ myApp.service('Doctors',function($q,$filter,FileManagerService,$cordovaDevice){
             var promises=[];
             if(typeof doctors!=='undefined'&&doctors){
                 var doctorKeyArray=Object.keys(doctors);
-                for (var i = 0; i < doctorKeyArray.length; i++) {
-                  //doctors[doctorKeyArray[i]].Phone=$filter('FormatPhoneNumber')(doctors[doctorKeyArray[i]].Phone);
-                  if(typeof doctors[doctorKeyArray[i]].ProfileImage!=='undefined'&&doctors[doctorKeyArray[i]].ProfileImage!=='')
-                  {
-                    if(doctors[doctorKeyArray[i]].DocumentType=='pdf')
-                    {
-                      doctors[doctorKeyArray[i]].ProfileImage='data:application/pdf;base64,'+doctors[doctorKeyArray[i]].ProfileImage;
-                    }else{
-                      doctors[doctorKeyArray[i]].ProfileImage='data:image/'+doctors[doctorKeyArray[i]].DocumentType+';base64,'+doctors[doctorKeyArray[i]].ProfileImage;
-                    }
-                    console.log(doctors[doctorKeyArray[i]]);
-                  }
-                }
-                var app = document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1;
-                if(app){
-                  for (var i = 0; i < doctorKeyArray.length; i++) {
-                    if(typeof doctors[doctorKeyArray[i]].ProfileImage!=='undefined'&&doctors[doctorKeyArray[i]].ProfileImage!=='' )
-                    {
-                      var platform=$cordovaDevice.getPlatform();
-                      var targetPath='';
-                      if(platform==='Android'){
-                          targetPath = cordova.file.dataDirectory+'Doctors/doctor'+doctors[doctorKeyArray[i]].DoctorSerNum+"."+doctors[doctorKeyArray[i]].DocumentType;
-                      }else if(platform==='iOS'){
-                        targetPath = cordova.file.documentsDirectory+ 'Doctors/doctor'+doctors[doctorKeyArray[i]].DoctorSerNum+"."+doctors[doctorKeyArray[i]].DocumentType;
-                      }
-                      var url = doctors[doctorKeyArray[i]].ProfileImage;
-                      var trustHosts = true
-                      var options = {};
-                      doctors[doctorKeyArray[i]].NameFileSystem='doctor'+doctors[doctorKeyArray[i]].DoctorSerNum+"."+doctors[doctorKeyArray[i]].DocumentType;
-                      doctors[doctorKeyArray[i]].PathFileSystem=targetPath;
-                      promises.push(FileManagerService.downloadFileIntoStorage(url, targetPath));
-                    }
-                  }
-                }
-                for (var i = 0; i < doctors.length; i++) {
+                for (var i = 0; i < doctors.length; i++) {  
                   var copyDoctor=copyDoctorObject(doctors[doctorKeyArray[i]]);
-                  if(typeof copyDoctor.ProfileImage=='undefined'||copyDoctor.ProfileImage=='')
+                  console.log(doctors[doctorKeyArray[i]]);
+                  if(typeof doctors[doctorKeyArray[i]].ProfileImage=='undefined'||doctors[doctorKeyArray[i]].ProfileImage=='')
                   {
                     copyDoctor.ProfileImage='./img/doctor.png';
+                  }else{
+                    doctors[doctorKeyArray[i]].ProfileImage="../listener/Doctors/"+doctors[doctorKeyArray[i]].ProfileImage;
                   }
                    if(copyDoctor.PrimaryFlag=='1'&&copyDoctor.OncologistFlag=='0'){
                         this.PrimaryPhysician.push(copyDoctor);

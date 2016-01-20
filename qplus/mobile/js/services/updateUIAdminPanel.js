@@ -14,7 +14,7 @@ myApp.service('UpdateUI',['$http', 'Patient','Doctors','Appointments','Messages'
         var patientProm=Patient.setUserFieldsOnline(patientFields, dataUserObject.Diagnosis);
         console.log(patientProm);
         promises=[doctorProm,documentProm,patientProm];
-      $q.all(promises).then(function(){
+        $q.all(promises).then(function(){
         console.log('I am inside!!!');
         console.log(dataUserObject);
         Messages.setUserMessages(dataUserObject.Messages);

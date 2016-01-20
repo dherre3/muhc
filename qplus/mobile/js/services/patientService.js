@@ -15,9 +15,7 @@ myApp.service('Patient',['UserPreferences','$q','$cordovaFileTransfer','$cordova
             this.Diagnosis=diagnosis;
             this.Alias=patientFields.Alias;
             this.UserSerNum=patientFields.PatientSerNum;
-
-
-
+            
             if(patientFields.ProfileImage&& typeof patientFields.ProfileImage!=='undefined'&& patientFields.ProfileImage=='')
             {
               var words=CryptoJS.enc.Hex.parse(patientFields.ProfileImage);
