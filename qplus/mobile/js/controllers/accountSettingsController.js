@@ -50,12 +50,7 @@ angular.module('MUHCApp')
       $scope.TelNum = Patient.getTelNum();
       $scope.Language=UserPreferences.getLanguage();
       $scope.ProfilePicture=Patient.getProfileImage();
-
-      if((window.localStorage.getItem('pass')).length>7){
-          $scope.passwordLength=7;
-      }else{
-          $scope.passwordLength=window.localStorage.getItem('pass').length;
-      }
+      $scope.passwordLength=7;
     }
 
     $scope.saveSettings=function(option){

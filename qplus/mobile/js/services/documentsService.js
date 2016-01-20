@@ -14,31 +14,10 @@ myApp.service('Documents',['UserPreferences', '$cordovaDevice','$cordovaNetwork'
 			this.Photos=[];
 			if(!documents) return;
 				var keysDocuments=Object.keys(documents);
-				var promises=[];
 				for (var i = 0; i < keysDocuments.length; i++) {
-					if(documents[keysDocuments[i]].DocumentType=='pdf')
-					{
-						documents[keysDocuments[i]].Content='data:application/pdf;base64,'+documents[keysDocuments[i]].Content;
-					}else{
-						documents[keysDocuments[i]].Content='data:image/'+documents[keysDocuments[i]].DocumentType+';base64,'+documents[keysDocuments[i]].Content;
-					}
-					var app = document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1;
-	        if(app){
-							var platform=$cordovaDevice.getPlatform();
-							var targetPath='';
-							if(platform==='Android'){
-						    	targetPath = cordova.file.externalRootDirectory+'Documents/docMUHC'+documents[keysDocuments[i]].DocumentSerNum+"."+documents[keysDocuments[i]].DocumentType;
-							}else if(platform==='iOS'){
-								targetPath = cordova.file.documentsDirectory+ 'Documents/docMUHC'+documents[keysDocuments[i]].DocumentSerNum+"."+documents[keysDocuments[i]].DocumentType;
-							}
-							var url = documents[keysDocuments[i]].Content;
-						    var trustHosts = true
-						    var options = {};
-						    documents[keysDocuments[i]].NameFileSystem='docMUHC'+documents[keysDocuments[i]].DocumentSerNum+"."+documents[keysDocuments[i]].DocumentType;
-						    documents[keysDocuments[i]].PathFileSystem=targetPath;
-								promises.push(FileManagerService.downloadFileIntoStorage(url, targetPath));
-					}
-
+					var n =documents[keysDocuments[i]].FinalFileName.lastIndexOf('.');
+					var fileType=documents[keysDocuments[i]].FinalFileName.substring(n+1,documents[keysDocuments[i]].FinalFileName.length);
+					documents[keysDocuments[i]].Content="../listener/Documents/"+documents[keysDocuments[i]].FinalFileName;
 					var imageToPhotoObject={};
 					imageToPhotoObject.AliasName_EN=documents[keysDocuments[i]].AliasName_EN;
 					imageToPhotoObject.AliasName_FR=documents[keysDocuments[i]].AliasName_FR;
@@ -51,17 +30,12 @@ myApp.service('Documents',['UserPreferences', '$cordovaDevice','$cordovaNetwork'
 					imageToPhotoObject.DocumentType=documents[keysDocuments[i]].DocumentType;
 					imageToPhotoObject.Content=documents[keysDocuments[i]].Content;
 					delete documents[keysDocuments[i]].Content;
-          delete documents[keysDocuments[i]].PathLocation;
+          			delete documents[keysDocuments[i]].PathLocation;
 					photos.push(imageToPhotoObject);
 					this.Photos.push(imageToPhotoObject);
 				};
-				$q.all(promises).then(function(results){
-					console.log(documents);
-					r.resolve(documents);
-				});
+				r.resolve(documents);
 				return r.promise;
-			console.log(this.Photos);
-
 		},
 		setDocumentsOffline:function(documents)
 		{

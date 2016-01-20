@@ -6,6 +6,7 @@ myApp.service('Patient',['UserPreferences','$q','$cordovaFileTransfer','$cordova
         setUserFieldsOnline:function(patientFields,diagnosis){
             var r=$q.defer();
             console.log(patientFields);
+            patientFields=patientFields[0]; 
             this.FirstName=patientFields.FirstName;
             this.LastName=patientFields.LastName;
             this.Alias=patientFields.Alias;
@@ -14,51 +15,21 @@ myApp.service('Patient',['UserPreferences','$q','$cordovaFileTransfer','$cordova
             this.Diagnosis=diagnosis;
             this.Alias=patientFields.Alias;
             this.UserSerNum=patientFields.PatientSerNum;
-            this.ProfileImage='data:image/'+patientFields.DocumentType+';base64,'+patientFields.ProfileImage;
-            profileImage=this.ProfileImage;
-            var app = document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1;
-            if(app){
-                if(typeof patientFields.ProfileImage!=='undefined'||patientFields.ProfileImage=='')
-                {
-                  patientFields.ProfileImage='data:image/'+patientFields.DocumentType+';base64,'+patientFields.ProfileImage;
-                  var platform=$cordovaDevice.getPlatform();
-                  var targetPath='';
-                  if(platform==='Android'){
-                      targetPath = cordova.file.dataDirectory+'Patient/patient'+patientFields.PatientSerNum+"."+patientFields.DocumentType;
-                  }else if(platform==='iOS'){
-                    targetPath = cordova.file.documentsDirectory+ 'Patient/patient'+patientFields.PatientSerNum+"."+patientFields.DocumentType;
-                  }
-                  var url = patientFields.ProfileImage;
-                  delete patientFields.ProfileImage;
-                  var trustHosts = true
-                  var options = {};
-                  this.NameFileSystem='patient'+patientFields.PatientSerNum+"."+patientFields.DocumentType;
-                  this.PathFileSystem=targetPath;
-                  patientFields.NameFileSystem='patient'+patientFields.PatientSerNum+"."+patientFields.DocumentType;
-                  patientFields.PathFileSystem=targetPath;
-                  var promise=[FileManagerService.downloadFileIntoStorage(url, targetPath)];
-                  $q.all(promise).then(function()
-                  {
-                    r.resolve(patientFields);
-                  },function(error){
-            				console.log(error);
-            				r.resolve(documents);
-            			});
-                }else{
-                  profileImage='./img/patient.png';
-                  r.resolve(patientFields);
-                }
-              }else{
-                if(typeof patientFields.ProfileImage!=='undefined'||patientFields.ProfileImage=='')
-                {
-                  patientFields.ProfileImage='data:image/'+patientFields.DocumentType+';base64,'+patientFields.ProfileImage;
-                  profileImage=patientFields.ProfileImage;
-                }else{
-                  profileImage='./img/patient.png';
-                }
-                delete patientFields.ProfileImage;
-                r.resolve(patientFields);
-              }
+
+
+
+            if(patientFields.ProfileImage&& typeof patientFields.ProfileImage!=='undefined'&& patientFields.ProfileImage=='')
+            {
+              var words=CryptoJS.enc.Hex.parse(patientFields.ProfileImage);
+              patientFields.ProfileImage=CryptoJS.enc.Base64.stringify(words);
+              this.ProfileImage='data:image/jpg;base64,'+patientFields.ProfileImage;
+              profileImage=this.ProfileImage;
+            }else{
+              profileImage='./img/patient.png';
+            }
+            delete patientFields.ProfileImage;
+            r.resolve(patientFields);
+              
             return r.promise;
         },
         setUserFieldsOffline:function(patientFields,diagnosis)

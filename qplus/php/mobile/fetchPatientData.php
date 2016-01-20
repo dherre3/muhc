@@ -1,5 +1,5 @@
 <?php
-
+//AngularJS trick to obtain post request data, does not affect another method is $_POST is already populated.
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST)) $_POST = json_decode(file_get_contents('php://input'), true);
 // Create DB connection
 include '../config.php';
@@ -9,15 +9,18 @@ if ($con->connect_error) {
     die("<br>Connection failed: " . $conn->connect_error);
 }
 $userID=$_POST["Username"];
+//The multi-query statements starts in line 194
 
-//Obtaining Lab results.
+
+
+//Obtaining Lab results query, 
 $sql="SELECT ComponentName, FacComponentName, AbnormalFlag, MaxNorm, MinNorm, ".
   "TestValue, TestValueString, UnitDescription, CAST(TestDate AS char(30)) as `TestDate`".
   " FROM TestResult, Users, Patient ".
   'WHERE Users.UserTypeSerNum=Patient.PatientSerNum AND '.
   'Users.Username Like '."'". $userID."';";
 
-//Obtaining Tasks.
+//Obtaining Tasks query.
  $sql.='SELECT '.
              'Alias.AliasName_EN AS TaskName_EN, '.
              'Alias.AliasName_FR AS TaskName_FR, '.
@@ -38,7 +41,7 @@ $sql="SELECT ComponentName, FacComponentName, AbnormalFlag, MaxNorm, MinNorm, ".
              'Users.Username Like '."'". $userID."';";
 
 
-//Obtaining Notifications
+//Obtaining Notifications query
 
 $sql.='SELECT '.
                       'Notifications.NotificationSerNum, '.
@@ -63,7 +66,7 @@ $sql.='SELECT '.
                       'Users.UserTypeSerNum=Patient.PatientSerNum AND '.
                       'Users.Username Like '."'". $userID."';";
 
-//Obtaining Documents
+//Obtaining Documents query
 
 $sql.='SELECT '.
                       'Document.FinalFileName, '.
@@ -88,7 +91,7 @@ $sql.='SELECT '.
                       'Users.UserTypeSerNum=Patient.PatientSerNum AND '.
                       'Users.Username Like '."'". $userID."';";
 
-//Obtaining appointments
+//Obtaining appointments query
 
  $sql.='SELECT '.
                       'Alias.AliasName_EN AS AppointmentType_EN, '.
@@ -116,7 +119,7 @@ $sql.='SELECT '.
                       'AliasExpression.AliasSerNum=Alias.AliasSerNum AND '.
                       'Users.UserTypeSerNum=Patient.PatientSerNum AND '.
                       'Users.Username Like '."'". $userID."';";
-//Obtaining Messages
+//Obtaining Messages query
 $sql.='SELECT '.
                       'Messages.MessageSerNum, '.
                       'Messages.SenderRole, '.
@@ -136,7 +139,7 @@ $sql.='SELECT '.
                        'Patient.PatientSerNum=Users.UserTypeSerNum AND' .
                         "( (Messages.ReceiverRole='Patient' AND Patient.PatientSerNum = Messages.ReceiverSerNum) OR (Messages.SenderRole='Patient' AND Patient.PatientSerNum = Messages.SenderSerNum) );";
 
-//Obtaining Diagnoses
+//Obtaining Diagnoses query
 $sql.='SELECT '.
                       'Diagnosis.Description_EN, '.
                       'Diagnosis.Description_FR '.
@@ -149,7 +152,7 @@ $sql.='SELECT '.
                        ' AND '.
                        'Users.UserTypeSerNum=Patient.PatientSerNum AND '.
                         'Diagnosis.PatientSerNum = Patient.PatientSerNum;';
-//Obtaining doctors
+//Obtaining doctors query
 $sql.='SELECT '.
                       'Doctor.FirstName, '.
                       'Doctor.LastName, '.
@@ -171,7 +174,7 @@ $sql.='SELECT '.
                        'Patient.PatientSerNum=Users.UserTypeSerNum AND '.
                         'PatientDoctor.PatientSerNum = Patient.PatientSerNum AND '.
                         'Doctor.DoctorSerNum = PatientDoctor.DoctorSerNum;';
-//Obtaing patient information
+//Obtaing patient information query
 $sql.='SELECT ' .
                       'Patient.PatientSerNum,' .
                       'Patient.FirstName, ' .
@@ -189,7 +192,9 @@ $sql.='SELECT ' .
                     'WHERE '.
                       "Users.Username LIKE '". $userID."'AND Users.UserTypeSerNum = Patient.PatientSerNum;";                        
 
-// Execute multi query
+// Execute multi query 
+
+//Defining name of database tables to simulate Firebase structure.
  $fieldsArray=array('LabTests','Tasks','Notifications','Documents','Appointments','Messages','Diagnoses','Doctors','Patient');
  $index=0;
  $patientDataArray=array();
@@ -204,12 +209,10 @@ if (mysqli_multi_query($con,$sql))
       while ($row=mysqli_fetch_assoc($result))
         {
        	$json[]=$row;
-       	//echo json_encode($json);
         }
-       //Update to next field
-        //echo json_encode($json);
-        //echo $fieldsArray[$index];
         $patientDataArray[$fieldsArray[$index]]=$json;
+
+        //Checking for the  last table query to spit the data.
         if($fieldsArray[$index]=='Patient')
        	{
 			echo json_encode($patientDataArray);
