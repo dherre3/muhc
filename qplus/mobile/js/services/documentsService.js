@@ -16,7 +16,7 @@ myApp.service('Documents',['UserPreferences', '$cordovaDevice','$cordovaNetwork'
 				var keysDocuments=Object.keys(documents);
 				for (var i = 0; i < keysDocuments.length; i++) {
 					var n =documents[keysDocuments[i]].FinalFileName.lastIndexOf('.');
-					var fileType=documents[keysDocuments[i]].FinalFileName.substring(n+1,documents[keysDocuments[i]].FinalFileName.length);
+					documents[keysDocuments[i]].DocumentType=documents[keysDocuments[i]].FinalFileName.substring(n+1,documents[keysDocuments[i]].FinalFileName.length);
 					documents[keysDocuments[i]].Content="../listener/Documents/"+documents[keysDocuments[i]].FinalFileName;
 					var imageToPhotoObject={};
 					imageToPhotoObject.AliasName_EN=documents[keysDocuments[i]].AliasName_EN;

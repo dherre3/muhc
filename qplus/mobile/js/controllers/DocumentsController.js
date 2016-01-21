@@ -40,6 +40,7 @@ myApp.controller('SingleDocumentController', ['Documents', '$timeout', '$scope',
   console.log('Simgle Document Controller');
   var page = myNavigator.getCurrentPage();
   var image = page.options.param;
+
   if(image.DocumentType=='pdf')
   {
     image.PreviewContent='./img/pdf-icon.png';

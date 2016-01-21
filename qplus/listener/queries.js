@@ -154,7 +154,6 @@ exports.patientNotificationsQuery=function(userID)
                     'From '+
                       'Notifications, '+
                       'Patient, '+
-                      'Resource, '+
                       'Users, ' +
                       'Alias ' +
                     'WHERE '+

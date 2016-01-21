@@ -57,7 +57,6 @@ $sql.='SELECT '.
                     'From '.
                       'Notifications, '.
                       'Patient, '.
-                      'Resource, '.
                       'Users, ' .
                       'Alias ' .
                     'WHERE '.

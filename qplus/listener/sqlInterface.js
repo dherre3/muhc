@@ -113,7 +113,6 @@ exports.cascadeFunction=function(UserID,queue,startObject)
 exports.getPatient=function(UserID)
 {
   var r=Q.defer();
-  console.log(queries.patientQuery(UserID));
   connection.query(queries.patientQuery(UserID), function(error, rows, fields)
   {
 
@@ -128,7 +127,6 @@ exports.getPatient=function(UserID)
 exports.getPatientLabTests=function(UserID)
 {
   var r=Q.defer();
-  console.log(queries.patientLabResultsQuery(UserID));
   connection.query(queries.patientLabResultsQuery(UserID), function(error, rows, fields)
   {
     if (error) r.reject(error);
@@ -182,7 +180,6 @@ exports.getPatientDocuments=function(UserID)
   var r=Q.defer();
   connection.query(queries.patientDocumentsQuery(UserID),function(error,rows,fields){
       if (error) r.reject(error);
-      console.log(error);
       LoadDocuments(rows).then(function(response){
       if(response=='All images were loaded!')
       {
@@ -198,9 +195,11 @@ exports.getPatientDocuments=function(UserID)
 exports.getPatientNotifications=function(UserID)
 {
   var r=Q.defer();
+  console.log(queries.patientNotificationsQuery(UserID));
   connection.query(queries.patientNotificationsQuery(UserID),function(error,rows,fields){
       console.log(error);
       if (error) r.reject(error);
+      console.log(rows);
       r.resolve(rows);
   });
   return r.promise;
@@ -252,7 +251,6 @@ exports.readNotification=function(requestObject)
 exports.checkIn=function(requestObject)
 {
   var r=Q.defer();
-  console.log(requestObject);
   var serNum=requestObject.Parameters.AppointmentSerNum;
 
   connection.query(queries.checkin(serNum),function(error, rows, fields)
@@ -267,7 +265,6 @@ exports.updateAccountField=function(requestObject)
 {
   var r=Q.defer();
   var UserID=requestObject.UserID;
-  console.log(requestObject);
   getPatientFromUserID(UserID).then(function(user)
   {
 
@@ -277,7 +274,6 @@ exports.updateAccountField=function(requestObject)
     if(field=='Password')
     {
       newValue=CryptoJS.SHA256(newValue);
-      console.log(newValue);
       connection.query(queries.setNewPassword(newValue,patientSerNum),
       function(error, rows, fields)
       {
@@ -458,7 +454,6 @@ var LoadAttachments = function (rows )
 function loadImageDoctor(rows){
   var deferred = Q.defer();
   for (var key in rows){
-    console.log(rows[key].ProfileImage.length);
     if((typeof rows[key].ProfileImage !=="undefined" )&&rows[key].ProfileImage){
 
       var n = rows[key].ProfileImage.lastIndexOf(".");
@@ -481,7 +476,6 @@ function loadProfileImagePatient(rows){
     var base64Buffer=buffer.toString('base64');
     rows[0].DocumentType='jpg';
     rows[0].ProfileImage=base64Buffer;
-    console.log(base64Buffer);
     deferred.resolve(rows);
     /*var n = rows[0].ProfileImage.lastIndexOf(".");
     var substring=rows[0].ProfileImage.substring(n+1,rows[0].ProfileImage.length);

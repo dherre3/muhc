@@ -25,7 +25,7 @@ myApp.service('Doctors',function($q,$filter,FileManagerService,$cordovaDevice){
             Oncologists=[];
             OtherDoctors=[];
             PrimaryPhysician=[];
-            var promises=[];
+            var promises=[];  
             if(typeof doctors!=='undefined'&&doctors){
                 var doctorKeyArray=Object.keys(doctors);
                 for (var i = 0; i < doctors.length; i++) {  
@@ -35,7 +35,7 @@ myApp.service('Doctors',function($q,$filter,FileManagerService,$cordovaDevice){
                   {
                     copyDoctor.ProfileImage='./img/doctor.png';
                   }else{
-                    doctors[doctorKeyArray[i]].ProfileImage="../listener/Doctors/"+doctors[doctorKeyArray[i]].ProfileImage;
+                    copyDoctor.ProfileImage="../listener/Doctors/"+doctors[doctorKeyArray[i]].ProfileImage;
                   }
                    if(copyDoctor.PrimaryFlag=='1'&&copyDoctor.OncologistFlag=='0'){
                         this.PrimaryPhysician.push(copyDoctor);

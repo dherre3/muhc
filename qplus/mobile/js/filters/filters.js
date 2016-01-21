@@ -171,17 +171,16 @@ return function(items,option)
 myApp.filter('FormatPhoneNumber',function(){
 	return function(phone)
 	{
-		console.log(typeof(phone));
 		if(typeof phone =='string'&&phone.length==10)
 		{
-			console.log('Inside string equal ten');
+			
 			var firstDigits=phone.substring(0,3);
 			var secondDigits=phone.substring(3,6);
 			var thirdDigits=phone.substring(6,phone.length);
-			console.log("("+firstDigits+")"+" "+secondDigits+"-"+thirdDigits);
+			
 			return "("+firstDigits+")"+" "+secondDigits+"-"+thirdDigits;
 		}else{
-			console.log(phone)
+
 			return phone;
 		}
 	};

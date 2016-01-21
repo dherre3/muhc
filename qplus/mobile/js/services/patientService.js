@@ -16,16 +16,18 @@ myApp.service('Patient',['UserPreferences','$q','$cordovaFileTransfer','$cordova
             this.Alias=patientFields.Alias;
             this.UserSerNum=patientFields.PatientSerNum;
             
-            if(patientFields.ProfileImage&& typeof patientFields.ProfileImage!=='undefined'&& patientFields.ProfileImage=='')
+            if(patientFields.ProfileImage&& typeof patientFields.ProfileImage!=='undefined'&& patientFields.ProfileImage!=='')
             {
+              console.log(typeof patientFields.ProfileImage);
               var words=CryptoJS.enc.Hex.parse(patientFields.ProfileImage);
               patientFields.ProfileImage=CryptoJS.enc.Base64.stringify(words);
               this.ProfileImage='data:image/jpg;base64,'+patientFields.ProfileImage;
+              console.log(this.ProfileImage);
               profileImage=this.ProfileImage;
             }else{
               profileImage='./img/patient.png';
             }
-            delete patientFields.ProfileImage;
+            console.log(profileImage)
             r.resolve(patientFields);
               
             return r.promise;
@@ -101,6 +103,7 @@ myApp.service('Patient',['UserPreferences','$q','$cordovaFileTransfer','$cordova
             return this.UserSerNum;
         },
         setProfileImage:function(img){
+            console.log('why?')
             this.ProfileImage='data:image/png;base64,'+img;
         },
         getProfileImage:function(){

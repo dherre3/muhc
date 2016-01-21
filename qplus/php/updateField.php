@@ -7,6 +7,7 @@ if ( isset($_POST["DoctorSerNum"])) {
   $sqlLookup="
     UPDATE Doctor
     SET Doctor." . $fieldToChange . "=" ."'". $_POST["newValue"]."'". " WHERE Doctor.DoctorSerNum=" . $_POST["DoctorSerNum"].";";
+    echo $sqlLookup;
 }else if ( isset($_POST["AdminSerNum"])) {
   $fieldToChange=$FileName = str_replace("'", "", $_POST["field"]);
   $sqlLookup="

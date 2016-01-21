@@ -31,6 +31,7 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
           signinUser(user).then(function(){$modalInstance.close(user);});
         }else{
           window.localStorage.removeItem('OpalAdminPanelUser');
+
         }    
       }
 
@@ -91,10 +92,7 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
 
           if ( response.AdminSerNum ||response.DoctorSerNum||response.StaffSerNum)
           {
-            console.log(response);
-            var date=new Date();
-            date.setHours(date.getHours()+24);
-            response.timestamp=date;
+            
             response.Username=username;
             response.Password=password;
             response.expires=new Date();
