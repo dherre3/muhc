@@ -39,13 +39,13 @@ myApp.controller('NotificationsController', ['RequestToServer','Notifications', 
         $scope.noNotifications=false;
         if(Language==='EN'){
             for (var i = 0; i < notificationsArray.length; i++) {
-                notificationsArray[i].Name=notificationsArray[i].NotificationPublishedType_EN;
-                notificationsArray[i].Content=notificationsArray[i].NotificationContent_EN;
+                notificationsArray[i].Name=notificationsArray[i].AliasName_EN;
+                notificationsArray[i].Content=notificationsArray[i].AliasDescription_EN;
             }
         }else{
             for (var i = 0; i < notificationsArray.length; i++) {
-                notificationsArray[i].Name=notificationsArray[i].NotificationPublishedType_FR;
-                notificationsArray[i].Content=notificationsArray[i].NotificationContent_FR;
+                notificationsArray[i].Name=notificationsArray[i].AliasName_FR;
+                notificationsArray[i].Content=notificationsArray[i].AliasDescription_FR;
             }
         }
         $timeout(function(){
@@ -68,9 +68,14 @@ myApp.controller('NotificationsController', ['RequestToServer','Notifications', 
                 myNavigator.pushPage('./templates/appointments/individual-appointment.html', {param:app},{ animation : 'slide' } );
             }else if(notification.Type==='Document'){
                 console.log('doing it');
+                console.log(notification.TypeSerNum);
+                console.log(Documents.getDocuments());
                 var doc=Documents.getDocumentBySerNum(notification.TypeSerNum);
+                console.log(myNavigator);
                 myNavigator.pushPage('./templates/documents/individual-document.html',{param:doc},{ animation : 'slide' } );
                // menu.setMainPage('views/scansNDocuments.html', {closeMenu: true});
+            }else{
+              myNavigator.pushPage('./templates/notifications/individual-notification.html',{param:notification},{ animation : 'slide' } );
             }
         }
 }]);

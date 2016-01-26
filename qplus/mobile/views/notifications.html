@@ -31,8 +31,7 @@
                 {{notification.Name}}
               </div>
           <div class="desc">
-                {{notification.IssuedBy}}
-                <div style=" color:grey;">{{notification.Content}}</div>
+                <div style=" color:grey;">{{notification.Content|limitLetters:100}}</div>
               </div>
               </div>
         </ons-col>
