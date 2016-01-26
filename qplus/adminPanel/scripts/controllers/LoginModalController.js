@@ -97,6 +97,7 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
             response.Password=password;
             response.expires=new Date();
             window.localStorage.setItem('OpalAdminPanelUser',JSON.stringify(response));
+            console.log(response);
             signinUser(response);
           }else if(response=="")
           {

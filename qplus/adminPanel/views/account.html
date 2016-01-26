@@ -17,7 +17,7 @@
           <div ng-show="value.Edit" style="margin-top:15px">
             <strong> Enter your new {{key|formatFieldsAccount}}: </strong>
           </div></td>
-          <td ng-show="key!=='Image'">{{value.Value|formatTelNum}}
+          <td ng-if="key!=='Image'">{{value.Value|formatTelNum}}
             <div ng-show="value.Edit" style="margin-top:15px">
               <div class="row">
                 <div style="margin-left:100px">
@@ -36,14 +36,14 @@
               <button class="btn btm-sm btn-danger" ng-click="value.Edit=false;value.newValue=value.Value;alert[key].show=false"> Cancel</button>
             </div>
           </div>
-          <div ng-show="alert[key].show==true">
+          <div ng-if="alert[key].show==true">
             <uib-alert type="{{alert[key].alertType}}">{{alert[key].reason}}</uib-alert>
           </div>
         </div>
           </td>
-          <td ng-show="key=='Image'">
+          <td ng-if="key=='Image'">
             <img ng-src="{{value.Value}}" width="40px">
-            <div ng-show="value.Edit">
+            <div ng-if="value.Edit">
               <div class="col-xs-12">
                 <span class="btn btn-primary btn-file" style="margin:5px 0 5px 0">
                     Browse <input type="file" accept="image/*" fileread="uploadProfilePic">
@@ -70,7 +70,7 @@
           <tr align="center">
             <td><strong>Username</strong></td>
             <td> {{username.Value}}
-              <div ng-show="username.Edit">
+              <div ng-if="username.Edit">
                 <div class="row">
                   <div style="margin-left:100px">
                 <div class="col-xs-6">
@@ -89,7 +89,7 @@
               </div>
 
             </div>
-            <div ng-show="alert['Username'].show==true">
+            <div ng-if="alert['Username'].show==true">
               <uib-alert type="{{alert['Username'].alertType}}">{{alert['Username'].reason}}</uib-alert>
             </div>
           </div>
@@ -99,7 +99,7 @@
           <tr align="center">
             <td><strong>Password</strong></td>
             <td> *****
-              <div ng-show="password.Edit">
+              <div ng-if="password.Edit">
                 <div class="row">
                   <div style="margin-left:100px">
                 <div class="col-xs-6">
@@ -120,7 +120,7 @@
               </div>
 
             </div>
-            <div ng-show="alert['Password'].show==true">
+            <div ng-if="alert['Password'].show==true">
               <uib-alert type="{{alert['Password'].alertType}}">{{alert['Password'].reason}}</uib-alert>
             </div>
           </div>

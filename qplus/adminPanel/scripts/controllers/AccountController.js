@@ -1,10 +1,10 @@
 app.controller('AccountController',function ($rootScope, $scope,User, $timeout, fieldsValidate) {
 
-  User.getUserFromServer().then(function(response)
+  /*User.getUserFromServer().then(function(response)
   {
     console.log(response);
     User.setUserSerNum(response.UserSerNum);
-  });
+  });*/
 
   $scope.accountFields=User.getAccountFields();
   $scope.password=User.getUserPassword();
