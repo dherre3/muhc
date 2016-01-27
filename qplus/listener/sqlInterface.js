@@ -204,6 +204,7 @@ exports.getPatientNotifications=function(UserID)
   });
   return r.promise;
 
+
 }
 exports.getPatientTasks=function(UserID)
 {
@@ -409,7 +410,7 @@ var LoadDocuments = function (rows)
       var n = rows[key].FinalFileName.lastIndexOf(".");
       var substring=rows[key].FinalFileName.substring(n+1,rows[key].FinalFileName.length);
       rows[key].DocumentType=substring;
-      rows[key].Content=filesystem.readFileSync(__dirname +  '/Documents/' + rows[key].FinalFileName,'base64' );
+      rows[key].Content=filesystem.readFileSync('/home/VarianFILEDATA/Documents/' + rows[key].FinalFileName,'base64' );
 
       imageCounter++;
       //console.log('imagecounter is : ',imageCounter);
@@ -459,7 +460,7 @@ function loadImageDoctor(rows){
       var n = rows[key].ProfileImage.lastIndexOf(".");
       var substring=rows[key].ProfileImage.substring(n+1,rows[key].ProfileImage.length);
       rows[key].DocumentType=substring;
-      rows[key].ProfileImage=filesystem.readFileSync(__dirname + '/Doctors/'+rows[key].ProfileImage,'base64' );
+      rows[key].ProfileImage=filesystem.readFileSync('/home/VarianFILEDATA/Doctors/'+rows[key].ProfileImage,'base64' );
 
     }
   }
