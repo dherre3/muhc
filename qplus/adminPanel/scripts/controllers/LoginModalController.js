@@ -26,7 +26,7 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
         var diff=(new Date()-date)/1000;
 
         console.log(diff);
-        if(diff<60)
+        if(diff<$rootScope.userExpiration)
         {
           signinUser(user).then(function(){$modalInstance.close(user);});
         }else{
@@ -92,12 +92,10 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
 
           if ( response.AdminSerNum ||response.DoctorSerNum||response.StaffSerNum)
           {
-            
+            console.log(response);
             response.Username=username;
-            response.Password=password;
             response.expires=new Date();
             window.localStorage.setItem('OpalAdminPanelUser',JSON.stringify(response));
-            console.log(response);
             signinUser(response);
           }else if(response=="")
           {

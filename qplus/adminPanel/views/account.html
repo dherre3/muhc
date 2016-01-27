@@ -1,7 +1,8 @@
 <div class="main-div-container">
   <div class="container">
-    <div ><h4>Role: {{userType}}</h4></div>
-    <div ng-show="userType=='Doctor'"><h4>Doctor Aria Ser: {{doctorAriaSer}}</h4></div>
+    <div ><h4>Role: {{userFields.Role}}</h4></div>
+    <div ng-show="userFields.Role=='Doctor'"><h4>Doctor Aria Ser: {{userFields.DoctorAriaSer}}</h4></div>
+    <div ng-show="userFields.Role=='Staff'"><h4>StaffID: {{userFields.StaffID}}</h4></div>
 
     <h3>Personal App Information</h3>
     <p style="color:grey">The information below is the personal information shared with the patients about you.</p>
@@ -12,13 +13,13 @@
         <th></th>
       </thead>
       <tbody>
-        <tr align="center" ng-repeat="(key, value) in accountFields" ng-show="key!=='Username'">
+        <tr ng-click="value.Edit=true;closeAllOtherFields(key)" align="center" ng-repeat="(key, value) in accountFields" ng-if="key!=='Password'&&key!=='Username'">
           <td><strong>{{key|formatFieldsAccount}}</strong>
           <div ng-show="value.Edit" style="margin-top:15px">
             <strong> Enter your new {{key|formatFieldsAccount}}: </strong>
           </div></td>
           <td ng-if="key!=='Image'">{{value.Value|formatTelNum}}
-            <div ng-show="value.Edit" style="margin-top:15px">
+            <div ng-if="value.Edit" style="margin-top:15px">
               <div class="row">
                 <div style="margin-left:100px">
               <div class="col-xs-6">
@@ -67,17 +68,17 @@
           <th></th>
         </thead>
         <tbody>
-          <tr align="center">
+          <tr align="center" ng-click="accountFields.Username.Edit=true;closeAllOtherFields('Username')">
             <td><strong>Username</strong></td>
-            <td> {{username.Value}}
-              <div ng-if="username.Edit">
+            <td> {{accountFields.Username.Value}}
+              <div ng-if="accountFields.Username.Edit">
                 <div class="row">
                   <div style="margin-left:100px">
                 <div class="col-xs-6">
-                <input ng-minlength="1" type="text" placeholder="Enter new username" value="username" ng-model="username.newValue"><br>
+                <input ng-minlength="1" type="text" placeholder="Enter new username" value="username" ng-model="accountFields.Username.newValue"><br>
               </div>
               <div class="col-xs-2">
-                <a ng-click="username.newValue=''" ><span class="list-item-note lucent"><i class="icon ion-close-circled"></i></span></a><br>
+                <a ng-click="accountFields.Username.newValue=''" ><span class="list-item-note lucent"><i class="icon ion-close-circled"></i></span></a><br>
               </div>
             </div>
                 </div>
@@ -85,7 +86,7 @@
                 <div class="row">
               <div class="col-xs-12">
                 <button class="btn btm-sm btn-success" ng-click="updateUsername()"> Update</button>&nbsp;
-                <button class="btn btm-sm btn-danger" ng-click="username.Edit=false;username.newValue=value.Value;alert['username'].show=false"> Cancel</button>
+                <button class="btn btm-sm btn-danger" ng-click="accountFields.Username.Edit=false;accountFields.Username.newValue=accountFields.Username.Value;alert['username'].show=false"> Cancel</button>
               </div>
 
             </div>
@@ -94,21 +95,21 @@
             </div>
           </div>
             </td>
-            <td align="right"><a href ng-click="username.Edit=true"><i class="icon-edit-account icon ion-edit"></i></a></td>
+            <td align="right"><a href ng-click="accountFields.Username.Edit=true;closeAllOtherFields('Username')"><i class="icon-edit-account icon ion-edit"></i></a></td>
           </tr>
-          <tr align="center">
+          <tr align="center" ng-click="accountFields.Password.Edit=true;closeAllOtherFields('Password')">
             <td><strong>Password</strong></td>
             <td> *****
-              <div ng-if="password.Edit">
+              <div ng-if="accountFields.Password.Edit">
                 <div class="row">
                   <div style="margin-left:100px">
                 <div class="col-xs-6">
-                <input ng-minlength="1" type="Password" placeholder="Enter old password" value="Password" ng-model="password.oldValue"><br>
-                <input ng-minlength="1" type="Password" placeholder="Enter new password" value="Password" ng-model="password.newValue">
+                <input ng-minlength="1" type="Password" placeholder="Enter old password" value="Password" ng-model="accountFields.Password.Value"><br>
+                <input ng-minlength="1" type="Password" placeholder="Enter new password" value="Password" ng-model="accountFields.Password.newValue">
               </div>
               <div class="col-xs-2">
-                <a ng-click="password.newValue=''" ><span class="list-item-note lucent"><i class="icon ion-close-circled"></i></span></a><br>
-                <a ng-click="password.renewValue=''" ><span class="list-item-note lucent"><i class="icon ion-close-circled"></i></span></a>
+                <a ng-click="accountFields.Password.Value=''" ><span class="list-item-note lucent"><i class="icon ion-close-circled"></i></span></a><br>
+                <a ng-click="accountFields.Password.newValue=''" ><span class="list-item-note lucent"><i class="icon ion-close-circled"></i></span></a>
               </div>
             </div>
                 </div>
@@ -116,7 +117,7 @@
                 <div class="row">
               <div class="col-xs-12">
                 <button class="btn btm-sm btn-success" ng-click="updatePassword()"> Update</button>&nbsp;
-                <button class="btn btm-sm btn-danger" ng-click="password.Edit=false;password.newValue=value.Value;alert['Password'].show=false"> Cancel</button>
+                <button class="btn btm-sm btn-danger" ng-click="accountFields.Password.Edit=false;accountFields.Password.newValue=accountFields.Password.Value;alert['Password'].show=false"> Cancel</button>
               </div>
 
             </div>
@@ -125,7 +126,7 @@
             </div>
           </div>
             </td>
-            <td align="right"><a href ng-click="password.Edit=true"><i class="icon-edit-account icon ion-edit"></i></a></td>
+            <td align="right"><a href ng-click="accountFields.Password.Edit=true;closeAllOtherFields('Password')"><i class="icon-edit-account icon ion-edit"></i></a></td>
           </tr>
         </tbody>
       </table>

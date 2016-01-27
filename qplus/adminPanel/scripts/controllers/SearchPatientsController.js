@@ -1,7 +1,8 @@
 var app=angular.module('adminPanelApp');
-app.controller('SearchPatientsController' , function (api,$scope,Patient,$state) {
+app.controller('SearchPatientsController' , function (api,$scope,Patient,$state,$rootScope) {
 
 		var patients=api.getAllPatients();
+
 		patients.then(function(patients,error){
 			console.log(error);
 			console.log(patients);
@@ -9,6 +10,7 @@ app.controller('SearchPatientsController' , function (api,$scope,Patient,$state)
 		});
 		$scope.goToPatient=function(patient)
 	   	{
+	   		$rootScope.checkSession();
 			Patient.setPatient(patient);
 			Patient.getPatientUserFromServer().then(function(rows)
 			{

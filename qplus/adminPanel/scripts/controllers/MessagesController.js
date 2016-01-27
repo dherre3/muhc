@@ -31,7 +31,7 @@ $scope.goToConversation=function(index)
 	});
 }
 $scope.sendMessage=function(index){
-
+	$rootScope.checkSession();
 	var messageToSend={};
 	console.log(Messages.getMessages());
  var messageDate=new Date();

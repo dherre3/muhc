@@ -26,19 +26,37 @@
 <table class="table table-bordered table-condensed" align="center">
   <tr align="center">
     <th>
+      Patient Id
+    </th>
+    <th>
+      AriaSer  
+    </th>
+    <th>
+      SSN
+    </th>
+    <th>
       First Name
     </th>
     <th>
       Last Name
     </th>
     <th>
-      SSN
+      Email
     </th>
-    <th>
+    <!--<th>
       Reset Password
-    </th>
+    </th>-->
   </tr>
   <tr align="center">
+    <td>
+      {{ariaResponse.PatientId}}
+    </td>
+    <td>
+      {{ariaResponse.PatientAriaSer}}
+    </td>
+    <td>
+      {{ariaResponse.SSN}}
+    </td>
     <td>
       {{ariaResponse.FirstName}}
     </td>
@@ -46,11 +64,11 @@
       {{ariaResponse.LastName}}
     </td>
     <td>
-      {{ariaResponse.SSN}}
+      {{ariaResponse.Email}}
     </td>
-    <td>
+    <!--<td>
       <button class="btn btn-primary" ng-click="resetPassword()">Reset Password</button>
-    </td>
+    </td>-->
   </tr>
 
 </table>

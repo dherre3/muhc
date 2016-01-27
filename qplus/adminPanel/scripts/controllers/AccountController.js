@@ -1,22 +1,12 @@
-app.controller('AccountController',function ($rootScope, $scope,User, $timeout, fieldsValidate) {
+app.controller('AccountController',function ($rootScope, URLs,$scope,User, $timeout, fieldsValidate) {
 
-  /*User.getUserFromServer().then(function(response)
-  {
-    console.log(response);
-    User.setUserSerNum(response.UserSerNum);
-  });*/
+  
 
-  $scope.accountFields=User.getAccountFields();
-  $scope.password=User.getUserPassword();
-  $scope.username=User.AccountObject['Username'];
-  var fields=User.getUserFields();
-  console.log(fields);
-  if(fields.DoctorAriaSer){
-    $scope.doctorAriaSer=fields.DoctorAriaSer;
-  }
-
+ 
+  setUpAccountSettings();
   $scope.update=function(key, value)
   {
+    $rootScope.checkSession()
     console.log(value);
     var result=fieldsValidate.validateString(key,value);
     $timeout(function(){
@@ -32,20 +22,23 @@ app.controller('AccountController',function ($rootScope, $scope,User, $timeout, 
     }
   };
   $scope.updatePassword=function(){
-    var result=fieldsValidate.validatePassword($scope.password.oldValue,  $scope.password.newValue,$scope.password);
-    $timeout(function(){
-      $scope.alert={};
-      $scope.alert['Password']=result;
-      $scope.alert['Password'].show=true;
-    });
-    if(result.type=='success')
-    {
-      User.updateFieldInServer('Password', $scope.password.newValue);
-      User.updateUserField('Password',$scope.password.newValue);
-      $scope.closeAllOtherFields()
-    }
+    $rootScope.checkSession();
+    fieldsValidate.validatePassword($scope.password.oldValue,$scope.password.newValue).then(function(result){
+      $timeout(function(){
+        $scope.alert={};
+        $scope.alert['Password']=result;
+        $scope.alert['Password'].show=true;
+      });
+      if(result.type=='success')
+      {
+        User.updateFieldInServer('Password', $scope.password.newValue);
+        User.updateUserField('Password',$scope.password.newValue);
+        $scope.closeAllOtherFields()
+      }
+      console.log(result);
+    })
 
-    console.log(result);
+
   };
   $scope.$watch('uploadProfilePic',function(){
     console.log($scope.uploadProfilePic);
@@ -72,5 +65,39 @@ app.controller('AccountController',function ($rootScope, $scope,User, $timeout, 
       }
     }
   }
-
+  function setUpAccountSettings()
+  {
+    var userFields=User.getUserFields();
+    $scope.userFields=userFields;
+    console.log(userFields);
+    var accountObject={};
+    for (var key in userFields) {
+      if(key!=='Image'&&key!=='UserTypeSerNum'&&key!=='DoctorAriaSer'&&key!=='Role'&&key!=='StaffID')
+      {
+        accountObject[key]=
+        {
+          'Value':userFields[key],
+          'Edit':false,
+          'newValue':userFields[key]
+        }
+      }else if(key=='Image')
+      {
+        accountObject[key]=
+        {
+          'Value':URLs.getDoctorImageUrl()+userFields[key],
+          'Edit':false,
+          'newValue':URLs.getDoctorImageUrl()+userFields[key]
+        }
+      }else if(key=='Password')
+      {
+        accountObject[key]=
+        {
+          'Value':'',
+          'Edit':false,
+          'newValue':''
+        }
+      }
+    };
+    $scope.accountFields=accountObject;
+  }
 });

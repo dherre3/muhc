@@ -174,7 +174,7 @@ app.service('LoginModal', function ($rootScope,$uibModal)
   });
 
 // RUN
-app.run(function ($rootScope, $state,LoginModal,$timeout)
+app.run(function ($rootScope, $state,LoginModal,$timeout,URLs,api,User)
 {
   /**
   * @ngdoc service
@@ -188,11 +188,26 @@ app.run(function ($rootScope, $state,LoginModal,$timeout)
   $state.go('home');
   $rootScope.$on('$stateChangeStart', function (event, toState, toParams)
   {
+    $rootScope.checkSession();
     var requireLogin = toState.data.requireLogin;
+    if($rootScope.isUserCheckedIn())
+    {
+      var user=window.localStorage.getItem('OpalAdminPanelUser');
+      user=JSON.parse(user);
+      api.getFieldFromServer(URLs.getUserUrl(),{Username:user.Username}).then(function(responseUser){
+        console.log(responseUser);
+        api.getFieldFromServer(URLs.getUserInformation(),{UserType:responseUser.UserType,UserTypeSerNum:responseUser.UserTypeSerNum})
+        .then(function(response){
+          User.setUserFields(response,responseUser.Username,responseUser.UserSerNum);
+          console.log(response);
+        });
+      });
+    }
 
 
     if (requireLogin && typeof $rootScope.currentUser === 'undefined')
     {
+      console.log($rootScope.currentUser);
       event.preventDefault();
       LoginModal()
       .then(function () {
@@ -200,7 +215,6 @@ app.run(function ($rootScope, $state,LoginModal,$timeout)
       })
       .catch(function ()
       {
-        setMenuClasses('home');
         return $state.go('home');
       });
 

@@ -1,6 +1,6 @@
 
 var app=angular.module('adminPanelApp');
-app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeout',function($scope,$http,URLs,api,$timeout){
+app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeout','$rootScope',function($scope,$http,URLs,api,$timeout,$rootScope){
   /**
   * @ngdoc controller
   * @name AdminPanel.controller:registerCtrl
@@ -67,6 +67,7 @@ $scope.alert={};
    * @param {Object} ssn Patient's SSN
    * @returns {String} $scope.patientFound
    */
+    $rootScope.checkSession();
 
    $scope.message="";
      if ($scope.SSN.length>11){
