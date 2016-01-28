@@ -1,0 +1,101 @@
+
+<ons-page ng-controller="ContactsController" style="background-color:white">
+    <ons-toolbar>
+   <div class="left">
+      <ons-toolbar-button ng-click="menu.toggle()">
+        <ons-icon icon="ion-navicon" size="28px" fixed-width="false"></ons-icon><div class="notification menu-notification">{{TotalNumberOfNews}}</div>
+      </ons-toolbar-button>
+    </div>
+    <div class="center">Contacts</div>
+  </ons-toolbar>
+      <ons-pull-hook ng-action="load($done)" var="loader" height="100px">
+        <span ng-switch="loader.getCurrentState()">
+          <span ng-switch-when="initial"><ons-icon size="35px" icon="ion-arrow-down-a"></ons-icon> Pull down to refresh</span>
+          <span ng-switch-when="preaction"><ons-icon size="35px" icon="ion-arrow-up-a"></ons-icon> Release to refresh</span>
+          <span ng-switch-when="action"><ons-icon size="35px" spin="true" icon="ion-load-d"></ons-icon> Loading data...</span>
+        </span>
+      </ons-pull-hook>
+    <ons-list >
+        <!--<ons-list class="person-list">-->
+
+
+      <ons-list-header class="person-list-header" ng-show="primaryPhysician.length>0">Primary Doctor</ons-list-header>
+
+      <ons-list-item modifier="chevron" ng-repeat="doctor in primaryPhysician" ng-click="goDoctorContact(doctor)" class="list-item-container">
+          <div class="list-item-left">
+            <img ng-src="{{doctor.ProfileImage}}" class="avator">
+          </div>
+          <div class="list-item-right">
+            <div class="list-item-content">
+              <div class="name">{{doctor.FirstName}} {{doctor.LastName}}
+              </div>
+
+              <span class="desc">Doctor</span>
+            </div>
+          </div>
+      </ons-list-item>
+
+
+      <!--<ons-list-item class="person" ng-repeat="doctor in primaryPhysician" ng-click="goDoctorContact(doctor)" modifier="chevron">
+        <ons-row>
+        <ons-col width="50px">
+        <img ng-src="{{doctor.ProfileImage}}" class="person-image">
+        </ons-col>
+        <ons-col class="person-name">
+            {{doctor.FirstName}} {{doctor.LastName}}
+        </ons-col>
+      </ons-row>
+      </ons-list-item>-->
+
+      <ons-list-header class="person-list-header" ng-show="oncologists.length>0">Oncologists</ons-list-header>
+      <ons-list-item modifier="chevron" ng-repeat="doctor in oncologists" ng-click="goDoctorContact(doctor)" class="list-item-container">
+          <div class="list-item-left">
+            <img ng-src="{{doctor.ProfileImage}}" class="avator">
+          </div>
+          <div class="list-item-right">
+            <div class="list-item-content">
+              <div class="name">{{doctor.FirstName}} {{doctor.LastName}}
+              </div>
+
+              <span class="desc">Doctor</span>
+            </div>
+          </div>
+      </ons-list-item>
+      <!--<ons-list-item class="person" ng-repeat="doctor in oncologists" ng-click="goDoctorContact(doctor)" modifier="chevron">
+        <ons-row>
+        <ons-col width="50px">
+        <img ng-src="{{doctor.ProfileImage}}" class="person-image">
+        </ons-col>
+        <ons-col class="person-name">
+            
+        </ons-col>
+        </ons-row>
+      </ons-list-item>-->
+
+      <ons-list-header class="person-list-header" ng-show="otherDoctors.length>0">Other</ons-list-header>
+        <ons-list-item modifier="chevron" ng-repeat="doctor in otherDoctors" ng-click="goDoctorContact(doctor)" class="list-item-container">
+          <div class="list-item-left">
+            <img ng-src="{{doctor.ProfileImage}}" class="avator">
+          </div>
+          <div class="list-item-right">
+            <div class="list-item-content">
+              <div class="name">{{doctor.FirstName}} {{doctor.LastName}}
+              </div>
+
+              <span class="desc">Doctor</span>
+            </div>
+          </div>
+      </ons-list-item>
+      <!--<ons-list-item class="person" ng-repeat="doctor in otherDoctors" ng-click="goDoctorContact(doctor)" modifier="chevron">
+        <ons-row>
+        <ons-col width="50px">
+        <img ng-src="{{doctor.ProfileImage}}" class="person-image">
+        </ons-col>
+        <ons-col class="person-name">
+            {{doctor.FirstName}} {{doctor.LastName}}
+        </ons-col>
+        </ons-row>
+      </ons-list-item>-->
+
+    </ons-list>
+  </ons-page>

@@ -55,6 +55,7 @@ myApp.controller('NotificationsController', ['RequestToServer','Notifications', 
     }
 
     $scope.goToNotification=function(index,notification){
+        
             console.log(notification.Type);
             if(notification.ReadStatus==='0'){
                 RequestToServer.sendRequest('NotificationRead',notification.NotificationSerNum);

@@ -1,0 +1,45 @@
+<ons-page ng-controller="IndividualStageController">
+  <ons-toolbar >
+    <div class="left"><ons-back-button>Back</ons-back-button></div>
+    <div class="center">Notification</div>
+  </ons-toolbar>
+  <!--<div class="container jumbotron" style="text-align: left;padding:5% 2% 5% 2%">-->
+  <div class='container' style="margin-top:3vh">
+  <div class="my-home-profile" ng-click="openDocument()">
+    <ons-row >
+      <ons-col width="30px">
+        <div align="right" >
+          <i class="fa fa-hospital-o iconHomeView"></i>
+        </div>
+      </ons-col>
+      <ons-col>
+      <div  align="middle" style="margin-left:5px">
+        <span class="profile-name titleThemeCard">{{stage.Name}}</span><br>
+          <div align="center">
+            <div class="plan-info">
+                <div ng-show="stage.Type=='Appointment'">
+                    <ons-icon icon="fa-calendar " style="color:#2B6197"></ons-icon>&nbsp;{{stage.Date|formatDateAppointmentTask}}
+                </div>
+                <div ng-show="stage.Type=='Task'&&stage.Status=='Past'">
+                <strong><i class="ion-compose iconHomeView" ></i>&nbsp;Stage completed: </strong>{{stage.Date|formatDateAppointmentTask}}
+                </div>
+                <div ng-show="stage.Type=='Task'&&stage.Status=='Future'">
+                <strong>Pending </strong>
+                </div>
+                <div ng-show="stage.Type=='Task'&&stage.Status=='Next'">
+                <strong><i class="ion-loop iconHomeView"></i>&nbsp;In progress...</strong>
+                </div>
+            </div>
+   {{stage.Description}}<br>
+       </div>
+
+        </div>
+        </ons-col>
+    </ons-row>
+   </div>
+   </div>
+   <!--<div align="center">
+   <button ng-show="futurestageointment" class="btn btn-sm btn-success" ng-click="requestChange()" value="maps">Request Change</button>
+   </div>-->
+  <!--</div>-->
+</ons-page>
