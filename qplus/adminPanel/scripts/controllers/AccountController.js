@@ -43,6 +43,19 @@ app.controller('AccountController',function ($rootScope, URLs,$scope,User, $time
   $scope.$watch('uploadProfilePic',function(){
     console.log($scope.uploadProfilePic);
   });
+
+  $scope.cancelEdit=function(value)
+  {
+    $scope.value.Edit=false;
+    $scope.value.newValue=value.Value;
+    $scope.alert[key].show=false;
+    $scope.accountFields.Password.Edit=false;
+    $scope.accountFields.Password.newValue=accountFields.Password.Value;
+    $scope.alert['Password'].show=false;
+    $scope.accountFields.Username.Edit=false;
+    $scope.accountFields.Username.newValue=accountFields.Username.Value;
+    $scope.alert['username'].show=false;
+  }
   $scope.updateUsername=function(){
       var result=fieldsValidate.validateString('Username',  $scope.username.newValue);
       $timeout(function(){
