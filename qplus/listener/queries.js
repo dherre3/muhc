@@ -7,6 +7,7 @@ exports.patientQuery=function(userID)
                       'Patient.FirstName, ' +
                       'Patient.LastName,' +
                       'Patient.TelNum,' +
+                      'Patient.PatientId, '+
                       'Patient.Email,' +
                       'Patient.Alias, '+
                       'Patient.Language,' +
@@ -268,6 +269,6 @@ exports.patientLabResultsQuery=function(userID)
   return "SELECT ComponentName, FacComponentName, AbnormalFlag, MaxNorm, MinNorm, "+
   "TestValue, TestValueString, UnitDescription, CAST(TestDate AS char(30)) as `TestDate`"+
   " FROM TestResult, Users, Patient "+
-  'WHERE Users.UserTypeSerNum=Patient.PatientSerNum AND '+
+  'WHERE Users.UserTypeSerNum=Patient.PatientSerNum AND TestResult.PatientSerNum = Patient.PatientSerNum AND '+
   'Users.Username Like '+"'"+ userID+"'";
 }
