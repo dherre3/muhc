@@ -1,0 +1,2 @@
+MAILTO=davidfherrerarhacker@gmail.com
+0 20 * * 5 /var/www/devDocuments/david/muhc/qplus/sql_backup/schemaCopy.php &> /dev/null
