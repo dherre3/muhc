@@ -9,34 +9,85 @@ app.controller('AccountController',function ($rootScope, URLs,$scope,User, $time
     $rootScope.checkSession()
     console.log(value);
     var result=fieldsValidate.validateString(key,value);
-    $timeout(function(){
-      $scope.alert={};
-      $scope.alert[key]=result;
-      $scope.alert[key].show=true;
-    });
+    /*$timeout(function(){
+      $scope.alertField={};
+      $scope.alertField[key]=result;
+      $scope.alertField[key].show=true;
+    });*/
     if(result.type=='success')
     {
-      User.updateFieldInServer(key, value);
-      User.updateUserField(key,value);
-      $scope.closeAllOtherFields();
+      User.updateFieldInServer(key, value).then(function(data)
+      {
+        $timeout(function(){
+          if(data=='Update Complete')
+          {
+            $scope.alertField={};
+            $scope.alertField[key]=result;
+            $scope.alertField[key].show=true;
+            User.updateUserField(key,value);
+            $scope.accountFields[key].Value=value;
+            $scope.accountFields[key].newValue=value;
+          }
+        });
+      },function(error){
+        $timeout(function(){
+              $scope.alertField={};
+              $scope.alertField[key].alertType='danger';
+              $scope.alertField[key].reason='Server error';
+              $scope.alertField[key].show=true;
+        })
+      });
+      //User.updateUserField(key,value);
+      //$scope.accountFields[key].Value=value;
+      //$scope.accountFields[key].newValue=value;
+      //$scope.closeAllOtherFields();
+    }else{
+      $timeout(function(){
+        $scope.alertField={};
+        $scope.alertField[key]=result;
+        $scope.alertField[key].show=true;
+      });
     }
   };
   $scope.updatePassword=function(){
     $rootScope.checkSession();
-    fieldsValidate.validatePassword($scope.password.oldValue,$scope.password.newValue).then(function(result){
-      $timeout(function(){
-        $scope.alert={};
-        $scope.alert['Password']=result;
-        $scope.alert['Password'].show=true;
-      });
+    fieldsValidate.validatePassword($scope.accountFields['Password'].Value,$scope.accountFields['Password'].newValue).then(function(result){
       if(result.type=='success')
       {
-        User.updateFieldInServer('Password', $scope.password.newValue);
-        User.updateUserField('Password',$scope.password.newValue);
-        $scope.closeAllOtherFields()
+        User.updateFieldInServer('Password', $scope.accountFields['Password'].newValue).then(
+          function(data){
+            if(data=='Update Complete')
+            {
+              $timeout(function(){
+                $scope.alertField={};
+                $scope.alertField['Password']=result;
+                $scope.alertField['Password'].show=true;
+                //User.updateUserField('Password',$scope.password.newValue);
+                $scope.accountFields['Password'].Value='';
+                $scope.accountFields['Password'].newValue='';
+              })
+            }
+            
+          },
+          function(error){
+            $timeout(function(){
+              $scope.alertField={};
+              $scope.alertField[key].alertType='danger';
+              $scope.alertField[key].reason='Server error';
+              $scope.alertField[key].show=true;
+            });
+            
+          })
+
+      }else{
+        $timeout(function(){
+          $scope.alertField={};
+          $scope.alertField['Password']=result;
+          $scope.alertField['Password'].show=true;
+        });
       }
       console.log(result);
-    })
+    });
 
 
   };
@@ -44,30 +95,36 @@ app.controller('AccountController',function ($rootScope, URLs,$scope,User, $time
     console.log($scope.uploadProfilePic);
   });
 
-  $scope.cancelEdit=function(value)
-  {
-    $scope.value.Edit=false;
-    $scope.value.newValue=value.Value;
-    $scope.alert[key].show=false;
-    $scope.accountFields.Password.Edit=false;
-    $scope.accountFields.Password.newValue=accountFields.Password.Value;
-    $scope.alert['Password'].show=false;
-    $scope.accountFields.Username.Edit=false;
-    $scope.accountFields.Username.newValue=accountFields.Username.Value;
-    $scope.alert['username'].show=false;
-  }
   $scope.updateUsername=function(){
-      var result=fieldsValidate.validateString('Username',  $scope.username.newValue);
-      $timeout(function(){
-        $scope.alert={};
-        $scope.alert['Username']=result;
-        $scope.alert['Username'].show=true;
-      });
+      var result=fieldsValidate.validateString('Username',  $scope.accountFields['Username'].newValue);
       if(result.type=='success')
       {
-        User.updateFieldInServer('Username', $scope.username.newValue);
-        User.updateUserField('Username',$scope.username.newValue);
-        $scope.closeAllOtherFields();
+        User.updateFieldInServer('Username', $scope.accountFields['Username'].newValue).then(
+          function(data){
+            $timeout(function(){
+              User.updateUserField('Username',$scope.accountFields['Username'].newValue);
+              $scope.accountFields['Username'].Value=$scope.accountFields['Username'].newValue;
+              $scope.accountFields['Username'].newValue=$scope.accountFields['Username'].newValue;
+              $scope.alertField={};
+              $scope.alertField['Username']=result;
+              $scope.alertField['Username'].show=true;
+            });
+          },function(error){
+              $timeout(function(){
+                $scope.alertField={};
+                $scope.alertField[key].alertType='danger';
+                $scope.alertField[key].reason='Server error';
+                $scope.alertField[key].show=true;
+              });
+          });
+        
+        //$scope.closeAllOtherFields();
+      }else{
+        $timeout(function(){
+          $scope.alertField={};
+          $scope.alertField['Username']=result;
+          $scope.alertField['Username'].show=true;
+        });
       }
   }
   $scope.closeAllOtherFields=function(fieldName)
@@ -80,11 +137,17 @@ app.controller('AccountController',function ($rootScope, URLs,$scope,User, $time
   }
   function setUpAccountSettings()
   {
+
     var userFields=User.getUserFields();
     $scope.userFields=userFields;
     console.log(userFields);
     var accountObject={};
-    for (var key in userFields) {
+    $scope.alertField={};
+    for (var key in userFields) { 
+      $scope.alertField[key]={};
+      $scope.alertField[key].alertType='';
+      $scope.alertField[key].reason='';
+      $scope.alertField[key].show=false;
       if(key!=='Image'&&key!=='UserTypeSerNum'&&key!=='DoctorAriaSer'&&key!=='Role'&&key!=='StaffID')
       {
         accountObject[key]=

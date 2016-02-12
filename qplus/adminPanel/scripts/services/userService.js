@@ -75,27 +75,15 @@ app.service('User',function(URLs, $q,api,$http,$rootScope){
     },
     updateUserField:function(field, newValue)
     {
-      if(field=='Image')
-      {
-        this['Image']=URLs.getBasicUrl()+newValue;
-        this.UserFields.Image=URLs.getBasicUrl()+newValue;
-        this.AccountObject.Image=URLs.getBasicUrl()+newValue;
-      }else if(field=='Username')
+       if(field=='Username')
       {
         this[field]=newValue;
         this.UserFields[field]=newValue;
-        this.AccountObject[field].Value=newValue;
         $rootScope.currentUser.Username=newValue;
-      }else if(field=='Password')
-      {
-        this[field]=newValue;
-        this.UserFields[field]=newValue;
-        this.AccountPassword.Value=newValue;
       }else{
         console.log(field);
         this[field]=newValue;
         this.UserFields[field]=newValue;
-        this.AccountObject[field].Value=newValue;
       }
 
 
@@ -220,7 +208,7 @@ app.service('User',function(URLs, $q,api,$http,$rootScope){
       objectToSend={};
       objectToSend.field=field;
       objectToSend.newValue=newValue;
-      console.log(this);
+      console.log(objectToSend);
       if(field=='Password'||field=='Username')
       {
         objectToSend.UserSerNum=this.UserSerNum;
@@ -233,23 +221,15 @@ app.service('User',function(URLs, $q,api,$http,$rootScope){
         objectToSend.StaffSerNum=this.UserTypeSerNum;
       }
       console.log(objectToSend);
+
       var url=URLs.getUpdateFieldUrl();
-      var req = {
-       method: 'POST',
-       url: url,
-       headers: {
-         'Content-Type': undefined
-       },
-       data: objectToSend
-      }
-      $http(req).then(function(data){
-        console.log(data.data);
-          r.resolve(data);
-
-      }, function(error){
+      api.getFieldFromServer(url,objectToSend).then(function(data){
+        console.log(data);
+        r.resolve(data);
+      },function(error){
         r.reject(error);
-
       });
+
       return r.promise;
 
 
