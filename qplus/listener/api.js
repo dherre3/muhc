@@ -111,9 +111,6 @@ exports.refresh = function (requestObject) {
     return r.promise;
 };
 
-exports.logRequest = function (requestObject) {
-    console.log('logged request');
-};
 
 exports.readMessage = function (requestObject) {
     var r = Q.defer();
@@ -184,9 +181,9 @@ exports.logActivity=function(requestObject)
   if (!validate(requestObject)) {
       r.reject('Invalid');
   } else {
-      sqlInterface.addToActivityLog(requestObject).then(function (requestObject) {
-          r.resolve(requestObject);
-      });
+      sqlInterface.addToActivityLog(requestObject);
+      r.resolve(requestObject);
+
   }
   return r.promise;
 }

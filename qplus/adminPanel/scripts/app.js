@@ -65,6 +65,15 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
         requireLogin:true
       }
     })
+    .state('patients.activity',{
+      url:'/patient-activity',
+      templateUrl:'templates/patients/patient-activity.html',
+      controller:'ActivityController',
+      data:{
+        requireLogin:true
+      }
+    })
+
     .state('patients.search-patients',{
       url:'/search-patients',
       templateUrl:'templates/patients/search-patients.html',

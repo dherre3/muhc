@@ -1,6 +1,6 @@
 var app=angular.module('adminPanelApp');
 
-app.service('Messages',function($http, $q, $rootScope,$filter,AllPatients, User,URLs){
+app.service('Messages',function(api,$http, $q, $rootScope,$filter,AllPatients, User,URLs){
    function findPatientConversationIndexBySerNum(array,serNum){
       for (var i = 0; i < array.length; i++) {
         if(array[i].PatientSerNum==serNum){
@@ -97,7 +97,8 @@ app.service('Messages',function($http, $q, $rootScope,$filter,AllPatients, User,
                 Message.Role=0;
                 Message.MessageContent=message.MessageContent;
                 Message.Date=new Date(message.MessageDate);
-                Message.ReadStatus=parseInt(message.ReceiverReadStatus);
+                console.log(message.ReadStatus);
+                Message.ReadStatus=parseInt(message.ReadStatus);
                 Message.MessageSerNum=message.MessageSerNum;
                 this.ConversationsObject[key].EmptyConversation=false;
                 this.ConversationsObject[key].Messages.push(Message);
@@ -144,6 +145,20 @@ app.service('Messages',function($http, $q, $rootScope,$filter,AllPatients, User,
     },
     getMessages:function(){
         return this.UserConversationsArray;
+    },
+    readConversation:function(conversationNumber)
+    {
+      for (var i = this.UserConversationsArray[conversationNumber].Messages.length - 1; i >= 0; i--) {
+        if(this.UserConversationsArray[conversationNumber].Messages[i].ReadStatus==0)
+        {
+          this.UserConversationsArray[conversationNumber].Messages[i].ReadStatus=1;
+          api.getFieldFromServer(URLs.readMessageUrl(),{MessageSerNum:this.UserConversationsArray[conversationNumber].Messages[i].MessageSerNum}).then(
+          function(response){
+            console.log('Messages Read');
+          });
+      };
+        }
+
     },
     sendMessage:function(content, patientSerNum, dateOfmessage){
       var r=$q.defer();

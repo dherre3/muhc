@@ -76,6 +76,10 @@ app.service('URLs',function(){
      getDoctorImageUrl:function()
      {
       return '/home/VarianFILEDATA/Doctors/';
+     },
+     readMessageUrl:function()
+     {
+      return basicURLPHP+'readMessage.php';
      }
 
    };

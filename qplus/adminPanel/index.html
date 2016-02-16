@@ -93,11 +93,18 @@ function goActive() {
               <li ng-show="userType!=='Doctor'" class="main-theme-font-color item-menu-size" ui-sref-active="active">
                 <a ui-sref="registration"><span class="item-menu-size"><i class="icon ion-clipboard"></i>  <strong>Registration</strong></a>
               </li>
-              <li ng-show="userType!=='Staff'" class="main-theme-font-color item-menu-size" ui-sref-active="active">
+              <li ng-show="userType!=='Staff'&&userType!=='Admin'" class="main-theme-font-color item-menu-size" ui-sref-active="active">
                 <a ui-sref="patients.search-patients"><span class="item-menu-size"><i class="ion-ios-people" ></i> <strong>Patients</strong></span></a>
               </li>
+                <li ng-show="userType!=='Staff'&&userType!=='Doctor'" class="dropdown " ui-sref-active="active">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="item-menu-size main-theme-font-color" ><i class="ion-ios-people"></i></span><span class="main-theme-font-color"> <strong>Patients</strong></span><span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li ><a ui-sref="patients.activity"><span class="item-menu-size main-theme-font-color" ><i class="ion-arrow-graph-up-right"></i></span>  Activity</a></li>
+                  <li><a ui-sref="patients.search-patients"><span class="item-menu-size main-theme-font-color" ><i class="ion-search"></i></span> Search Patient</a></li>
+                </ul>
+            </li>
 
-              <li ng-show="userType!=='Staff'" class="main-theme-font-color item-menu-size" ui-sref-active="active">
+              <li ng-show="userType==='Doctor'" class="main-theme-font-color item-menu-size" ui-sref-active="active">
                 <a ui-sref="messages"><span class="item-menu-size"><i class="ion-email"></i><i class="{{}}"></i>  <strong>Messages  <span class="badge" ng-show="NumberOfNewMessages!==0">{{NumberOfNewMessages}}</span></a></strong></span></a>
               </li>
 

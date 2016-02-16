@@ -334,7 +334,7 @@ exports.inputFeedback=function(requestObject)
   });
   return r.promise;
 }
-//Adding action to activity blog
+//Adding action to activity log
 exports.addToActivityLog=function(requestObject)
 {
   connection.query(queries.logActivity(requestObject),
@@ -351,16 +351,6 @@ exports.getUsersPassword=function(username)
   {
     if(error) r.reject(error);
     r.resolve(rows[0].Password);
-  });
-  return r.promise;
-}
-exports.logActivity=function(requestObject)
-{
-  var r =Q.defer();
-  connection.query(queries.logActivity(requestObject),
-  function(error, rows, fields)
-  {
-    r.resolve(requestObject);
   });
   return r.promise;
 }

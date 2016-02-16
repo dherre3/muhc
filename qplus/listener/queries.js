@@ -251,8 +251,8 @@ exports.logActivity=function(requestObject)
   if(typeof requestObject.Parameters!=='undefined'){
     parameters=JSON.stringify(requestObject.Parameters);
   }
-  console.log("INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`UserID`, `DeviceID`,`Parameters` ,`DateAdded`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.UserID+ "', '"+requestObject.DeviceId+"', '"+parameters+"' , CURRENT_TIMESTAMP ,CURRENT_TIMESTAMP )");
-  return "INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`UserID`, `DeviceID`,`Parameters` ,`DateAdded`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.UserID+ "', '"+requestObject.DeviceId+"', '"+parameters+"' , CURRENT_TIMESTAMP ,CURRENT_TIMESTAMP )";
+  console.log("INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`UserID`, `DeviceID` ,`DateTime`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.UserID+ "', '"+requestObject.DeviceId+"', CURRENT_TIMESTAMP ,CURRENT_TIMESTAMP )");
+  return "INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`UserID`, `DeviceID`,`DateTime`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.UserID+ "', '"+requestObject.DeviceId+"', CURRENT_TIMESTAMP ,CURRENT_TIMESTAMP )";
 }
 
 exports.userPassword=function(username)
