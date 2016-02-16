@@ -188,7 +188,7 @@ exports.getPatientDocuments=function(UserID)
         r.resolve(response);
       }
         
-      });
+      },function(error){r.resolve(rows)});
   });
   return r.promise;
 }
@@ -410,7 +410,9 @@ var LoadDocuments = function (rows)
       var n = rows[key].FinalFileName.lastIndexOf(".");
       var substring=rows[key].FinalFileName.substring(n+1,rows[key].FinalFileName.length);
       rows[key].DocumentType=substring;
-      rows[key].Content=filesystem.readFileSync('/home/VarianFILEDATA/Documents/' + rows[key].FinalFileName,'base64' );
+      rows[key].Content=filesystem.readFileSync('/home/VarianFILEDATA/Documents/' + rows[key].FinalFileName,'base64',function(error,data){
+        if(error) r.reject(error);
+      });
 
       imageCounter++;
       //console.log('imagecounter is : ',imageCounter);
