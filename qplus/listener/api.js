@@ -39,7 +39,7 @@ exports.login = function (requestObject) {
 
                                   sqlInterface.getPatientTasks(UserID).then(function (rows) {
                                       objectToFirebase.Tasks = rows;
-                                      
+
                                       sqlInterface.getPatientLabTests(UserID).then(function(rows){
                                          /*
                                        * Add additional fields for login in here!!!!
@@ -49,7 +49,7 @@ exports.login = function (requestObject) {
                                         r.resolve(objectToFirebase);
                                       });
 
-                                     
+
                                   });
                               });
                           });
@@ -184,7 +184,7 @@ exports.logActivity=function(requestObject)
   if (!validate(requestObject)) {
       r.reject('Invalid');
   } else {
-      sqlInterface.logActivity(requestObject).then(function (requestObject) {
+      sqlInterface.addToActivityLog(requestObject).then(function (requestObject) {
           r.resolve(requestObject);
       });
   }

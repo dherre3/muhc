@@ -11,7 +11,6 @@ var buffer=require('buffer');
 
 /*
 *Connecting to mysql database
-*
 */
 var sqlConfig={
   host:credentials.HOST,
@@ -19,7 +18,10 @@ var sqlConfig={
   password:credentials.MYSQL_PASSWORD,
   database:credentials.MYSQL_DATABASE
 };
-
+/*
+*Re-connecting the sql database, NodeJS has problems and disconnects if inactive,
+The handleDisconnect deals with that
+*/
 var connection = mysql.createConnection(sqlConfig);
 
 function handleDisconnect(myconnection) {
@@ -34,6 +36,10 @@ function handleDisconnect(myconnection) {
 
 handleDisconnect(connection);
 
+/*
+*It things is UTC time, so puts a minus 4 on every time, this change to the prototype
+ensures we get Montreal time.
+*/
 //Changing string to match montreal time
 Date.prototype.toISOString = function() {
   var a=this.getTimezoneOffset();
@@ -50,6 +56,7 @@ Date.prototype.toISOString = function() {
     };
 var exports=module.exports={};
 
+//Function that refreshes a table and sends it to table in mysql
 exports.refreshField=function(UserID, field)
 {
   var r=Q.defer();
@@ -70,6 +77,8 @@ exports.refreshField=function(UserID, field)
   }
   return r.promise;
 }
+//Utility function to run queries, accepts UserID, query, and callbackfunction with
+//the results from the query
 exports.apiRequestField=function(UserID, query, callbackFunction)
 {
   connection.query(query, function(err,rows,fields){
@@ -109,7 +118,7 @@ exports.cascadeFunction=function(UserID,queue,startObject)
 
   return r.promise;
 }
-
+//Gets the patient fields in patient table and converts user image to base64
 exports.getPatient=function(UserID)
 {
   var r=Q.defer();
@@ -124,6 +133,7 @@ exports.getPatient=function(UserID)
   return r.promise;
 }
 
+//Obtaints the patient lab tests from lab test table
 exports.getPatientLabTests=function(UserID)
 {
   var r=Q.defer();
@@ -134,6 +144,8 @@ exports.getPatientLabTests=function(UserID)
   });
   return r.promise;
 }
+
+//Obtains the patient doctors
 exports.getPatientDoctors=function(UserID)
 {
   var r=Q.defer();
@@ -145,6 +157,8 @@ exports.getPatientDoctors=function(UserID)
   });
   return r.promise;
 }
+
+//Obtains patient diagnosis
 exports.getPatientDiagnoses=function(UserID)
 {
   var r=Q.defer();
@@ -154,6 +168,8 @@ exports.getPatientDiagnoses=function(UserID)
   });
   return r.promise;
 }
+
+//Api call to obtain patient messages;
 exports.getPatientMessages=function(UserID)
 {
   var r=Q.defer();
@@ -165,7 +181,7 @@ exports.getPatientMessages=function(UserID)
   });
   return r.promise;
 }
-
+//Api call to obtain patient appointments
 exports.getPatientAppointments=function(UserID)
 {
   var r=Q.defer();
@@ -175,6 +191,7 @@ exports.getPatientAppointments=function(UserID)
   });
   return r.promise;
 }
+//Gets patient documents
 exports.getPatientDocuments=function(UserID)
 {
   var r=Q.defer();
@@ -187,11 +204,12 @@ exports.getPatientDocuments=function(UserID)
       }else{
         r.resolve(response);
       }
-        
+
       },function(error){r.resolve(rows)});
   });
   return r.promise;
 }
+//Api call to obtain patient notifications
 exports.getPatientNotifications=function(UserID)
 {
   var r=Q.defer();
@@ -206,6 +224,7 @@ exports.getPatientNotifications=function(UserID)
 
 
 }
+//Api call to obtain patient tasks
 exports.getPatientTasks=function(UserID)
 {
   var r=Q.defer();
@@ -215,6 +234,7 @@ exports.getPatientTasks=function(UserID)
   });
   return r.promise;
 }
+//Api call to insert a message into messages table
 exports.sendMessage=function(objectRequest)
 {
   var r=Q.defer();
@@ -226,6 +246,8 @@ exports.sendMessage=function(objectRequest)
   });
   return r.promise;
 }
+
+//Api call to read message
 exports.readMessage=function(requestObject)
 {
   var r=Q.defer();
@@ -237,6 +259,7 @@ exports.readMessage=function(requestObject)
   });
   return r.promise;
 }
+//Api call to read notification
 exports.readNotification=function(requestObject)
 {
   var r=Q.defer();
@@ -248,7 +271,7 @@ exports.readNotification=function(requestObject)
   });
   return r.promise;
 }
-
+//Api call to checkin to an Appointment (Implementation in Aria is yet to be done)
 exports.checkIn=function(requestObject)
 {
   var r=Q.defer();
@@ -261,7 +284,7 @@ exports.checkIn=function(requestObject)
   });
   return r.promise;
 }
-
+//Updating field in the database tables
 exports.updateAccountField=function(requestObject)
 {
   var r=Q.defer();
@@ -294,7 +317,7 @@ exports.updateAccountField=function(requestObject)
   });
   return r.promise;
 }
-
+//Inputing feedback into feedback table
 exports.inputFeedback=function(requestObject)
 {
   var r =Q.defer();
@@ -311,6 +334,7 @@ exports.inputFeedback=function(requestObject)
   });
   return r.promise;
 }
+//Adding action to activity blog
 exports.addToActivityLog=function(requestObject)
 {
   connection.query(queries.logActivity(requestObject),
@@ -319,6 +343,7 @@ exports.addToActivityLog=function(requestObject)
     console.log(rows);
   });
 }
+//Gets user password for encrypting/decrypting
 exports.getUsersPassword=function(username)
 {
   var r=Q.defer();
@@ -339,7 +364,7 @@ exports.logActivity=function(requestObject)
   });
   return r.promise;
 }
-
+//API call to get Security questions
 exports.getSecurityQuestions=function(PatientSerNum)
 {
   var r=Q.defer();
@@ -350,6 +375,7 @@ exports.getSecurityQuestions=function(PatientSerNum)
   });
   return r.promise;
 }
+//Api call to get patient fields for password reset
 exports.getPatientFieldsForPasswordReset=function(userID)
 {
   var r=Q.defer();
@@ -370,6 +396,10 @@ exports.setNewPassword=function(password,patientSerNum)
   });
   return r.promise;
 }
+
+/*
+Table mappings for cascade synchronous function
+*/
 var tableMappings=
 {
   'Messages':exports.getPatientMessages,
@@ -382,7 +412,6 @@ var tableMappings=
   'Documents':exports.getPatientDocuments,
   'LabTests':exports.getPatientLabTests
 };
-
 function getPatientFromUserID(UserID)
 {
   var r=Q.defer();
@@ -488,36 +517,6 @@ function loadProfileImagePatient(rows){
   }else{
     deferred.resolve(rows);
   }
-  
+
   return deferred.promise;
 }
-
-/*function Queue()
-{
-  var array=[];
-  var head=0;
-  this.isEmpty:function()
-  {
-    if(head==0)
-    {
-      return true;
-    }else{
-      return false;
-    }
-  }
-  this.enqueue:function(field)
-  {
-    array.push(field);
-    head++;
-  }
-  this.dequeue:function()
-  {
-    if(head!=0)
-    {
-      head--;
-      return array[head];
-    }else{
-      console.log('Queue is empty');
-    }
-  }
-}*/
