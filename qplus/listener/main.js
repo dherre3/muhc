@@ -5,6 +5,7 @@ var updateServer=require('./updateServer.js');
 var credentials=require('./credentials.js');
 var sqlInterface=require('./sqlInterface.js');
 var CryptoJS=require('crypto-js')
+var q=require('q');
 var api=require('./api.js');
 
 //console.log(a);
@@ -179,6 +180,7 @@ exports.resetPasswordRequest=function(requestKey, requestObject)
 }
 exports.apiRequestBrowserListener=function(requestKey,requestObject)
 {
+  var r=q.defer();
   sqlInterface.getUsersPassword(requestObject.UserID).then(function(key){
     requestObject.Request=utility.decryptObject(requestObject.Request,key);
     var encryptionKey=key;
@@ -198,7 +200,7 @@ exports.apiRequestBrowserListener=function(requestKey,requestObject)
         requestObject.reason='Error wrong arguments';
         api.logRequest(requestObject);
       }
-      return (firebaseObject);
+      r.resolve(firebaseObject);
 
     }
     requestObject.Parameters=utility.decryptObject(requestObject.Parameters,key);
@@ -213,7 +215,7 @@ exports.apiRequestBrowserListener=function(requestKey,requestObject)
         firebaseObject.encryptionKey=encryptionKey;
         firebaseObject.object=objectToFirebase;
         firebaseObject.type='UploadToFirebase';
-        return (firebaseObject);
+        r.resolve(firebaseObject);
         console.log('Completing update client requests');
       }).catch(function(response){
           var firebaseObject={};
@@ -228,7 +230,7 @@ exports.apiRequestBrowserListener=function(requestKey,requestObject)
             requestObject.reason='Error wrong arguments';
             api.logRequest(requestObject);
           }
-          return (firebaseObject);
+          r.resolve(firebaseObject);
       });
     }else
     {
@@ -239,7 +241,7 @@ exports.apiRequestBrowserListener=function(requestKey,requestObject)
         firebaseObject.requestKey=requestKey;
         firebaseObject.requestObject=requestObject;
         firebaseObject.type='CompleteRequest';
-        return (firebaseObject);
+        r.resolve(firebaseObject);
       }).catch(function(response){
         var firebaseObject={};
         firebaseObject.requestKey=requestKey;
@@ -254,7 +256,7 @@ exports.apiRequestBrowserListener=function(requestKey,requestObject)
           api.logRequest(requestObject);
         }
         console.log('Problems with update server request');
-        return (firebaseObject);
+        r.resolve(firebaseObject);
       });
     }
   }).catch(function(error){
@@ -271,11 +273,14 @@ exports.apiRequestBrowserListener=function(requestKey,requestObject)
       requestObject.reason='Error wrong arguments';
       api.logRequest(requestObject);
     }
-    return (firebaseObject);
+    r.resolve(firebaseObject);
   });
+
+  return r.promise;
 }
 exports.resetPasswordBrowserListener=function(requestKey, requestObject)
 {
+  var r=q.defer();
   sqlInterface.getPatientFieldsForPasswordReset(requestObject.UserID).then(function(patient){
     console.log('Inside this function');
     console.log(patient);
@@ -299,13 +304,13 @@ exports.resetPasswordBrowserListener=function(requestKey, requestObject)
           firebaseObject.requestObject=requestObject;
           firebaseObject.encryptionKey=patient.SSN;
           firebaseObject.object=response;
-          return firebaseObject;
+          r.resolve(firebaseObject);
         });
       }else{
         response.type='ResetPasswordError';
         response.requestKey=requestKey;
         response.requestObject=requestObject;
-        return response;
+        r.resolve(response);
       }
     }else{
       sqlInterface.getSecurityQuestions(patient.PatientSerNum).then(function(questions)
@@ -338,7 +343,7 @@ exports.resetPasswordBrowserListener=function(requestKey, requestObject)
             firebaseObject.requestKey=requestKey;
             firebaseObject.requestObject={};
             firebaseObject.type='CompleteRequest';
-            return firebaseObject;
+            r.resolve(firebaseObject);
           }).catch(function(response){
             console.log('Invalid setting password');
               //completeRequest(requestKey,{},'Invalid');
@@ -354,7 +359,7 @@ exports.resetPasswordBrowserListener=function(requestKey, requestObject)
                 requestObject.reason='Error wrong arguments';
                 api.logRequest(requestObject);
               }
-              return firebaseObject;
+              r.resolve(firebaseObject);
           });
         }
       });
@@ -372,6 +377,7 @@ exports.resetPasswordBrowserListener=function(requestKey, requestObject)
       requestObject.reason='Error wrong arguments';
       api.logRequest(requestObject);
     }
-    return firebaseObject;
+    r.resolve(firebaseObject);
   });
+  return r.promise;
 }

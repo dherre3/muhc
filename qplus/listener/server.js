@@ -36,11 +36,20 @@ app.post('/login',function(req,res,next){
     if(requestObject.Request=='ResetPassword'||requestObject.Request=='ChangePasswordReset')
     {
       console.log(requestObject);
-      var result=main.resetPasswordBrowserListener(requestKey,requestObject);
-      res.send(result);
+      main.resetPasswordBrowserListener(requestKey,requestObject).then(function(results)
+      {
+        console.log('Reset Password');
+        console.log(results);
+        res.send(result);
+      });
+     
     }else{
-      var result=main.apiRequestBrowserListener(requestKey, requestObject);
-      res.send(result);
+      main.apiRequestBrowserListener(requestKey, requestObject).then(function(results){
+        console.log('Api call from server.js')
+        console.log(results);
+        res.send(results);
+      })
+
     }
      /*requestObject.Request=utility.decryptObject(requestObject.Request);
      console.log(requestObject.Request);
