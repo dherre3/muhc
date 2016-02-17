@@ -15,54 +15,59 @@ var ref=new Firebase(credentials.FIREBASE_URL);
 ref.child('requests').on('child_added',function(requestsFromFirebase){
   var requestObject=requestsFromFirebase.val();
   var requestKey=requestsFromFirebase.key();
-  request(requestKey,requestObject);
+  if(requestObject.Request=='ResetPassword'||requestObject.Request=='ChangePasswordReset')
+  {
+    console.log(requestObject);
+    exports.resetPasswordRequest(requestKey,requestObject);
+  }else{
+    exports.apiRequest(requestKey, requestObject);
+
+  }
 });
 
 
 function request(requestKey, requestObject)
 {
-  if(requestObject.Request=='ResetPassword'||requestObject.Request=='ChangePasswordReset')
-  {
-    console.log(requestObject);
-    resetPasswordRequest(requestKey,requestObject);
-  }else{
-    sqlInterface.getUsersPassword(requestObject.UserID).then(function(key){
-      console.log(key);
-      console.log(requestObject.Request);
-      requestObject.Request=utility.decryptObject(requestObject.Request,key);
-      var encryptionKey=key;
-      //console.log(encryptionKey);
-      if(requestObject.Request=='') {
-        console.log('Rejecting request');
-        completeRequest(requestKey,{},'Invalid');
-        return;
-      }
-      requestObject.Parameters=utility.decryptObject(requestObject.Parameters,key);
-      if(requestObject.Request=='Login'||requestObject.Request=='Refresh')
-      {
-        updateClient.update(requestObject).then(function(objectToFirebase)
-        {
-          console.log(encryptionKey);
-            uploadToFirebase(requestKey, encryptionKey,requestObject, objectToFirebase);
 
-        }).catch(function(response){
-            completeRequest(requestKey,requestObject,'Invalid');
-        });
-      }else
-      {
-        console.log(requestObject);
-        updateServer.update(requestObject).then(function(response)
-        {
-            completeRequest(requestKey, requestObject);
-        }).catch(function(response){
-            completeRequest(requestKey,requestObject,'Invalid');
-        });
-      }
-    }).catch(function(error){
-      console.log(error);
+}
+
+exports.apiRequest=function(requestKey, requestObject){
+  sqlInterface.getUsersPassword(requestObject.UserID).then(function(key){
+    console.log(key);
+    console.log(requestObject.Request);
+    requestObject.Request=utility.decryptObject(requestObject.Request,key);
+    var encryptionKey=key;
+    //console.log(encryptionKey);
+    if(requestObject.Request=='') {
+      console.log('Rejecting request');
       completeRequest(requestKey,{},'Invalid');
-    });
-  }
+      return;
+    }
+    requestObject.Parameters=utility.decryptObject(requestObject.Parameters,key);
+    if(requestObject.Request=='Login'||requestObject.Request=='Refresh')
+    {
+      updateClient.update(requestObject).then(function(objectToFirebase)
+      {
+        console.log(encryptionKey);
+          uploadToFirebase(requestKey, encryptionKey,requestObject, objectToFirebase);
+
+      }).catch(function(response){
+          completeRequest(requestKey,requestObject,'Invalid');
+      });
+    }else
+    {
+      console.log(requestObject);
+      updateServer.update(requestObject).then(function(response)
+      {
+          completeRequest(requestKey, requestObject);
+      }).catch(function(response){
+          completeRequest(requestKey,requestObject,'Invalid');
+      });
+    }
+  }).catch(function(error){
+    console.log(error);
+    completeRequest(requestKey,{},'Invalid');
+  });
 }
 function uploadToFirebase(requestKey,encryptionKey,requestObject,object)
 {
@@ -96,7 +101,7 @@ function completeRequest(requestKey, requestObject, invalid)
 
 
 }
-function resetPasswordRequest(requestKey, requestObject)
+exports.resetPasswordRequest=function(requestKey, requestObject)
 {
   //console.log(requestObject.UserID);
   //console.log(requestKey);
@@ -171,4 +176,202 @@ function resetPasswordRequest(requestKey, requestObject)
     }).catch(function(response){
       completeRequest(requestKey,{},'Invalid');
     });
+}
+exports.apiRequestBrowserListener=function(requestKey,requestObject)
+{
+  sqlInterface.getUsersPassword(requestObject.UserID).then(function(key){
+    requestObject.Request=utility.decryptObject(requestObject.Request,key);
+    var encryptionKey=key;
+    console.log(requestObject.Request);
+
+    if(requestObject.Request=='') {
+      console.log('Rejecting request');
+      var firebaseObject={};
+      firebaseObject.requestKey=requestKey;
+      firebaseObject.requestObject={};
+      firebaseObject.type='CompleteRequest';
+      firebaseObject.Invalid='Invalid';
+      if(firebaseObject.Invalid!==undefined)
+      {
+        api.logRequest(requestObject);
+      }else{
+        requestObject.reason='Error wrong arguments';
+        api.logRequest(requestObject);
+      }
+      return (firebaseObject);
+
+    }
+    requestObject.Parameters=utility.decryptObject(requestObject.Parameters,key);
+    if(requestObject.Request=='Login'||requestObject.Request=='Refresh')
+    {
+      updateClient.update(requestObject).then(function(objectToFirebase)
+      {
+        console.log(objectToFirebase);
+        var firebaseObject={};
+        firebaseObject.requestKey=requestKey;
+        firebaseObject.requestObject=requestObject;
+        firebaseObject.encryptionKey=encryptionKey;
+        firebaseObject.object=objectToFirebase;
+        firebaseObject.type='UploadToFirebase';
+        return (firebaseObject);
+        console.log('Completing update client requests');
+      }).catch(function(response){
+          var firebaseObject={};
+          firebaseObject.requestKey=requestKey;
+          firebaseObject.requestObject=requestObject;
+          firebaseObject.type='CompleteRequest';
+          firebaseObject.Invalid='Invalid';
+          if(firebaseObject.Invalid!==undefined)
+          {
+            api.logRequest(requestObject);
+          }else{
+            requestObject.reason='Error wrong arguments';
+            api.logRequest(requestObject);
+          }
+          return (firebaseObject);
+      });
+    }else
+    {
+      console.log('server request');
+      updateServer.update(requestObject).then(function(response)
+      {
+        var firebaseObject={};
+        firebaseObject.requestKey=requestKey;
+        firebaseObject.requestObject=requestObject;
+        firebaseObject.type='CompleteRequest';
+        return (firebaseObject);
+      }).catch(function(response){
+        var firebaseObject={};
+        firebaseObject.requestKey=requestKey;
+        firebaseObject.requestObject=requestObject;
+        firebaseObject.type='CompleteRequest';
+        firebaseObject.Invalid='Invalid';
+        if(firebaseObject.Invalid!==undefined)
+        {
+          api.logRequest(requestObject);
+        }else{
+          requestObject.reason='Error wrong arguments';
+          api.logRequest(requestObject);
+        }
+        console.log('Problems with update server request');
+        return (firebaseObject);
+      });
+    }
+  }).catch(function(error){
+    console.log(error);
+    var firebaseObject={};
+    firebaseObject.requestKey=requestKey;
+    firebaseObject.requestObject=requestObject;
+    firebaseObject.type='CompleteRequest';
+    firebaseObject.Invalid='Invalid';
+    if(firebaseObject.Invalid!==undefined)
+    {
+      api.logRequest(requestObject);
+    }else{
+      requestObject.reason='Error wrong arguments';
+      api.logRequest(requestObject);
+    }
+    return (firebaseObject);
+  });
+}
+exports.resetPasswordBrowserListener=function(requestKey, requestObject)
+{
+  sqlInterface.getPatientFieldsForPasswordReset(requestObject.UserID).then(function(patient){
+    console.log('Inside this function');
+    console.log(patient);
+    console.log(patient.SSN);
+    if(requestObject.Request=='ResetPassword'){
+      var unencrypted=utility.decryptObject(requestObject.Parameters,patient.SSN);
+      console.log(unencrypted);
+      if(typeof unencrypted.SSN!=='undefined'&&unencrypted.SSN!=='')
+      {
+        //console.log(patient.PatientSerNum);
+        sqlInterface.getSecurityQuestions(patient.PatientSerNum).then(function(questions)
+        {
+          console.log(questions);
+          var integer=Math.floor((3*Math.random()));
+          console.log(integer);
+          questions[integer].type='success';
+          var response={ResetPassword:questions[integer]};
+          var firebaseObject={};
+          firebaseObject.type='UploadToFirebase';
+          firebaseObject.requestKey=requestKey;
+          firebaseObject.requestObject=requestObject;
+          firebaseObject.encryptionKey=patient.SSN;
+          firebaseObject.object=response;
+          return firebaseObject;
+        });
+      }else{
+        response.type='ResetPasswordError';
+        response.requestKey=requestKey;
+        response.requestObject=requestObject;
+        return response;
+      }
+    }else{
+      sqlInterface.getSecurityQuestions(patient.PatientSerNum).then(function(questions)
+      {
+        console.log(questions);
+        var flag=false;
+        var newPassword='';
+        for (var i = 0; i < questions.length; i++) {
+          console.log(questions[i].Answer);
+          var password={NewPassword:requestObject.Parameters.NewPassword};
+          console.log(password);
+          password=utility.decryptObject(password,questions[i].Answer);
+          console.log(password);
+          if(typeof password.NewPassword!=='undefined'&&password.NewPassword!==''){
+            console.log(password.NewPassword);
+            newPassword=CryptoJS.SHA256(password.NewPassword).toString();
+            console.log(newPassword);
+            console.log('I am the truth');
+            flag=true;
+          }
+        }
+        if(!flag)
+        {
+          //completeRequest(requestKey,{},'Invalid');
+          console.log('Invalid flag');
+        }else{
+          console.log(patient);
+          sqlInterface.setNewPassword(newPassword,patient.PatientSerNum).then(function(){
+            var firebaseObject={};
+            firebaseObject.requestKey=requestKey;
+            firebaseObject.requestObject={};
+            firebaseObject.type='CompleteRequest';
+            return firebaseObject;
+          }).catch(function(response){
+            console.log('Invalid setting password');
+              //completeRequest(requestKey,{},'Invalid');
+              var firebaseObject={};
+              firebaseObject.requestKey=requestKey;
+              firebaseObject.requestObject={};
+              firebaseObject.type='CompleteRequest';
+              firebaseObject.Invalid='Invalid';
+              if(firebaseObject.Invalid!==undefined)
+              {
+                api.logRequest(requestObject);
+              }else{
+                requestObject.reason='Error wrong arguments';
+                api.logRequest(requestObject);
+              }
+              return firebaseObject;
+          });
+        }
+      });
+    }
+  }).catch(function(response){
+    var firebaseObject={};
+    firebaseObject.requestKey=requestKey;
+    firebaseObject.requestObject={};
+    firebaseObject.type='CompleteRequest';
+    firebaseObject.Invalid='Invalid';
+    if(firebaseObject.Invalid!==undefined)
+    {
+      api.logRequest(requestObject);
+    }else{
+      requestObject.reason='Error wrong arguments';
+      api.logRequest(requestObject);
+    }
+    return firebaseObject;
+  });
 }
