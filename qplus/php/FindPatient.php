@@ -1,14 +1,5 @@
 <?php
-// Connection to MSSQL 2008 R2 ( ARIA )
-define( "DB_USERNAME", "root" );
-define( "DB_PASSWORD", "service" );
-define( "HOST", "172.26.66.41" );
-define( "PORT", "22" );
-define( "HOST_USERNAME", "webdb" );
-define( "HOST_PASSWORD", "service" );
-define( "ARIA_DB", "172.16.220.56:1433\\database" );
-define( "ARIA_USERNAME", "reports" );
-define( "ARIA_PASSWORD", "reports" );
+
 // Parse the Parameters
 //$Data=file_get_contents("php://input");
 //$request=json_decode($Data);
@@ -33,7 +24,7 @@ SELECT DISTINCT
 	 Doctor.LastName AS DoctorLastName,
 	 PatientDoctor.PrimaryFlag,
 	 PatientDoctor.OncologistFlag,
-     Photo.Picture, 
+     Photo.Picture,
 	 Patient.SSN,
 	 Patient.PatientId,
 	 Diagnosis.Description
@@ -45,8 +36,8 @@ SELECT DISTINCT
 	 variansystem.dbo.PatientDoctor PatientDoctor,
 	 variansystem.dbo.Doctor Doctor
 	 WHERE
-	 Patient.SSN LIKE '%".$PatientSSN."%' 
-     AND Photo.PatientSer = Patient.PatientSer 
+	 Patient.SSN LIKE '%".$PatientSSN."%'
+     AND Photo.PatientSer = Patient.PatientSer
 	 AND Patient.SSN=PatientActuals.SSN
 	 AND PatientActuals.PatientSer=Diagnosis.PatientSer
 	 AND PatientActuals.PatientSer=PatientDoctor.PatientSer
@@ -79,7 +70,7 @@ else {
      ";
 
     $lookupresult= $conn->query($sqllookup);
-    if ( $lookupresult->num_rows===1) { 
+    if ( $lookupresult->num_rows===1) {
         $row=$lookupresult->fetch_assoc();
         $row['response']="Patient has already been registered!";
         echo json_encode($row);
