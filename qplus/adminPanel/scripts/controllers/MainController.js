@@ -80,7 +80,7 @@ $scope.signin=function(){
   .then(function () {
         $timeout(function(){
           $rootScope.NumberOfDoctorPatients=User.getNumberOfDoctorPatients();
-          console.log('$scope.NumberOfDoctorPatients');
+          console.log($scope.NumberOfDoctorPatients);
         });
   });
 

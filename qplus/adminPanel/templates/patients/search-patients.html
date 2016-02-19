@@ -1,12 +1,19 @@
-<div class="main-div-container">
-  <div>
-    <div class="col-xs-12" style="margin-bottom:30px">
-        <div class="display:inline-block">
-            <strong>Search Patient: </strong> <input type="search" value="" placeholder="Search" class="search-input" style="max-width:300px" ng-model="searchPatient">
+<div class="main-div-container animated zoomIn">
+  <div style="padding:20px">
+  <div class='widget'>
+    <div class="widget-header">
+      <div class="row">
+        <div class="pull-left" style="font-size:20px;margin-left:10px">
+          <i class="ion-ios-people"></i> <strong>Patients</strong>
         </div>
+        <div class="pull-right col-xs-6 col-sm-4">
+          <input type="search" value="" placeholder="Search" class="search-input" ng-model="searchPatient">
+        </div>
+      </div>
     </div>
-    <div style="margin-top:30px;height:100%;padding:10px" >
-      <table class="table table-hover" style="padding:20px">
+    <div class="widget-body no-padding">
+          <div class="table-responsive">
+      <table class="table table-hover" >
           <th class="active" style="text-align:center">
           Patient ID #
           </th>
@@ -25,19 +32,27 @@
           <th class="active"style="text-align:center">
           Email
           </th>
-          <th class="active">
-          </th>
 
-          <tr align="center" ng-repeat="patient in patients|filter:searchPatient">
+          <tr align="center" ng-click="goToPatient(patient)" ng-repeat-start="patient in patients|filter:searchPatient">
               <td>{{patient.PatientId}}</td>
               <td>{{patient.PatientAriaSer}}</td>
               <td>{{patient.FirstName}}</td>
               <td>{{patient.LastName}}</td>
               <td>{{patient.SSN}}</td>
               <td>{{patient.Email}}</td>
-              <td align="center"><button class="btn btn-primary" ng-click="goToPatient(patient)">Go To Patient &raquo;</button></td>
+          </tr>
+          <tr ng-if="patient.expanded" ng-repeat-end="">
+            <td colspan="6" >
+              <div  style="margin: 0 auto;margin-top:5px; width:350px; height:500px;">
+                  <object type="text/html" data="http://172.26.66.41/devDocuments/david/muhc/qplus/mobile"
+                          style="width:100%; height:100%; border:1px solid lightgrey;border-radius:2px">
+                  </object>
+              </div>
+            </td>
           </tr>
       </table>
     </div>
+    </div>
+  </div>  
   </div>
 </div>

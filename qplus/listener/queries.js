@@ -182,9 +182,9 @@ exports.getPatientFieldsForPasswordReset=function(userID)
 {
   return 'SELECT Patient.SSN, Patient.PatientSerNum FROM Patient, Users WHERE Users.Username LIKE '+"\'"+ userID+"\'"+'AND Users.UserTypeSerNum = Patient.PatientSerNum';
 }
-exports.setNewPassword=function(password,patientSerNum)
+exports.setNewPassword=function(password,patientSerNum, token)
 {
-  return "UPDATE Users SET Password='"+password+"' WHERE UserType LIKE 'Patient' AND UserTypeSerNum="+patientSerNum;
+  return "UPDATE Users SET Password='"+password+"', SessionId='"+token+"' WHERE UserType LIKE 'Patient' AND UserTypeSerNum="+patientSerNum;
 }
 exports.patientTasksQuery=function(userID)
 {
@@ -209,25 +209,25 @@ exports.patientTasksQuery=function(userID)
              'Users.Username Like '+"'"+ userID+"'";
 
 }
-exports.readMessage=function(MessageSerNum)
+exports.readMessage=function(MessageSerNum,token)
 {
-  return "UPDATE `Messages` SET ReadStatus=1 WHERE Messages.MessageSerNum='"+MessageSerNum+"'";
+  return "UPDATE `Messages` SET ReadStatus=1, SessionId='"+token+"' WHERE Messages.MessageSerNum='"+MessageSerNum+"'";
 }
-exports.checkin=function(AppointmentSerNum)
+exports.checkin=function(AppointmentSerNum,token)
 {
-  return "UPDATE Appointment SET Checkin=1 WHERE Appointment.Checkin=0 AND Appointment.AppointmentSerNum='"+AppointmentSerNum+"'";
+  return "UPDATE Appointment SET Checkin=1, SessionId='"+token+"' WHERE Appointment.Checkin=0 AND Appointment.AppointmentSerNum='"+AppointmentSerNum+"'";
 }
-exports.readNotification=function(NotificationSerNum)
+exports.readNotification=function(NotificationSerNum,token)
 {
-  return "UPDATE Notifications SET ReadStatus=1 WHERE `Notifications`.`NotificationSerNum`='"+NotificationSerNum+"'";
+  return "UPDATE Notifications SET ReadStatus=1, SessionId='"+token+"' WHERE `Notifications`.`NotificationSerNum`='"+NotificationSerNum+"'";
 }
-exports.accountChange=function( serNum, field, newValue)
+exports.accountChange=function( serNum, field, newValue, token)
 {
-  return "UPDATE Patient SET "+field+"='"+newValue+"' WHERE PatientSerNum LIKE '"+serNum+"'";
+  return "UPDATE Patient SET "+field+"='"+newValue+"', SessionId='"+token+"' WHERE PatientSerNum LIKE '"+serNum+"'";
 }
 exports.inputFeedback=function(UserSerNum, content)
 {
-  return "INSERT INTO Feedback (`FeedbackSerNum`,`UserSerNum`,`FeedbackContent`,`LastUpdated`) VALUES (NULL,'"+UserSerNum+"','"+ content + "',"+"CURRENT_TIMESTAMP )";
+  return "INSERT INTO Feedback (`FeedbackSerNum`,`UserSerNum`,`FeedbackContent`,`SessionId`, `LastUpdated`) VALUES (NULL,'"+UserSerNum+"','"+ content + "',"+"CURRENT_TIMESTAMP )";
 }
 exports.sendMessage=function(objectRequest)
 {
@@ -238,8 +238,9 @@ exports.sendMessage=function(objectRequest)
   var receiverSerNum=objectRequest.ReceiverSerNum;
   var messageContent=objectRequest.MessageContent;
   var messageDate=objectRequest.MessageDate;
+  var token=objectRequest.Token;
   console.log("INSERT INTO Messages (`MessageSerNum`, `SenderRole`,`ReceiverRole`, `SenderSerNum`, `ReceiverSerNum`,`MessageContent`,`ReadStatus`,`MessageDate`,`LastUpdated`) VALUES (NULL,'"+senderRole+"','"+ receiverRole + "', '"+senderSerNum+"','"+ receiverSerNum +"','" +messageContent+"',0,'"+messageDate+"' ,CURRENT_TIMESTAMP )");
-  return "INSERT INTO Messages (`MessageSerNum`, `SenderRole`,`ReceiverRole`, `SenderSerNum`, `ReceiverSerNum`,`MessageContent`,`ReadStatus`,`MessageDate`,`LastUpdated`) VALUES (NULL,'"+senderRole+"','"+ receiverRole + "', '"+senderSerNum+"','"+ receiverSerNum +"','" +messageContent+"',0,'"+messageDate+"' ,CURRENT_TIMESTAMP )";
+  return "INSERT INTO Messages (`MessageSerNum`, `SenderRole`,`ReceiverRole`, `SenderSerNum`, `ReceiverSerNum`,`MessageContent`,`ReadStatus`,`MessageDate`,`SessionId`,`LastUpdated`) VALUES (NULL,'"+senderRole+"','"+ receiverRole + "', '"+senderSerNum+"','"+ receiverSerNum +"','" +messageContent+"',0,'"+messageDate+"','"+token+"' ,CURRENT_TIMESTAMP )";
 }
 exports.getPatientFromUserId=function(userID)
 {
@@ -247,12 +248,7 @@ exports.getPatientFromUserId=function(userID)
 }
 exports.logActivity=function(requestObject)
 {
-  var parameters='';
-  if(typeof requestObject.Parameters!=='undefined'){
-    parameters=JSON.stringify(requestObject.Parameters);
-  }
-  console.log("INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`UserID`, `DeviceID` ,`DateTime`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.UserID+ "', '"+requestObject.DeviceId+"', CURRENT_TIMESTAMP ,CURRENT_TIMESTAMP )");
-  return "INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`UserID`, `DeviceID`,`DateTime`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.UserID+ "', '"+requestObject.DeviceId+"', CURRENT_TIMESTAMP ,CURRENT_TIMESTAMP )";
+  return "INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`Username`, `DeviceId`,`SessionId`,`DateTime`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.UserID+ "', '"+requestObject.DeviceId+"','"+requestObject.Token+"', CURRENT_TIMESTAMP ,CURRENT_TIMESTAMP )";
 }
 
 exports.userPassword=function(username)

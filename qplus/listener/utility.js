@@ -46,7 +46,6 @@ console.log(secret);
 };
 exports.decryptObject=function(object,secret)
 {
-  var decipherbytes = CryptoJS.AES.decrypt('David', 'David');
   if(typeof object =='string')
   {
     var decipherbytes = CryptoJS.AES.decrypt(object, secret);

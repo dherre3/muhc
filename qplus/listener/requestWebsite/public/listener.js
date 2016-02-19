@@ -6,14 +6,14 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
   setInterval(function(){
     location.reload();
   },1296000000);
-  var ref=new Firebase('https://brilliant-inferno-7679.firebaseio.com/');
+  var ref=new Firebase('https://brilliant-inferno-7679.firebaseio.com/dev');
   ref.auth('9HeH3WPYe4gdTuqa88dtE3KmKy7rqfb4gItDRkPF');
   ref.child('requests').on('child_added',function(request){
-    $.post("http://172.26.66.41:8010/login",{key: request.key(),objectRequest: request.val()}, function(data){
+    $.post("http://172.26.66.41:8020/login",{key: request.key(),objectRequest: request.val()}, function(data){
       console.log(data);
+
       if(data.type=='UploadToFirebase')
       {
-        var ref=new Firebase('https://brilliant-inferno-7679.firebaseio.com/');
         uploadToFirebase(data.requestKey, data.encryptionKey,data.requestObject, data.object);
       }else if(data.type=='CompleteRequest')
       {
@@ -29,6 +29,7 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
 
   function uploadToFirebase(requestKey,encryptionKey,requestObject,object)
   {
+    console.log(requestObject); 
     console.log('I am about to go to into encrypting');
     //console.log(request);
     object=encryptObject(object,encryptionKey);

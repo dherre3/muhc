@@ -1,18 +1,9 @@
-<div class="main-div-container">
-
-  <uib-tabset>
-    <uib-tab active="home" ng-hide="admin">
-   <tab-heading>
-     Home
-   </tab-heading>
-   <div ng-show="loggedin" style="margin-left:20px;margin-top:20px">
+<div class="main-div-container jumbotron animated zoomIn">
+  <div ng-show="loggedin" style="margin-left:20px;margin-top:20px">
      <h4>{{date|date:'EEEE MM dd'}}</h4>
      <h2>
-       Welcome, {{currentUser.FirstName}} {{currentUser.LastName}}
+       Welcome, <span ><strong>{{currentUser.FirstName}} {{currentUser.LastName}}</strong></span>
      </h2>
-     <ul>
-       <li ng-show="userType=='Doctor'"> {{TotalNumberOfDoctorPatients}} of your patients are currently registered for the app</li>
-     </ul>
      <p ng-show="NumberOfNewMessages>0">
        <span style="font-size:30px"><i class="ion-email"></i></span>  You have {{NumberOfNewMessages}} new {{messages}} <a href="#/messages">Go to my messages &raquo;</a>
      </p>
@@ -23,38 +14,86 @@
 
 
    </div>
-     <div  ng-show="!loggedin" class="container" align="center">
-       <h3>You are not currently signed in!</h3>
-            <br>
-       <button class="btn btn-primary btn-block btn-lg" name="button" ng-click="signin()">Sign in</button>
-     </div>
+  <div class="row" style="padding:30px 0 0 30px">
+  <div class="col-lg-offset-1 col-xs-12 col-md-6 col-lg-3">
+  <div class="widget">
+    <div class="widget-body">
+      <div class="widget-icon green pull-left">
+        <i class="ion-ios-people"></i>  
+      </div>
+      <div class="widget-content">
+      <div class="title">
+        {{TotalNumberOfPatients}}
+      </div >
+      <div class="comment">
+       Number of Registered Patients<br><br>
+      </div>
+    </div>
+    </div> 
+  </div>
+
+  </div>
+   <div class="col-xs-12 col-md-6 col-lg-3" ng-if="loggedin&&userType!=='Staff'&&userType!=='Admin'">
+  <div class="widget">
+    <div class="widget-body">
+      <div class="widget-icon red pull-left">
+        <i class="ion-medkit"></i>  
+      </div>
+      <div class="widget-content">
+      <div class="title">
+
+        {{TotalNumberOfDoctorPatients}}
+
+      </div >
+      <div class="comment">
+      Your registered patients<br>
+      <a ui-sref="patients.search-patients">see my patients &raquo;</a>
+      </div>
+    </div>
+    </div> 
+  </div>
+
+  </div>
+    <div class="col-xs-12 col-md-6 col-lg-3"  ng-if="loggedin&&userType=='Doctor'">
+  <div class="widget">
+    <div class="widget-body">
+      <div class="widget-icon blue pull-left">
+        <i class="ion-android-mail"></i>  
+      </div>
+      <div class="widget-content">
+      <div class="title">
+        {{NumberOfNewMessages}}
+      </div >
+      <div class="comment">
+       Messages<br>
+       <a href ui-sref="messages" >see my messages &raquo;</a>
+      </div>
+    </div>
+    </div> 
+  </div>
+
+  </div>
+</div>
 
 
 
-   </uib-tab>
-          <uib-tab active="about">
-          <tab-heading>
-             About
-          </tab-heading>
-          <div style="margin:20px 0 0 20px">
+     <div  >
+<div  class="home-font" style="margin:20px 0 0 20px;background:inherit">
           <h3>About Opal</h3>
-	Opal is a multiplatform application that allows patients to obtain
-	information about their treatment and their waiting times. <br>
-	These tool will allow you as a doctor or administrator to obtain all the information that is
+
+  Opal is a multiplatform application that allows patients to obtain
+  information about their treatment and their waiting times. <br>
+  These tool will allow you as a doctor or administrator to obtain all the information that is
   currently being shown to the patient.<br>
   These tool will allow you to:
   <ul>
-			<li>Obtain a real time view of the information that is currently shared with the patients.</li>
-			<li> Keep an open channel of communication with the patients via chat message.</li>
-			<li> 	See all the documents that have currently being published to the patients.</li>
-			<li>A look at a patient's treatment plan.</li>
-			<li>Update the information that is currently being shown to the patient about you.</li>
+      <li>Obtain a real time view of the information that is currently shared with the patients.</li>
+      <li> Keep an open channel of communication with the patients via chat message.</li>
+      <li>  See all the documents that have currently being published to the patients.</li>
+      <li>A look at a patient's treatment plan.</li>
+      <li>Update the information that is currently being shown to the patient about you.</li>
   </ul>
-<h3>FAQ</h3>
-	- There are currently {{TotalNumberOfPatients}} patients registered for the app.
 </div>
-          </uib-tab>
-
-  </uib-tabset>
+     </div>
 
 </div>

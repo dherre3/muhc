@@ -235,14 +235,17 @@ exports.getPatientTasks=function(UserID)
   return r.promise;
 }
 //Api call to insert a message into messages table
-exports.sendMessage=function(objectRequest)
+exports.sendMessage=function(requestObject)
 {
   var r=Q.defer();
-  connection.query(queries.sendMessage(objectRequest),function(error,rows, fields)
+  connection.query(queries.sendMessage(requestObject),function(error,rows, fields)
   {
 
     if(error) r.reject(error);
-    r.resolve(objectRequest);
+    console.log(rows.insertId);
+    var id=rows.insertId;
+    //connection.query(queriesMH.sendMessage(objectRequest,id));
+    r.resolve(requestObject);
   });
   return r.promise;
 }
@@ -252,7 +255,7 @@ exports.readMessage=function(requestObject)
 {
   var r=Q.defer();
   var serNum=requestObject.Parameters.MessageSerNum;
-  connection.query(queries.readMessage(serNum),function(error, rows, fields)
+  connection.query(queries.readMessage(serNum, requestObject.Token),function(error, rows, fields)
   {
     if(error) r.reject(error);
     r.resolve(requestObject);
@@ -264,7 +267,7 @@ exports.readNotification=function(requestObject)
 {
   var r=Q.defer();
   var serNum=requestObject.Parameters.NotificationSerNum;
-  connection.query(queries.readNotification(serNum),function(error, rows, fields)
+  connection.query(queries.readNotification(serNum, requestObject.Token),function(error, rows, fields)
   {
     if(error) r.reject(error);
     r.resolve(requestObject);
@@ -277,7 +280,7 @@ exports.checkIn=function(requestObject)
   var r=Q.defer();
   var serNum=requestObject.Parameters.AppointmentSerNum;
 
-  connection.query(queries.checkin(serNum),function(error, rows, fields)
+  connection.query(queries.checkin(serNum,requestObject.Token),function(error, rows, fields)
   {
     if(error) r.reject(error);
     r.resolve(requestObject);
@@ -298,17 +301,19 @@ exports.updateAccountField=function(requestObject)
     if(field=='Password')
     {
       newValue=CryptoJS.SHA256(newValue);
-      connection.query(queries.setNewPassword(newValue,patientSerNum),
+      connection.query(queries.setNewPassword(newValue,patientSerNum,requestObject.Token),
       function(error, rows, fields)
       {
+        if(error) r.reject(error);
         delete requestObject.Parameters.NewValue;
         r.resolve(requestObject);
       });
 
     }else{
-      connection.query(queries.accountChange(patientSerNum,field,newValue),
+      connection.query(queries.accountChange(patientSerNum,field,newValue,requestObject.Token),
       function(error, rows, fields)
       {
+        if(error) r.reject(error);
         r.resolve(requestObject);
       });
     }
@@ -326,9 +331,10 @@ exports.inputFeedback=function(requestObject)
   {
     var userSerNum=user.UserSerNum;
     var content=requestObject.Parameters.FeedbackContent;
-    connection.query(queries.inputFeedback(userSerNum,content),
+    connection.query(queries.inputFeedback(userSerNum,content,requestObject.Token),
     function(error, rows, fields)
     {
+      if(error) r.reject(error);
       r.resolve(requestObject);
     });
   });
@@ -376,10 +382,10 @@ exports.getPatientFieldsForPasswordReset=function(userID)
   });
   return r.promise;
 }
-exports.setNewPassword=function(password,patientSerNum)
+exports.setNewPassword=function(password,patientSerNum, token)
 {
   var r=Q.defer();
-  connection.query(queries.setNewPassword(password,patientSerNum),function(error,rows,fields)
+  connection.query(queries.setNewPassword(password,patientSerNum,token),function(error,rows,fields)
   {
     if(error) r.reject(error);
     r.resolve(rows);

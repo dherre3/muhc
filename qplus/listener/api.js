@@ -118,7 +118,7 @@ exports.readMessage = function (requestObject) {
         r.reject('Invalid');
     } else {
         sqlInterface.readMessage(requestObject).then(function (response) {
-            sqlInterface.addToActivityLog(requestObject);
+            //sqlInterface.addToActivityLog(requestObject);
             r.resolve(response);
         });
     }
@@ -131,7 +131,7 @@ exports.readNotification = function (requestObject) {
         r.reject('Invalid');
     } else {
         sqlInterface.readNotification(requestObject).then(function (requestObject) {
-          sqlInterface.addToActivityLog(requestObject);
+          //sqlInterface.addToActivityLog(requestObject);
           r.resolve(requestObject);
         });
     }
@@ -143,7 +143,7 @@ exports.checkIn = function (requestObject) {
         r.reject('Invalid');
     } else {
         sqlInterface.checkIn(requestObject).then(function (requestObject) {
-          sqlInterface.addToActivityLog(requestObject);
+          //sqlInterface.addToActivityLog(requestObject);
           r.resolve(requestObject);
         });
     }
@@ -156,8 +156,9 @@ exports.accountChange = function (requestObject) {
         r.reject('Invalid');
     } else {
         sqlInterface.updateAccountField(requestObject).then(function (requestObject) {
-            sqlInterface.addToActivityLog(requestObject);
-            r.resolve(requestObject);
+          r.resolve(requestObject);
+        }).catch(function(error){
+          r.reject(error);
         });
     }
     return r.promise;
@@ -169,8 +170,10 @@ exports.inputFeedback=function(requestObject)
       r.reject('Invalid');
   } else {
       sqlInterface.inputFeedback(requestObject).then(function (requestObject) {
-          sqlInterface.addToActivityLog(requestObject);
-          r.resolve(requestObject);
+          //sqlInterface.addToActivityLog(requestObject);
+        r.resolve(requestObject);
+      }).catch(function(error){
+        r.reject(error);
       });
   }
   return r.promise;
@@ -195,7 +198,7 @@ exports.sendMessage=function(requestObject)
   } else {
 
       sqlInterface.sendMessage(requestObject).then(function (objectRequest) {
-          sqlInterface.addToActivityLog(requestObject);
+          //sqlInterface.addToActivityLog(requestObject);
           r.resolve(objectRequest);
       });
   }

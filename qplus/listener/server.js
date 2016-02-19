@@ -1,12 +1,5 @@
 var express        =         require("express");
 var bodyParser     =         require("body-parser");
-var utility=require('./utility.js');
-var updateClient=require('./updateClient.js');
-var updateServer=require('./updateServer.js');
-var credentials=require('./credentials.js');
-var sqlInterface=require('./sqlInterface.js');
-var CryptoJS=require('crypto-js')
-var api=require('./api.js');
 var main=require('./main.js');
 
 var app            =         express();
@@ -33,14 +26,14 @@ app.post('/login',function(req,res,next){
   console.log(requestKey);
     console.log(requestObject);
 
-    if(requestObject.Request=='ResetPassword'||requestObject.Request=='ChangePasswordReset')
+    if(requestObject.Request=='VerifySSN'||requestObject.Request=='SetNewPassword')
     {
       console.log(requestObject);
       main.resetPasswordBrowserListener(requestKey,requestObject).then(function(results)
       {
-        console.log('Reset Password');
+        console.log('Reset Password fucker');
         console.log(results);
-        res.send(result);
+        res.send(results);
       });
      
     }else{
@@ -94,6 +87,6 @@ app.post('/login',function(req,res,next){
 
 });
 
-app.listen(8010,function(){
-  console.log("Started on PORT 3000");
+app.listen(8020,function(){
+  console.log("Started on PORT 8020");
 })

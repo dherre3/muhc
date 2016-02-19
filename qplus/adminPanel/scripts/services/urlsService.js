@@ -80,7 +80,12 @@ app.service('URLs',function(){
      readMessageUrl:function()
      {
       return basicURLPHP+'readMessage.php';
+     },
+     getActivityUrl:function()
+     {
+      return basicURLPHP+'patientActivity/getActivityLog.php';
      }
+
 
    };
 

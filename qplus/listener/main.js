@@ -16,7 +16,7 @@ var ref=new Firebase(credentials.FIREBASE_URL);
 ref.child('requests').on('child_added',function(requestsFromFirebase){
   var requestObject=requestsFromFirebase.val();
   var requestKey=requestsFromFirebase.key();
-  if(requestObject.Request=='ResetPassword'||requestObject.Request=='ChangePasswordReset')
+  if(requestObject.Request=='VerifySSN'||requestObject.Request=='SetNewPassword')
   {
     console.log(requestObject);
     exports.resetPasswordRequest(requestKey,requestObject);
@@ -26,11 +26,6 @@ ref.child('requests').on('child_added',function(requestsFromFirebase){
   }
 });
 
-
-function request(requestKey, requestObject)
-{
-
-}
 
 exports.apiRequest=function(requestKey, requestObject){
   sqlInterface.getUsersPassword(requestObject.UserID).then(function(key){
@@ -110,7 +105,7 @@ exports.resetPasswordRequest=function(requestKey, requestObject)
       console.log('Inside this function');
       console.log(patient);
       console.log(patient.SSN);
-      if(requestObject.Request=='ResetPassword'){
+      if(requestObject.Request=='VerifySSN'){
         var unencrypted=utility.decryptObject(requestObject.Parameters,patient.SSN);
         console.log(unencrypted);
         if(typeof unencrypted.SSN!=='undefined'&&unencrypted.SSN!=='')
@@ -165,7 +160,7 @@ exports.resetPasswordRequest=function(requestKey, requestObject)
             console.log('Invalid flag');
           }else{
             console.log(patient);
-            sqlInterface.setNewPassword(newPassword,patient.PatientSerNum).then(function(){
+            sqlInterface.setNewPassword(newPassword,patient.PatientSerNum,requestObject.Token).then(function(){
               completeRequest(requestKey,requestObject);
             }).catch(function(response){
               console.log('Invalid setting password');
@@ -285,7 +280,7 @@ exports.resetPasswordBrowserListener=function(requestKey, requestObject)
     console.log('Inside this function');
     console.log(patient);
     console.log(patient.SSN);
-    if(requestObject.Request=='ResetPassword'){
+    if(requestObject.Request=='VerifySSN'){
       var unencrypted=utility.decryptObject(requestObject.Parameters,patient.SSN);
       console.log(unencrypted);
       if(typeof unencrypted.SSN!=='undefined'&&unencrypted.SSN!=='')
@@ -294,7 +289,7 @@ exports.resetPasswordBrowserListener=function(requestKey, requestObject)
         sqlInterface.getSecurityQuestions(patient.PatientSerNum).then(function(questions)
         {
           console.log(questions);
-          var integer=Math.floor((3*Math.random()));
+          var integer=Math.floor((questions.length*Math.random()));
           console.log(integer);
           questions[integer].type='success';
           var response={ResetPassword:questions[integer]};
@@ -338,7 +333,7 @@ exports.resetPasswordBrowserListener=function(requestKey, requestObject)
           console.log('Invalid flag');
         }else{
           console.log(patient);
-          sqlInterface.setNewPassword(newPassword,patient.PatientSerNum).then(function(){
+          sqlInterface.setNewPassword(newPassword,patient.PatientSerNum, requestObject.Token).then(function(){
             var firebaseObject={};
             firebaseObject.requestKey=requestKey;
             firebaseObject.requestObject={};

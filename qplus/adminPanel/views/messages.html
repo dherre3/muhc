@@ -1,8 +1,8 @@
-<div class="container-fluid">
+<div class="container-fluid animated zoomIn">
  <div class="col-md-4 col-sm-4 col-lg-4" >
  <div class="panel panel-default" style="height:70vh; margin:0;padding:0">
  <div class="panel-body" style="margin:0;padding:0">
- <ul class="list">
+ <ul class="list" style="overflow-x:hidden">
   <li class="list__item" ng-class="(selectedIndex==$index)?'conversationSelected':''"ng-repeat="person in chat" ng-click="goToConversation($index)">
      <div class='row' >
        <div class="col-xs-1" >

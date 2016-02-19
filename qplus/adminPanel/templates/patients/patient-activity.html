@@ -1,19 +1,30 @@
-<div class='main-div-container'>
-	<div>
-    <div class="form-inline" style="padding:20px">
-  <div class="form-group">
-    <label >Search Patient: </label>
+<div class='main-div-container animated zoomIn'>
+	  <div style="padding:20px">
+  <div class='widget'>
+    <div class="widget-header">
+      <div class="row" style="font-size:20px;">
+        <div class="pull-left" style="font-size:20px;margin-left:10px">
+         <div class="form-group">
+    <label ><i class="ion-search"></i> Search Patient: </label>
     <input type="search" value="" placeholder="Search" class="form-control"  ng-model="searchPatient">
   </div>
-  <div class="form-group">
-    <label >Filter</label>
+        </div>
+        <div class="pull-left col-xs-6 col-sm-2">
+           <div class="form-group">
+    <label ><i class="ion-ios-settings-strong"></i> Filter:</label>
     <select class="form-control" ng-model="data.singleSelect">
-      <option value="option-1">Option 1</option>
-      <option value="option-2">Option 2</option></select>
+      <option value="option-1">All</option>
+      <option value="option-2">Last Week</option>
+      <option value="option-2">Last Month</option>
+
+    </select>
   </div>
-</div>
-    <div style="margin-top:30px;height:100%;padding:10px" >
-      <table class="table table-hover" style="padding:20px">
+        </div>
+      </div>
+    </div>
+    <div class="widget-body no-padding">
+          <div class="table-responsive">
+      <table class="table table-hover" >
           <th class="active" style="text-align:center">
           Patient ID #
           </th>
@@ -46,5 +57,8 @@
           </tr>
       </table>
     </div>
+    </div>
+  </div>  
+  </div>
 
 </div>
