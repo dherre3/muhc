@@ -1,5 +1,9 @@
 <div class="main-div-container animated zoomIn">
   <div class="container">
+  <div class="col-xs-offset-7 col-xs-5" id="showToast">
+
+    
+  </div>
     <div ><h4>Role: {{userFields.Role}}</h4></div>
     <div ng-show="userFields.Role=='Doctor'"><h4>Doctor Aria Ser: {{userFields.DoctorAriaSer}}</h4></div>
     <div ng-show="userFields.Role=='Staff'"><h4>StaffID: {{userFields.StaffID}}</h4></div>
@@ -56,7 +60,13 @@
               </div>
             </div>
           </td>
-          <td align="right"><a href ng-click="(value.Edit==true)?value.Edit=false:value.Edit=true;closeAllOtherFields(key)"><i class="icon-edit-account icon ion-edit"></i></a></td>
+          <td align="right" >
+            <a href ng-click="(value.Edit==true)?value.Edit=false:value.Edit=true;closeAllOtherFields(key)">
+              <md-button class="md-fab md-mini md-primary" aria-label="Eat cake" style="margin-top:-5px">
+                <md-icon class="material-icons">mode_edit</md-icon>
+              </md-button>
+            </a>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -95,7 +105,11 @@
             </div>
           </div>
             </td>
-            <td align="right"><a href ng-click="accountFields.Username.Edit=true;closeAllOtherFields('Username')"><i class="icon-edit-account icon ion-edit"></i></a></td>
+            <td align="right"><a href ng-click="accountFields.Username.Edit?accountFields.Username.Edit=false:accountFields.Username.Edit=true;closeAllOtherFields('Username')">
+              <md-button class="md-fab md-mini md-primary" aria-label="Eat cake" style="margin-top:-5px">
+                <md-icon class="material-icons">mode_edit</md-icon>
+              </md-button>
+            </a></td>
           </tr>
           <tr align="center">
             <td class="text-left"><strong>Password</strong></td>
@@ -126,9 +140,19 @@
             </div>
           </div>
             </td>
-            <td align="right"><a href ng-click="accountFields.Password.Edit=true;closeAllOtherFields('Password')"><i class="icon-edit-account icon ion-edit"></i></a></td>
+            <td align="right"><a href ng-click="accountFields.Password.Edit?accountFields.Password.Edit=false:accountFields.Password.Edit=true;closeAllOtherFields('Password')">
+              <md-button class="md-fab md-mini md-primary" aria-label="Eat cake" style="margin-top:-5px">
+                <md-icon class="material-icons">mode_edit</md-icon>
+              </md-button></a></td>
           </tr>
         </tbody>
       </table>
   </div>
 </div>
+<script type="text/ng-template" id="toast-template.html"><md-toast>
+  <span flex>Field has been updated!</span>
+  <md-button ng-click="closeToast()">
+    Close
+  </md-button>
+</md-toast>
+</script>

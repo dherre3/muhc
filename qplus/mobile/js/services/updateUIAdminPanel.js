@@ -1,6 +1,6 @@
 var myApp=angular.module('MUHCApp');
 myApp.service('UpdateUI',['$http', 'Patient','Doctors','Appointments','Messages','Documents','UserPreferences', 'UserAuthorizationInfo', '$q', 'Notifications', 'UserPlanWorkflow','$cordovaNetwork', 'Notes', 'LocalStorage','RequestToServer','$filter','LabResults',
-  function ($http, Patient,Doctors, Appointments,Messages, Documents, UserPreferences, UserAuthorizationInfo, $q, Notifications, UserPlanWorkflow,$cordovaNetwork,Notes,LocalStorage,RequestToServer,$filter,LabResults) {
+  'Credentials',function ($http, Patient,Doctors, Appointments,Messages, Documents, UserPreferences, UserAuthorizationInfo, $q, Notifications, UserPlanWorkflow,$cordovaNetwork,Notes,LocalStorage,RequestToServer,$filter,LabResults,Credentials) {
   //Enter code here!!
   function updateAllServices(dataUserObject,mode){
       console.log(mode);
@@ -56,7 +56,7 @@ myApp.service('UpdateUI',['$http', 'Patient','Doctors','Appointments','Messages'
     updateUserFields:function()
     {
       var username=UserAuthorizationInfo.getUsername();
-      var url='http://172.26.66.41/devDocuments/david/muhc/qplus/php/mobile/fetchPatientData.php';
+      var url=Credentials.mobileAppDataURL;
       var r=$q.defer();
       var req = {
        method: 'POST',
@@ -77,7 +77,7 @@ myApp.service('UpdateUI',['$http', 'Patient','Doctors','Appointments','Messages'
       });
       return r.promise;
     }
-      
+
 
 
 

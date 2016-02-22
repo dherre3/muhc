@@ -33,7 +33,7 @@
           Email
           </th>
 
-          <tr align="center" ng-click="goToPatient(patient)" ng-repeat-start="patient in patients|filter:searchPatient">
+          <tr class="unfocus" align="center" ng-click="goToPatient(patient)" ng-repeat-start="patient in patients|filter:searchPatient">
               <td>{{patient.PatientId}}</td>
               <td>{{patient.PatientAriaSer}}</td>
               <td>{{patient.FirstName}}</td>
@@ -41,18 +41,16 @@
               <td>{{patient.SSN}}</td>
               <td>{{patient.Email}}</td>
           </tr>
-          <tr ng-if="patient.expanded" ng-repeat-end="">
+          <tr uib-collapse="!patient.expanded" ng-repeat-end="">
             <td colspan="6" >
               <div  style="margin: 0 auto;margin-top:5px; width:350px; height:500px;">
-                  <object type="text/html" data="http://172.26.66.41/devDocuments/david/muhc/qplus/mobile"
-                          style="width:100%; height:100%; border:1px solid lightgrey;border-radius:2px">
-                  </object>
+                <load-app src='appFolder'></load-app>
               </div>
             </td>
           </tr>
       </table>
     </div>
     </div>
-  </div>  
+  </div>
   </div>
 </div>

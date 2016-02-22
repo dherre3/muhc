@@ -53,7 +53,7 @@ body {
   margin:0 auto;
   margin-top:-10px;
   min-height:65vh;
-  width:90vw;
+  width:90%;
   border:1px solid lightgrey;
   background-color: #fbfbfb;
   border-radius: 4px;
@@ -493,7 +493,10 @@ input[type="search"].search-input::-webkit-search-cancel-button {
 .widget .widget-body.no-padding {
     padding: 0;
 }
-.widget .widget-icon {
+.orange {
+    background: #d3a938!important;
+}
+.widget-icon {
     width: 65px;
     height: 65px;
     border-radius: 50%;
@@ -516,7 +519,7 @@ input[type="search"].search-input::-webkit-search-cancel-button {
     font-size: 28px;
     display: block;
 }
-.widget .widget-icon i {
+ .widget-icon i {
     line-height: 66px;
     color: #fff;
     font-size: 30px;
@@ -524,4 +527,29 @@ input[type="search"].search-input::-webkit-search-cancel-button {
 .home-font{
     font-family: 'Source Sans Pro', sans-serif;
     font-weight: 300;
+}
+/*
+*Angular Material
+*/
+.buttondemoBasicUsage section {
+  background: #f7f7f7;
+  border-radius: 3px;
+  text-align: center;
+  margin: 1em;
+  position: relative !important;
+  padding-bottom: 10px; }
+.buttondemoBasicUsage md-content {
+  margin-right: 7px; }
+.buttondemoBasicUsage section .md-button {
+  margin-top: 16px;
+  margin-bottom: 16px; }
+.buttondemoBasicUsage .label {
+  position: absolute;
+  bottom: 5px;
+  left: 7px;
+  font-size: 14px;
+  opacity: 0.54; }
+
+.unfocus{
+  outline:none;
 }

@@ -23,13 +23,10 @@
       </div>
     </div>
     <div class="widget-body no-padding">
-          <div class="table-responsive">
+          <div class="table-responsive" style="padding:0 10px 10px 10px;background: #fff;">
       <table class="table table-hover" >
           <th class="active" style="text-align:center">
           Patient ID #
-          </th>
-          <th class="active"style="text-align:center">
-          Patient Aria Ser
           </th>
           <th class="active"style="text-align:center">
           First Name
@@ -37,23 +34,28 @@
           <th class="active"style="text-align:center">
           Last Name
           </th>
-          <th class="active"style="text-align:center">
-          SSN
+           <th class="active"style="text-align:center">
+          Login Time
           </th>
           <th class="active"style="text-align:center">
-          Email
-          </th>
-          <th class="active">
+          Logout Time
           </th>
 
-          <tr align="center" ng-repeat="patient in patients|filter:searchPatient">
-              <td>{{patient.PatientId}}</td>
-              <td>{{patient.PatientAriaSer}}</td>
-              <td>{{patient.FirstName}}</td>
-              <td>{{patient.LastName}}</td>
-              <td>{{patient.SSN}}</td>
-              <td>{{patient.Email}}</td>
-              <td align="center"><button class="btn btn-primary" ng-click="goToPatient(patient)">Go To Patient &raquo;</button></td>
+          <tr class="unfocus" align="center"  ng-repeat-start="(key, value) in activityLogObject" ng-init="value.expanded=false" ng-click="searchActivity(value)">
+              <td>{{value.PatientId}}</td>
+              <td>{{value.FirstName}}</td>
+              <td>{{value.LastName}}</td>
+              <td>{{value.LoginTime|date:'dd/MM/yy h:mm a'}}</td>
+              <td>{{value.LogoutTime|date:'dd/MM/yy h:mm a'}}</td>
+          </tr>
+          <tr uib-collapse="!value.expanded" ng-repeat-end="">
+            <td>
+            </td>
+            <td colspan="4" >
+              <table>
+                
+              </table>
+            </td>
           </tr>
       </table>
     </div>

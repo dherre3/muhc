@@ -1,6 +1,7 @@
 var app=angular.module('adminPanelApp');
-app.controller('SearchPatientsController' , function (api,$scope,Patient,$state,$rootScope) {
+app.controller('SearchPatientsController' , function (api,$scope,Patient,$state,$rootScope, Credentials) {
 
+		$scope.appFolder=Credentials.mobileAppFolder;
 		var patients=api.getAllPatients();
 
 		patients.then(function(patients,error){
@@ -38,7 +39,7 @@ app.controller('SearchPatientsController' , function (api,$scope,Patient,$state,
 					//$state.go('patients.patient');
 				});
 	   		}
-	   		
+
 	   	};
 	   	function closeOtherPatients(serNum)
 	   	{

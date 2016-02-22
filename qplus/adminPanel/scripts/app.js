@@ -15,10 +15,11 @@ var app=angular
     'ngResource',
     'ngRoute',
     'ngSanitize',
-    'ngTouch',
     'ui.router',
     'ui.bootstrap',
-    'luegg.directives'
+    'luegg.directives',
+    'CredentialsAdminPanel',
+    'ngMaterial'
   ]);
 app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider, $stateProvider) {
       $urlRouterProvider.otherwise("/");
@@ -29,7 +30,8 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
       controller: 'MainController',
       data:
       {
-        requireLogin:true
+        requireLogin:true,
+        label:'Home'
       }
     })
     .state('registration',{
@@ -37,7 +39,8 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
       templateUrl:'views/registration.html',
       controller:'RegistrationController',
       data:{
-        requireLogin:true
+        requireLogin:true,
+        label:'Register Patient'
       }
     })
     .state('patients',{
@@ -46,7 +49,8 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
       controller:'PatientsController',
       abstract:true,
       data:{
-        requireLogin:true
+        requireLogin:true,
+        label:'Patient'
       }
     })
     .state('messages',{
@@ -54,7 +58,8 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
       templateUrl:'views/messages.html',
       controller:'MessagesController',
       data:{
-        requireLogin:true
+        requireLogin:true,
+        label:'Messages'
       }
     })
     .state('requests',{
@@ -62,7 +67,8 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
       templateUrl:'views/requests.html',
       controller:'RequestsController',
       data:{
-        requireLogin:true
+        requireLogin:true,
+        label:'Account Settings'
       }
     })
     .state('patients.activity',{
@@ -70,7 +76,8 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
       templateUrl:'templates/patients/patient-activity.html',
       controller:'ActivityController',
       data:{
-        requireLogin:true
+        requireLogin:true,
+        label:'Patient Activity'
       }
     })
 
@@ -79,7 +86,8 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
       templateUrl:'templates/patients/search-patients.html',
       controller:'SearchPatientsController',
       data:{
-        requireLogin:true
+        requireLogin:true,
+        label:'Search Patients'
       }
     })
     .state('patients.patient',{
@@ -88,7 +96,8 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
       controller:'IndividualPatientController',
       //abstract:true,
       data:{
-        requireLogin:true
+        requireLogin:true,
+        label:'Account Settings'
       }
     })
     /*.state('patients.patient.general',{
@@ -154,7 +163,8 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
       controller: 'AccountController',
       data:
       {
-        requireLogin:true
+        requireLogin:true,
+        label:'Account Settings'
       }
     })
   }]);
@@ -194,6 +204,7 @@ app.run(function ($rootScope, $state,LoginModal,$timeout,URLs,api,User)
   * @description
   * Sets an interceptor for the app. Whenever a state change happens if data.requireLogin is set to true for that state it will prevent the user from switching to that view and prompt them to log in. If authenticated, it will go the chosen state, goes to home view otherwise.
   */
+  $('#stateName').css('display','block');
   $state.go('home');
   $rootScope.$on('$stateChangeStart', function (event, toState, toParams)
   {
@@ -213,6 +224,7 @@ app.run(function ($rootScope, $state,LoginModal,$timeout,URLs,api,User)
       });
     }
 
+    $rootScope.stateName=toState.data.label;
 
     if (requireLogin && typeof $rootScope.currentUser === 'undefined')
     {

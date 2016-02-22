@@ -5,6 +5,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST)) $_POST = json_decode(
 include '../config.php';
 $con = new mysqli("localhost", DB_USERNAME, DB_PASSWORD, MYSQL_DB);
 // Check connection
+if (!mysqli_set_charset($con, "utf8")) {
+    printf("Error loading character set utf8: %s\n", mysqli_error($link));
+    exit();
+}
 if ($con->connect_error) {
     die("<br>Connection failed: " . $conn->connect_error);
 }
@@ -13,11 +17,11 @@ $userID=$_POST["Username"];
 
 
 
-//Obtaining Lab results query, 
+//Obtaining Lab results query,
 $sql="SELECT ComponentName, FacComponentName, AbnormalFlag, MaxNorm, MinNorm, ".
   "TestValue, TestValueString, UnitDescription, CAST(TestDate AS char(30)) as `TestDate`".
   " FROM TestResult, Users, Patient ".
-  'WHERE Users.UserTypeSerNum=Patient.PatientSerNum AND '.
+  'WHERE TestResult.PatientSerNum=Patient.PatientSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND '.
   'Users.Username Like '."'". $userID."';";
 
 //Obtaining Tasks query.
@@ -189,9 +193,9 @@ $sql.='SELECT ' .
                       'Patient, '.
                       'Users ' .
                     'WHERE '.
-                      "Users.Username LIKE '". $userID."'AND Users.UserTypeSerNum = Patient.PatientSerNum;";                        
+                      "Users.Username LIKE '". $userID."'AND Users.UserTypeSerNum = Patient.PatientSerNum;";
 
-// Execute multi query 
+// Execute multi query
 
 //Defining name of database tables to simulate Firebase structure.
  $fieldsArray=array('LabTests','Tasks','Notifications','Documents','Appointments','Messages','Diagnoses','Doctors','Patient');
@@ -216,7 +220,7 @@ if (mysqli_multi_query($con,$sql))
        	{
 			echo json_encode($patientDataArray);
        	}
-        
+
        $index++;
       // Free result set
       mysqli_free_result($result);

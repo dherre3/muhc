@@ -1,8 +1,20 @@
-app.controller('AccountController',function ($rootScope, URLs,$scope,User, $timeout, fieldsValidate) {
-
-  
-
- 
+var myApp=angular.module('adminPanelApp');
+myApp.controller('ToastController',function($mdToast,$scope){
+  $scope.closeToast=function()
+  {
+    $mdToast.hide();
+  }
+});
+myApp.controller('AccountController',function ($rootScope, URLs,$scope,User, $timeout, fieldsValidate,$mdToast,$document) {
+  $scope.showCustomToast = function() {
+    $mdToast.show({
+      controller:'ToastController',
+      templateUrl: 'toast-template.html',
+      parent : $document[0].querySelector('#showToast'),
+      hideDelay: 3000,
+      position: 'top right'
+    });
+  };
   setUpAccountSettings();
   $scope.update=function(key, value)
   {
@@ -27,6 +39,7 @@ app.controller('AccountController',function ($rootScope, URLs,$scope,User, $time
             User.updateUserField(key,value);
             $scope.accountFields[key].Value=value;
             $scope.accountFields[key].newValue=value;
+            $scope.showCustomToast();
           }
         });
       },function(error){
@@ -65,6 +78,7 @@ app.controller('AccountController',function ($rootScope, URLs,$scope,User, $time
                 //User.updateUserField('Password',$scope.password.newValue);
                 $scope.accountFields['Password'].Value='';
                 $scope.accountFields['Password'].newValue='';
+                $scope.showCustomToast();
               })
             }
             
@@ -108,6 +122,7 @@ app.controller('AccountController',function ($rootScope, URLs,$scope,User, $time
               $scope.alertField={};
               $scope.alertField['Username']=result;
               $scope.alertField['Username'].show=true;
+              $scope.showCustomToast();
             });
           },function(error){
               $timeout(function(){
@@ -176,4 +191,5 @@ app.controller('AccountController',function ($rootScope, URLs,$scope,User, $time
     };
     $scope.accountFields=accountObject;
   }
-});
+})
+

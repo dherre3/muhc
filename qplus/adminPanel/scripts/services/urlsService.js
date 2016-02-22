@@ -1,12 +1,11 @@
 var app=angular.module('adminPanelApp');
 
-app.service('URLs',function(){
-   var basicURL='http://172.26.66.41/devDocuments/david/muhc/qplus/';
-   var patientDocumentsURL='http://172.26.66.41/devDocuments/david/muhc/qplus/listener/Documents';
-   var doctorImagesURL='http://172.26.66.41/devDocuments/david/muhc/qplus/listener/Doctors';
-   var patientImagesURL='http://172.26.66.41/devDocuments/david/muhc/qplus/listener/Patients';
-   var basicURLPHP=basicURL+'php/'
-
+app.service('URLs',function(Credentials){
+   var basicURL=Credentials.basicURL;
+   var patientDocumentsURL=Credentials.patientDocumentsURL;//'http://172.26.66.41/devDocuments/david/muhc/qplus/listener/Documents';
+   var doctorImagesURL=Credentials.doctorImagesURL;//'http://172.26.66.41/devDocuments/david/muhc/qplus/listener/Doctors';
+   var patientImagesURL=Credentials.patientImagesURL;//'http://172.26.66.41/devDocuments/david/muhc/qplus/listener/Patients';
+   var basicURLPHP=Credentials.basicURL+'php/';
    return{
      getBasicURLPHP:function(){
        return basicURLPHP;
@@ -81,9 +80,13 @@ app.service('URLs',function(){
      {
       return basicURLPHP+'readMessage.php';
      },
-     getActivityUrl:function()
+     getPatientActivityUrl:function()
      {
-      return basicURLPHP+'patientActivity/getActivityLog.php';
+      return basicURLPHP+'patientActivity/getPatientActivityLog.php';
+     },
+     getPatientSessionActivityUrl:function()
+     {
+      return basicURLPHP+'patientActivity/getPatientSessionActivity.php';
      }
 
 
