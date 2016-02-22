@@ -18,7 +18,7 @@
 	}
 
 	
-	$query="SELECT Patient.PatientId, PatientActivityLog.SessionId, PatientActivityLog.DateTime, PatientActivityLog.Request, PatientActivityLog.DeviceId, Patient.FirstName, Patient.LastName FROM PatientActivityLog, Users,  Patient WHERE ".$filter." AND ".$username." AND DateTime>'2016-02-11' AND PatientActivityLog.Username LIKE Users.Username AND Patient.PatientSerNum=Users.UserTypeSerNum AND Users.UserType='Patient' ORDER BY DateTime ASC;";
+	$query="SELECT Patient.PatientId, PatientActivityLog.SessionId, PatientActivityLog.DateTime, PatientActivityLog.Request, PatientActivityLog.DeviceId, Patient.FirstName, Patient.LastName FROM PatientActivityLog, Users,  Patient WHERE ".$filter." AND ".$username." AND PatientActivityLog.Username LIKE Users.Username AND Patient.PatientSerNum=Users.UserTypeSerNum AND Users.UserType='Patient' ORDER BY DateTime ASC;";
 	$queryResults = $conn->query($query);
 	if($queryResults->num_rows===0)
 	{

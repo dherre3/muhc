@@ -57,6 +57,7 @@ myApp.service('UpdateUI',['$http', 'Patient','Doctors','Appointments','Messages'
     {
       var username=UserAuthorizationInfo.getUsername();
       var url=Credentials.mobileAppDataURL;
+      console.log(url);
       var r=$q.defer();
       var req = {
        method: 'POST',

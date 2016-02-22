@@ -238,12 +238,11 @@ exports.getPatientTasks=function(UserID)
 exports.sendMessage=function(requestObject)
 {
   var r=Q.defer();
+  console.log(requestObject);
   connection.query(queries.sendMessage(requestObject),function(error,rows, fields)
   {
 
     if(error) r.reject(error);
-    console.log(rows.insertId);
-    var id=rows.insertId;
     //connection.query(queriesMH.sendMessage(objectRequest,id));
     r.resolve(requestObject);
   });

@@ -36,6 +36,15 @@ app.controller('LoginModalController',function ($scope, $modalInstance,$rootScop
       }
 
     }
+
+    $scope.onEnter=function(event)
+    {
+      console.log(event.keyCode);
+      if(event.keyCode==13)
+      {
+        $scope.login($scope.user.username, $scope.user.password);
+      }
+    }
     function signinUser(response)
     {
       var r=$q.defer();

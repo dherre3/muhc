@@ -9,13 +9,13 @@
       <!-- Use floating label instead of placeholder -->
       <label>Username</label>
      <md-icon class="material-icons" style="color:darkblue">person</md-icon>
-      <input ng-model="user.username" type="text" ng-required>
+      <input ng-model="user.username" type="text" ng-required ng-keyup="onEnter($event)">
     </md-input-container>
     <md-input-container class="md-icon-float md-block">
       <!-- Use floating label instead of placeholder -->
       <label>Password</label>
        <md-icon class="material-icons" style="color:darkblue">lock</md-icon>
-      <input ng-model="user.password" type="password" ng-required>
+      <input ng-model="user.password" type="password" ng-required ng-keyup="onEnter($event)">
     </md-input-container>
     </md-content>
   </div>

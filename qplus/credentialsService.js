@@ -7,16 +7,17 @@ appModule.service('Credentials',[function(){
   this.doctorImagesURL='http://172.26.66.41/devDocuments/david/muhc/qplus/listener/Doctors';
   this.patientImagesURL='http://172.26.66.41/devDocuments/david/muhc/qplus/listener/Patients';
   this.url='http://172.26.66.41/devDocuments/david/muhc/qplus/php/mobile/fetchPatientData.php';
+  this.mobileAppDataURL='http://172.26.66.41/devDocuments/david/muhc/qplus/php/mobile/fetchPatientData.php';
   this.mobileAppFolder='http://172.26.66.41/devDocuments/david/muhc/qplus/mobile';
 
 
   //Local version
-  this.basicURL='http://localhost:8888/muhc/copyServer/qplus/';
+  /*this.basicURL='http://localhost:8888/muhc/copyServer/qplus/';
   this.patientDocumentsURL='http://localhost:8888/muhc/copyServer/qplus/listener/Documents';
   this.doctorImagesURL='http://localhost:8888/muhc/copyServer/qplus/listener/Doctors';
   this.patientImagesURL='http://localhost:8888/muhc/copyServer/qplus/listener/Patients';
   this.mobileAppDataURL='http://localhost:8888/muhc/copyServer/qplus/php/mobile/fetchPatientData.php';
-  this.mobileAppFolder='http://localhost:8888/muhc/copyServer/qplus/mobile';
+  this.mobileAppFolder='http://localhost:8888/muhc/copyServer/qplus/mobile';*/
 
 
 

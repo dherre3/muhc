@@ -553,3 +553,27 @@ input[type="search"].search-input::-webkit-search-cancel-button {
 .unfocus{
   outline:none;
 }
+/*
+*Side bar styling
+*/
+/*
+Header darkblue
+*/
+#page-wrapper:not(.open) ul.sidebar .sidebar-title.separator, .sidebar-footer, ul.sidebar .sidebar-list a:hover, ul.sidebar .sidebar-main a {
+    background: #004d00;
+}
+#sidebar-wrapper {
+    background: #006600;
+}
+
+ul.sidebar .sidebar-list a {
+    text-indent: 25px;
+    font-size: 15px;
+    color: white;
+    line-height: 40px;
+}
+.sidebar-footer div a {
+    color: white;
+    font-size: 12px;
+    line-height: 43px;
+}

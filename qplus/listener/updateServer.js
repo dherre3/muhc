@@ -54,7 +54,6 @@ exports.update=function(requestObject)
   }else if(type=='Message')
   {
     api.sendMessage(requestObject).then(function(response){
-
         r.resolve(response);
     }).catch(function(response)
     {

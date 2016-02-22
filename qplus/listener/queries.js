@@ -231,14 +231,15 @@ exports.inputFeedback=function(UserSerNum, content)
 }
 exports.sendMessage=function(objectRequest)
 {
-  objectRequest=objectRequest.Parameters;
+  var token=objectRequest.Token;
+  objectRequest=objectRequest.Parameters; 
   var senderRole=objectRequest.SenderRole;
   var receiverRole=objectRequest.ReceiverRole;
   var senderSerNum=objectRequest.SenderSerNum;
   var receiverSerNum=objectRequest.ReceiverSerNum;
   var messageContent=objectRequest.MessageContent;
   var messageDate=objectRequest.MessageDate;
-  var token=objectRequest.Token;
+
   console.log("INSERT INTO Messages (`MessageSerNum`, `SenderRole`,`ReceiverRole`, `SenderSerNum`, `ReceiverSerNum`,`MessageContent`,`ReadStatus`,`MessageDate`,`LastUpdated`) VALUES (NULL,'"+senderRole+"','"+ receiverRole + "', '"+senderSerNum+"','"+ receiverSerNum +"','" +messageContent+"',0,'"+messageDate+"' ,CURRENT_TIMESTAMP )");
   return "INSERT INTO Messages (`MessageSerNum`, `SenderRole`,`ReceiverRole`, `SenderSerNum`, `ReceiverSerNum`,`MessageContent`,`ReadStatus`,`MessageDate`,`SessionId`,`LastUpdated`) VALUES (NULL,'"+senderRole+"','"+ receiverRole + "', '"+senderSerNum+"','"+ receiverSerNum +"','" +messageContent+"',0,'"+messageDate+"','"+token+"' ,CURRENT_TIMESTAMP )";
 }
