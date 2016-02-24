@@ -8,9 +8,9 @@
 	$filter=1;
 	$username=1;
 
-	if ( isset($_POST["Filter"]))
+	if ( isset($_POST["StartDate"])&&isset($_POST["EndDate"]))
 	{	
-		$filter="DateTime BETWEEN '".$_POST["filter"]."' AND NOW()";	
+		$filter="DateTime BETWEEN '".$_POST["StartDate"]."' AND '".$_POST["EndDate"]."'";	
 	}
 	if(isset($_POST["Username"]))
 	{
@@ -18,7 +18,7 @@
 	}
 
 	
-	$query="SELECT Patient.PatientId, PatientActivityLog.SessionId, PatientActivityLog.DateTime, PatientActivityLog.Request, PatientActivityLog.DeviceId, Patient.FirstName, Patient.LastName FROM PatientActivityLog, Users,  Patient WHERE ".$filter." AND ".$username." AND PatientActivityLog.Username LIKE Users.Username AND Patient.PatientSerNum=Users.UserTypeSerNum AND Users.UserType='Patient' ORDER BY DateTime ASC;";
+	$query="SELECT Patient.PatientId,Patient.SSN, Patient.PatientAriaSer, Patient.Email, PatientActivityLog.SessionId, PatientActivityLog.DateTime, PatientActivityLog.Request, PatientActivityLog.DeviceId, Patient.FirstName, Patient.LastName FROM PatientActivityLog, Users,  Patient WHERE ".$filter." AND ".$username." AND PatientActivityLog.Username LIKE Users.Username AND Patient.PatientSerNum=Users.UserTypeSerNum AND Users.UserType='Patient' ORDER BY DateTime ASC;";
 	$queryResults = $conn->query($query);
 	if($queryResults->num_rows===0)
 	{

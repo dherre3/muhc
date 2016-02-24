@@ -560,10 +560,10 @@ input[type="search"].search-input::-webkit-search-cancel-button {
 Header darkblue
 */
 #page-wrapper:not(.open) ul.sidebar .sidebar-title.separator, .sidebar-footer, ul.sidebar .sidebar-list a:hover, ul.sidebar .sidebar-main a {
-    background: #004d00;
+    background: #738634;
 }
 #sidebar-wrapper {
-    background: #006600;
+    background: #8DAA2E;
 }
 
 ul.sidebar .sidebar-list a {
@@ -573,7 +573,7 @@ ul.sidebar .sidebar-list a {
     line-height: 40px;
 }
 .sidebar-footer div a {
-    color: white;
+    color: #C0F70C;
     font-size: 12px;
     line-height: 43px;
 }
