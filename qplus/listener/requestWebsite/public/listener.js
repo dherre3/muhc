@@ -8,6 +8,25 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
   },1296000000);
   var ref=new Firebase('https://brilliant-inferno-7679.firebaseio.com/dev');
   ref.auth('9HeH3WPYe4gdTuqa88dtE3KmKy7rqfb4gItDRkPF');
+  setInterval(function(){
+    ref.child('Users').on('value',function(snapshot){
+          console.log(snapshot.val());
+          var now=(new Date()).getTime();
+          var usersData=snapshot.val();
+          for (var user in usersData) {
+            console.log(user);
+            for(var device in usersData[user])
+            {
+              console.log(device);
+              if(now-usersData[user][device].timestamp>240000)
+              {
+                ref.child('Users/'+user+'/'+device).set(null);
+              }
+            }
+          };
+      });
+  },60000);
+  
   ref.child('requests').on('child_added',function(request){
     $.post("http://172.26.66.41:8020/login",{key: request.key(),objectRequest: request.val()}, function(data){
       console.log(data);
@@ -34,6 +53,7 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
     //console.log(request);
     object=encryptObject(object,encryptionKey);
     //console.log(object);
+    object.timestamp=Firebase.ServerValue.TIMESTAMP;
     var deviceId=requestObject.DeviceId;
     var UserID=requestObject.UserID;
     var userFieldsPath='Users/'+UserID+'/'+deviceId;

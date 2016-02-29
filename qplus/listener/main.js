@@ -74,6 +74,7 @@ function uploadToFirebase(requestKey,encryptionKey,requestObject,object)
   var deviceId=requestObject.DeviceId;
   var UserID=requestObject.UserID;
   var userFieldsPath='Users/'+UserID+'/'+deviceId;
+  object.timestamp=Firebase.ServerValue.TIMESTAMP;
     console.log('I am about to write to firebase');
   ref.child(userFieldsPath).update(object, function(){
     console.log('I just finished writing to firebase');

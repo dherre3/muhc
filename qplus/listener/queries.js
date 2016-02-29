@@ -269,3 +269,8 @@ exports.patientLabResultsQuery=function(userID)
   'WHERE Users.UserTypeSerNum=Patient.PatientSerNum AND TestResult.PatientSerNum = Patient.PatientSerNum AND '+
   'Users.Username Like '+"'"+ userID+"'";
 }
+exports.updateLogout=function(requestObject)
+{
+  console.log("UPDATE PatientActivityLog SET DateTime= NOW() WHERE Token='"+requestObject.Token+"' AND Request='Logout';");
+  return "UPDATE PatientActivityLog SET DateTime= NOW() WHERE SessionId='"+requestObject.Token+"' AND Request='Logout';";
+}

@@ -4,11 +4,17 @@ var filesystem  =require('fs');
 var Firebase =require('firebase');
 var sqlInterface=require('./sqlInterface.js');
 var CryptoJS=require('crypto-js');
+var requestObject={
+	Token:'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ2IjowLCJkIjp7InByb3ZpZGVyIjoicGFzc3dvcmQiLCJ1aWQiOiJhNTFmYmExOC0zODEwLTQ4MDgtOTIzOC00ZDBlNDg3Nzg1YzgifSwiaWF0IjoxNDU2Mzc2MDU4fQ.mvz1ZSosHwKT0Y-uz1AOPulnheu98PDuYnXZ1dH8XsA',
+	Request:'Logout',
+	Username:'ac6eaeaa-f725-4b07-bdc0-72faef725985',
+	DeviceId:'browser'
+};
 
-function sayHelloWorld()
+sqlInterface.updateLogout(requestObject).then(function(result)
 {
-  console.log('Hello World');
-}
+	console.log(result.affectedRows);
+});
 //Testing queue object
 
 /*var queue=utility.Queue();
@@ -27,5 +33,5 @@ while(!queue.isEmpty())
   console.log(b);
 
 });*/
-var a=CryptoJS.AES.encrypt('SU','HERD91052016').toString();
-console.log(CryptoJS.AES.decrypt("U2FsdGVkX19BHMosuJuvy8SoLVUJjEX1m/0UzXDm6nfJauQJbDQjbLOoIf6igH07uLWBJQZQHwTFXJGUkhK/fA==",'d4ee71e271a4e01f9de703add199686d0c98d115802945841a501242b6ccc063'));
+//var a=CryptoJS.AES.encrypt('SU','HERD91052016').toString();
+//console.log(CryptoJS.AES.decrypt("U2FsdGVkX19BHMosuJuvy8SoLVUJjEX1m/0UzXDm6nfJauQJbDQjbLOoIf6igH07uLWBJQZQHwTFXJGUkhK/fA==",'d4ee71e271a4e01f9de703add199686d0c98d115802945841a501242b6ccc063'));

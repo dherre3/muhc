@@ -55,7 +55,16 @@ Date.prototype.toISOString = function() {
         'Z';
     };
 var exports=module.exports={};
-
+exports.updateLogout=function(requestObject)
+{
+  var r=Q.defer();
+  connection.query(queries.updateLogout(requestObject),function(err, rows, fields){
+    if(err) r.reject(err);
+    console.log(rows);
+    r.resolve(rows);
+  });
+  return r.promise;
+}
 //Function that refreshes a table and sends it to table in mysql
 exports.refreshField=function(UserID, field)
 {
