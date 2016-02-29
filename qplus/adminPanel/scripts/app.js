@@ -101,6 +101,16 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
         label:'Account Settings'
       }
     })
+    .state('hospital-maps',{
+        url:'/hospital-maps',
+        templateUrl:'views/maps.html',
+        controller:'MapsController',
+        data:{
+          requireLogin:true,
+          label:'Hospital Maps'
+        }
+
+    })
     /*.state('patients.patient.general',{
       url:'/general',
       templateUrl:'templates/individual-patient/patient-general.html',

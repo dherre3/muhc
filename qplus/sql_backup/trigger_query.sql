@@ -5,3 +5,14 @@ CREATE TRIGGER `appointment_update_trigger` AFTER UPDATE ON `Appointment`
 END
 //
 
+CREATE TABLE `HospitalMap` (
+  `MapSerNum` int(11) unsigned NOT NULL,
+  `Url` varchar(255) DEFAULT NULL,
+  `MapNameAlias` varchar(255) DEFAULT NULL,
+  `FileName` varchar(255) NOT NULL,
+  `MapName_EN` varchar(255) DEFAULT NULL,
+  `MapDescription_EN` varchar(255) DEFAULT NULL,
+  `MapName_FR` varchar(255) DEFAULT NULL,
+  `MapDescription_FR` varchar(255) DEFAULT NULL,
+  `LastUpdated` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
