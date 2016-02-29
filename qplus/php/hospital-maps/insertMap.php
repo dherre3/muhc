@@ -4,11 +4,11 @@
 	$array=array();
 	if ( isset($_POST["MapAliasName"]) && isset($_POST["MapName_EN"])&&isset($_POST["MapName_FR"])&&isset($_POST["MapDescription_EN"])&&isset($_POST["MapDescription_FR"])&&isset($_POST["MapUrl"]))
 	{
-		$path = $_POST['MapAliasName'].'.png';
+		$path = 'qrCodes/'.$_POST['MapAliasName'].'.png';
 		
 		if(!file_exists($path))
 		{
-			QRcode::png($_POST['MapAliasName'],$_POST["MapAliasName"].'.png');
+			QRcode::png($_POST['MapAliasName'],'qrCodes/'.$_POST["MapAliasName"].'.png');
 			$type = pathinfo($path, PATHINFO_EXTENSION);
 			$data = file_get_contents($path);
 			$base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
@@ -19,7 +19,7 @@
 		  	if ($conn->connect_error) {
 		      die("<br>Connection failed: " . $conn->connect_error);
 		  	}
-		  	$query="INSERT INTO `Map`(`MapSerNum`, `Url`, `MapNameAlias` , `FileName`,`MapName_EN`, `MapDescription_EN`, `MapName_FR`, `MapDescription_FR`, `LastUpdated`) VALUES (NULL,'".$_POST["MapUrl"]."','".$_POST['MapAliasName']."','".$path."','".$_POST["MapName_EN"]."','".$_POST["MapDescription_EN"]."','".$_POST["MapName_FR"]."','".$_POST["MapDescription_FR"]."',NULL)";
+		  	$query="INSERT INTO `HospitalMap`(`HospitalMapSerNum`, `MapUrl`, `QRMapAlias` , `QRImageFileName`,`MapName_EN`, `MapDescription_EN`, `MapName_FR`, `MapDescription_FR`, `LastUpdated`) VALUES (NULL,'".$_POST["MapUrl"]."','".$_POST['MapAliasName']."','".$path."','".$_POST["MapName_EN"]."','".$_POST["MapDescription_EN"]."','".$_POST["MapName_FR"]."','".$_POST["MapDescription_FR"]."',NULL)";
 		  	$result=$conn->query($query);
 		  	if($result)
 		  	{

@@ -379,6 +379,19 @@ exports.getSecurityQuestions=function(PatientSerNum)
   });
   return r.promise;
 }
+exports.getMapLocation=function(requestObject)
+{
+  var qrCode=requestObject.Parameters.QRCode;
+  console.log(requestObject);
+  var r=Q.defer();
+  connection.query(queries.getMapLocation(qrCode),function(error,rows,fields)
+  {
+    console.log(error);
+    if(error) r.reject(error);
+    r.resolve(rows[0]);
+  });
+  return r.promise;
+}
 //Api call to get patient fields for password reset
 exports.getPatientFieldsForPasswordReset=function(userID)
 {

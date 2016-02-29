@@ -6,9 +6,9 @@ END
 //
 
 CREATE TABLE `HospitalMap` (
-  `MapSerNum` int(11) unsigned NOT NULL,
-  `Url` varchar(255) DEFAULT NULL,
-  `MapNameAlias` varchar(255) DEFAULT NULL,
+  `HospitalMapSerNum` int(11) unsigned NOT NULL,
+  `MapUrl` varchar(255) DEFAULT NULL,
+  `MapQRAlias` varchar(255) DEFAULT NULL,
   `FileName` varchar(255) NOT NULL,
   `MapName_EN` varchar(255) DEFAULT NULL,
   `MapDescription_EN` varchar(255) DEFAULT NULL,

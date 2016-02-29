@@ -40,7 +40,7 @@ exports.apiRequest=function(requestKey, requestObject){
       return;
     }
     requestObject.Parameters=utility.decryptObject(requestObject.Parameters,key);
-    if(requestObject.Request=='Login'||requestObject.Request=='Refresh')
+    if(requestObject.Request=='Login'||requestObject.Request=='Refresh'||requestObject=='MapLocation')
     {
       updateClient.update(requestObject).then(function(objectToFirebase)
       {
@@ -200,8 +200,9 @@ exports.apiRequestBrowserListener=function(requestKey,requestObject)
 
     }
     requestObject.Parameters=utility.decryptObject(requestObject.Parameters,key);
-    if(requestObject.Request=='Login'||requestObject.Request=='Refresh')
+    if(requestObject.Request=='Login'||requestObject.Request=='Refresh'||requestObject.Request=='MapLocation')
     {
+      console.log('Im in there');
       updateClient.update(requestObject).then(function(objectToFirebase)
       {
         console.log(objectToFirebase);

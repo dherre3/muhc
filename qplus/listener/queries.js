@@ -274,3 +274,9 @@ exports.updateLogout=function(requestObject)
   console.log("UPDATE PatientActivityLog SET DateTime= NOW() WHERE Token='"+requestObject.Token+"' AND Request='Logout';");
   return "UPDATE PatientActivityLog SET DateTime= NOW() WHERE SessionId='"+requestObject.Token+"' AND Request='Logout';";
 }
+
+exports.getMapLocation=function(qrCode)
+{
+  console.log("SELECT * FROM HospitalMap WHERE QRMapAlias = '"+qrCode+"';");
+  return "SELECT * FROM HospitalMap WHERE QRMapAlias = '"+qrCode+"';";
+}

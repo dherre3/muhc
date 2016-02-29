@@ -31,7 +31,7 @@ app.post('/login',function(req,res,next){
       console.log(requestObject);
       main.resetPasswordBrowserListener(requestKey,requestObject).then(function(results)
       {
-        console.log('Reset Password fucker');
+        console.log('Reset Password ');
         console.log(results);
         res.send(results);
       });

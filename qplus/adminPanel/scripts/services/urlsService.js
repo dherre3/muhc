@@ -87,6 +87,10 @@ app.service('URLs',function(Credentials){
      getPatientSessionActivityUrl:function()
      {
       return basicURLPHP+'patientActivity/getPatientSessionActivity.php';
+     },
+     getInsertMapUrl:function()
+     {
+      return basicURLPHP+'hospital-maps/insertMap.php';
      }
 
 

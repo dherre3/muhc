@@ -24,10 +24,13 @@ myApp.controller('MapsController',['$timeout','$scope','api','URLs', function($t
 		api.getFieldFromServer(URLs.getInsertMapUrl(),objectToSend).then(function(result)
 		{
 			console.log(result);
-			if(result.Response=='Success')
+			if(result.response=='Success')
 			{
-				$scope.showQRCode=true;
-				$scope.QRCode=result.QRCode;
+				$timeout(function(){
+					$scope.showQRCode=true;
+					$scope.QRCode=result.QRCode;
+				});
+				
 			}else{
 				
 			}

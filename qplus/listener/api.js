@@ -111,7 +111,21 @@ exports.refresh = function (requestObject) {
     return r.promise;
 };
 
-
+exports.getMapLocation=function(requestObject)
+{
+  var r=Q.defer();
+  console.log(requestObject);
+  sqlInterface.getMapLocation(requestObject).then(function(response)
+  {
+    var objectToSend={};
+    objectToSend.MapLocation=response;
+    console.log(response);
+    r.resolve(objectToSend);
+  }).catch(function(error){
+    r.reject('Invalid');
+  });
+  return r.promise;
+}
 exports.readMessage = function (requestObject) {
     var r = Q.defer();
     if (!validate('Digit', requestObject)) {

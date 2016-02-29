@@ -29,6 +29,14 @@ exports.update=function(requestObject)
     {
       r.reject(reponse);
     });
+  }else if(type=='MapLocation'){
+    api.getMapLocation(requestObject).then(function(objectToFirebase)
+    {
+      r.resolve(objectToFirebase);
+    }).catch(function(response)
+    {
+      r.reject(reponse);
+    });
   }else{
     r.reject('Invalid');
   }
