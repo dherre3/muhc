@@ -8,11 +8,7 @@ var resetPasswordApi=require('./resetPassword.js');
 var CryptoJS=require('crypto-js')
 var q=require('q');
 var api=require('./api.js');
-
-//console.log(a);
-//var requestTest={type:'pirlo',param:{david:'12121',andres:'andres'}};
-
-//request(requestTest)
+var processApiRequest=require('./processApiRequest.js');
 var ref=new Firebase(credentials.FIREBASE_URL);
 
 
@@ -70,7 +66,33 @@ exports.apiRequest=function(requestKey,requestObject)
 
     }
     requestObject.Parameters=utility.decryptObject(requestObject.Parameters,key);
-    if(requestObject.Request=='Login'||requestObject.Request=='Refresh'||requestObject.Request=='MapLocation')
+    processApiRequest.processRequest(requestObject).then(function(objectToFirebase)
+    {
+      var firebaseObject={
+        requestKey:requestKey,
+        requestObject:requestObject,
+        encryptionKey:encryptionKey,
+        type:'UploadToFirebase',
+        object:objectToFirebase,
+        response:'Success'
+      };
+      r.resolve(firebaseObject);
+      console.log('Completing update client requests');
+    }).catch(function(response){
+        var firebaseObject={
+          requestKey:requestKey,
+          requestObject:requestObject,
+          encryptionKey:encryptionKey,
+          type:'CompleteRequest',
+          Invalid:'Invalid',
+          reason:'Failed to retrieve fields from database, problems with database',
+          response:'Error'
+        };
+        r.resolve(firebaseObject);
+    });
+
+
+    /*if(requestObject.Request=='Login'||requestObject.Request=='Refresh'||requestObject.Request=='MapLocation')
     {
       console.log('Im in there');
       updateClient.update(requestObject).then(function(objectToFirebase)
@@ -132,7 +154,7 @@ exports.apiRequest=function(requestKey,requestObject)
       response:'Error'
     };
     r.resolve(firebaseObject);
-  });
+  });*/
 
   return r.promise;
 }

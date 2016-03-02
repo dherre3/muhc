@@ -1,5 +1,61 @@
 var CryptoJS    =require('crypto-js');
+var mysql       = require('mysql');
+var Q           =require('q');
+var credentials=require('./credentials.js');
 var exports=module.exports={};
+
+var sqlConfig={
+  host:credentials.HOST,
+  user:credentials.MYSQL_USERNAME,
+  password:credentials.MYSQL_PASSWORD,
+  database:credentials.MYSQL_DATABASE
+};
+/*
+*Re-connecting the sql database, NodeJS has problems and disconnects if inactive,
+The handleDisconnect deals with that
+*/
+var connection = mysql.createConnection(sqlConfig);
+
+function handleDisconnect(myconnection) {
+  myconnection.on('error', function(err) {
+    console.log('Re-connecting lost connection');
+    connection.destroy();
+    connection = mysql.createConnection(sqlConfig);
+    handleDisconnect(connection);
+    connection.connect();
+  });
+}
+
+handleDisconnect(connection);
+Date.prototype.toISOString = function() {
+  var a=this.getTimezoneOffset();
+
+  var offset=a/60;
+      return this.getUTCFullYear() +
+        '-' + String(this.getUTCMonth() + 1) +
+        '-' + this.getUTCDate() +
+        'T' + String(this.getUTCHours()-offset) + //
+        ':' + this.getUTCMinutes() +
+        ':' + this.getUTCSeconds() +
+        '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
+        'Z';
+};
+
+
+//Running sql query
+exports.runSqlQuery=function(query, parameters)
+{
+  connection.query(query,parameters, function(err,rows,fields){
+    var r=Q.defer();
+    if (err) r.reject(error);
+    r.resolve(rows);
+  });
+}
+
+
+
+
+
 exports.encryptObject=function(object,secret)
 {
   /*console.log(object.Appointments[0].ScheduledStartTime);

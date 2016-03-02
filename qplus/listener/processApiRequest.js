@@ -1,8 +1,10 @@
 var exports=module.exports={};
 var Q=require('q');
-var api=require('./api.js');
+var apiPatientUpdate=require('./apiPatientUpdate.js');
+var apiHospitalUpdate=require('./apiHospitalUpdate.js');
+
 var validate=require('./validate.js');
-exports.update=function(requestObject)
+exports.processRequest=function(requestObject)
 {
   var r=Q.defer();
   var type=requestObject.Request;
@@ -15,9 +17,35 @@ exports.update=function(requestObject)
   {
     r.reject('Invalid');
   }
-  if(type=='MessageRead')
+  if(type=='Login')
   {
-    api.readMessage(requestObject).then(function(response)
+    apiPatientUpdate.login(requestObject).then(function(objectToFirebase){
+      r.resolve(objectToFirebase);
+    }).catch(function(response)
+    {
+      r.reject(response);
+    });
+  }else if(type=='Refresh')
+  {
+
+    apiPatientUpdate.refresh(requestObject).then(function(objectToFirebase)
+    {
+      r.resolve(objectToFirebase);
+    }).catch(function(response)
+    {
+      r.reject(reponse);
+    });
+  }else if(type=='MapLocation'){
+    apiPatientUpdate.getMapLocation(requestObject).then(function(objectToFirebase)
+    {
+      r.resolve(objectToFirebase);
+    }).catch(function(response)
+    {
+      r.reject(reponse);
+    });
+  }else if(type=='MessageRead')
+  {
+    apiHospitalUpdate.readMessage(requestObject).then(function(response)
     {
       r.resolve(response);
     }).catch(function(response)
@@ -26,7 +54,7 @@ exports.update=function(requestObject)
     });
   }else if(type=='NotificationRead')
   {
-    api.readNotification(requestObject).then(function(response)
+    apiHospitalUpdate.readNotification(requestObject).then(function(response)
     {
       r.resolve(response);
     }).catch(function(response)
@@ -35,7 +63,7 @@ exports.update=function(requestObject)
     });
   }else if(type=='Checkin')
   {
-    api.checkIn(requestObject).then(function(response)
+    apiHospitalUpdate.checkIn(requestObject).then(function(response)
     {
       r.resolve(response);
     }).catch(function(response)
@@ -53,7 +81,7 @@ exports.update=function(requestObject)
     });
   }else if(type=='Message')
   {
-    api.sendMessage(requestObject).then(function(response){
+    apiHospitalUpdate.sendMessage(requestObject).then(function(response){
         r.resolve(response);
     }).catch(function(response)
     {
@@ -61,7 +89,7 @@ exports.update=function(requestObject)
     });
   }else  if(type=='AccountChange')
   {
-    api.accountChange(requestObject).then(function(response)
+    apiHospitalUpdate.accountChange(requestObject).then(function(response)
     {
       r.resolve(response);
     }).catch(function(response)
@@ -70,13 +98,16 @@ exports.update=function(requestObject)
     });
   }else if(type=='Feedback')
   {
-    api.inputFeedback(requestObject).then(function(response)
+    apiHospitalUpdate.inputFeedback(requestObject).then(function(response)
     {
       r.resolve(response);
     }).catch(function(response)
     {
       r.reject(response);
     });
+  }else{
+    r.reject('Invalid');
   }
+
   return r.promise;
 };

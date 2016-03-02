@@ -413,6 +413,16 @@ exports.setNewPassword=function(password,patientSerNum, token)
   });
   return r.promise;
 }
+exports.getPatientDeviceLastActivity=function(userid,device)
+{
+  var r=Q.defer();
+  connection.query(queries.getPatientDeviceLastActivity(userid,device),function(error,rows,fields)
+  {
+    if(error) r.reject(error);
+    r.resolve(rows);
+  });
+  return r.promise;
+}
 
 /*
 Table mappings for cascade synchronous function

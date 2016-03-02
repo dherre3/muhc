@@ -232,7 +232,7 @@ exports.inputFeedback=function(UserSerNum, content)
 exports.sendMessage=function(objectRequest)
 {
   var token=objectRequest.Token;
-  objectRequest=objectRequest.Parameters; 
+  objectRequest=objectRequest.Parameters;
   var senderRole=objectRequest.SenderRole;
   var receiverRole=objectRequest.ReceiverRole;
   var senderSerNum=objectRequest.SenderSerNum;
@@ -247,8 +247,13 @@ exports.getPatientFromUserId=function(userID)
 {
   return "SELECT UserTypeSerNum, UserSerNum FROM Users WHERE Username LIKE"+"\'"+ userID+"\'"+" AND UserType LIKE 'Patient'";
 }
-exports.logActivity=function(requestObject)
+exports.logActivity=function(requestObject,time)
 {
+  if(typeof time!=='undefined')
+  {
+    return "INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`Username`, `DeviceId`,`SessionId`,`DateTime`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.UserID+ "', '"+requestObject.DeviceId+"','"+requestObject.Token+"', "+requestObject.Timestamp+" ,CURRENT_TIMESTAMP )";
+
+  }
   return "INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`Username`, `DeviceId`,`SessionId`,`DateTime`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.UserID+ "', '"+requestObject.DeviceId+"','"+requestObject.Token+"', CURRENT_TIMESTAMP ,CURRENT_TIMESTAMP )";
 }
 
@@ -284,4 +289,12 @@ exports.getMapLocation=function(qrCode)
 exports.changeReadStatus=function(table, patientSerNum)
 {
   return "UPDATE '"+table+"' SET ReadStatus=1 WHERE PatientSerNum="+patientSerNum;
+}
+exports.changeReadStatus=function(table, patientSerNum)
+{
+  return "UPDATE '"+table+"' SET ReadStatus=1 WHERE PatientSerNum="+patientSerNum;
+}
+exports.getPatientDeviceLastActivity=function(userid,device)
+{
+  return "SELECT * FROM PatientActivityLog WHERE Username='"+userId+"' AND DeviceId='"+device+"' ORDER BY ActivitySerNum DESC LIMIT 1;";
 }
