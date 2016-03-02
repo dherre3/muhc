@@ -1,6 +1,7 @@
 var express        =         require("express");
 var bodyParser     =         require("body-parser");
-var main=require('./main.js');
+var mainRequestApi=require('./main.js');
+var resetPasswordApi=require('./resetPassword.js');
 
 var app            =         express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -29,15 +30,15 @@ app.post('/login',function(req,res,next){
     if(requestObject.Request=='VerifySSN'||requestObject.Request=='SetNewPassword')
     {
       console.log(requestObject);
-      main.resetPasswordBrowserListener(requestKey,requestObject).then(function(results)
+      resetPasswordApi.resetPasswordRequest(requestKey,requestObject).then(function(results)
       {
         console.log('Reset Password ');
         console.log(results);
         res.send(results);
       });
-     
+
     }else{
-      main.apiRequestBrowserListener(requestKey, requestObject).then(function(results){
+      mainRequestApi.apiRequest(requestKey, requestObject).then(function(results){
         console.log('Api call from server.js')
         console.log(results);
         res.send(results);
