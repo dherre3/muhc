@@ -27,7 +27,6 @@ exports.processRequest=function(requestObject)
     });
   }else if(type=='Refresh')
   {
-
     apiPatientUpdate.refresh(requestObject).then(function(objectToFirebase)
     {
       r.resolve(objectToFirebase);

@@ -142,7 +142,7 @@ exports.apiRequest=function(requestKey,requestObject)
         };
         r.resolve(firebaseObject);
       });
-    }
+    }*/
   }).catch(function(error){
     console.log(error);
     var firebaseObject={
@@ -154,7 +154,7 @@ exports.apiRequest=function(requestKey,requestObject)
       response:'Error'
     };
     r.resolve(firebaseObject);
-  });*/
+  });
 
   return r.promise;
 }

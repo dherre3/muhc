@@ -296,5 +296,5 @@ exports.changeReadStatus=function(table, patientSerNum)
 }
 exports.getPatientDeviceLastActivity=function(userid,device)
 {
-  return "SELECT * FROM PatientActivityLog WHERE Username='"+userId+"' AND DeviceId='"+device+"' ORDER BY ActivitySerNum DESC LIMIT 1;";
+  return "SELECT * FROM PatientActivityLog WHERE Username='"+userid+"' AND DeviceId='"+device+"' ORDER BY ActivitySerNum DESC LIMIT 1;";
 }

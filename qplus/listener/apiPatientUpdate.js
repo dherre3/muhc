@@ -16,6 +16,7 @@ exports.login = function (requestObject) {
     var device=requestObject.DeviceId;
     var objectToFirebase = {};
     sqlInterface.getPatientDeviceLastActivity(UserID,device).then(function(result){
+      console.log(result);
       if(result.Request=='Login')
       {
           var date=new Date(result.DateTime);
@@ -101,7 +102,6 @@ exports.refresh = function (requestObject) {
         queue.enqueueArray(paramArray);
         sqlInterface.cascadeFunction(UserID, queue, {}).then(function (rows) {
             objectToFirebase = rows;
-            sqlInterface.addToActivityLog(requestObject);
             r.resolve(objectToFirebase);
         });
     } else if(parameters=='All'){
