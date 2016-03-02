@@ -280,3 +280,8 @@ exports.getMapLocation=function(qrCode)
   console.log("SELECT * FROM HospitalMap WHERE QRMapAlias = '"+qrCode+"';");
   return "SELECT * FROM HospitalMap WHERE QRMapAlias = '"+qrCode+"';";
 }
+
+exports.changeReadStatus=function(table, patientSerNum)
+{
+  return "UPDATE '"+table+"' SET ReadStatus=1 WHERE PatientSerNum="+patientSerNum;
+}
