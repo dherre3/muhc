@@ -138,6 +138,8 @@ exports.getAllPatientFields=function(userid)
       objectToFirebase[tableNames[i]]=response[i];
     }
     r.resolve(objectToFirebase);
+  },function(error){
+    r.reject(error);
   });
   return r.promise;
 }

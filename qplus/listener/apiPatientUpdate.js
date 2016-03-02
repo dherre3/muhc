@@ -107,6 +107,8 @@ exports.refresh = function (requestObject) {
     } else if(parameters=='All'){
       sqlInterface.getAllPatientFields(requestObject).then(function(objectToFirebase){
         r.resolve(objectToFirebase);
+      }).catch(function(error){
+        r.reject(error);
       });
     }else {
         if (!validate('RefreshField', parameters)) {
