@@ -105,7 +105,7 @@ exports.refresh = function (requestObject) {
             r.resolve(objectToFirebase);
         });
     } else if(parameters=='All'){
-      exports.login(requestObject).then(function(objectToFirebase){
+      sqlInterface.getAllPatientFields(requestObject).then(function(objectToFirebase){
         r.resolve(objectToFirebase);
       });
     }else {
@@ -115,7 +115,6 @@ exports.refresh = function (requestObject) {
         //validate(parameters)
         sqlInterface.refreshField(UserID, parameters).then(function (rows) {
             objectToFirebase = rows;
-            sqlInterface.addToActivityLog(requestObject);
             r.resolve(objectToFirebase);
         });
     }

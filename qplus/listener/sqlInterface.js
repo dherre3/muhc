@@ -108,6 +108,7 @@ exports.apiRequestField=function(UserID, query, callbackFunction)
 *@return (object) Return the object containing the patient information with
 for all the fields listed in the queue
 */
+
 exports.cascadeFunction=function(UserID,queue,startObject)
 {
   var r=Q.defer();
@@ -125,6 +126,19 @@ exports.cascadeFunction=function(UserID,queue,startObject)
   }
 
 
+  return r.promise;
+}
+exports.getAllPatientFields=function(userid)
+{
+  var r=Q.defer();
+  var tablePromisesArray;
+  var objectToFirebase={};
+   Q.all(tablePromisesArray).then(function(response){
+    for (var i = 0; i < response.length; i++) {
+      objectToFirebase[tableNames[i]]=response[i];
+    }
+    r.resolve(objectToFirebase);
+  });
   return r.promise;
 }
 //Gets the patient fields in patient table and converts user image to base64
@@ -427,6 +441,29 @@ exports.getPatientDeviceLastActivity=function(userid,device)
 /*
 Table mappings for cascade synchronous function
 */
+var tablePromisesArray=[
+  exports.getPatientMessages,
+  exports.getPatient,
+  exports.getPatientDoctors,
+  exports.getPatientDiagnoses,
+  exports.getPatientAppointments,
+  exports.getPatientNotifications,
+  exports.getPatientTasks,
+  exports.getPatientDocuments,
+  exports.getPatientLabTests
+];
+var tableNames=
+[
+  'Messages',
+  'Patient',
+  'Doctors',
+  'Diagnoses',
+  'Appointments',
+  'Notifications',
+  'Tasks',
+  'Documents',
+  'LabTests'
+];
 var tableMappings=
 {
   'Messages':exports.getPatientMessages,
