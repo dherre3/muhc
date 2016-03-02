@@ -1,3 +1,6 @@
+var sqlInterface=require('./sqlInterface.js');
+var q=require('q');
+var utility=require('./utility.js');
 var exports=module.exports={};
 exports.resetPasswordRequest=function(requestKey, requestObject)
 {
