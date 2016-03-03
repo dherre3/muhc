@@ -116,23 +116,6 @@ exports.cascadeFunction=function(UserID,queue,startObject)
 
   return r.promise;
 }
-
-exports.getAllPatientFields=function(userid)
-{
-  var r=Q.defer();
-  var tablePromisesArray;
-  var objectToFirebase={};
-  
-   Q.all(preparePromiseArray(userid)).then(function(response){
-    for (var key in tableMappings) {
-      objectToFirebase[key]=response[i];
-    }
-    r.resolve(objectToFirebase);
-  },function(error){
-    r.reject(error);
-  });
-  return r.promise;
-}
 function preparePromiseArray(userid)
 {
   console.log(userid);
@@ -142,6 +125,24 @@ function preparePromiseArray(userid)
   }
   return array;
 }
+exports.getAllPatientFields=function(userid)
+{
+  var r=Q.defer();
+  var tablePromisesArray;
+  var objectToFirebase={};
+  var index=0;
+   Q.all(preparePromiseArray(userid)).then(function(response){
+    for (var key in tableMappings) {
+      objectToFirebase[key]=response[index];
+      index++;
+    }
+    r.resolve(objectToFirebase);
+  },function(error){
+    r.reject(error);
+  });
+  return r.promise;
+}
+
 //Gets the patient fields in patient table and converts user image to base64
 exports.getPatient=function(UserID)
 {
