@@ -8,16 +8,23 @@ var buffer=require('buffer');
 
 
 
-
+var sqlConfig={
+  port:'/Applications/MAMP/tmp/mysql/mysql.sock',
+  user:'root',
+  password:'root',
+  database:'QPlusApp',
+  dateStrings:true
+};
 /*
 *Connecting to mysql database
 */
-var sqlConfig={
+
+/*var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,
   database:credentials.MYSQL_DATABASE
-};
+};*/
 /*
 *Re-connecting the sql database, NodeJS has problems and disconnects if inactive,
 The handleDisconnect deals with that
@@ -36,35 +43,17 @@ function handleDisconnect(myconnection) {
 
 handleDisconnect(connection);
 
-/*
-*It things is UTC time, so puts a minus 4 on every time, this change to the prototype
-ensures we get Montreal time.
-*/
-//Changing string to match montreal time
-Date.prototype.toISOString = function() {
-  var a=this.getTimezoneOffset();
-
-  var offset=a/60;
-      return this.getUTCFullYear() +
-        '-' + String(this.getUTCMonth() + 1) +
-        '-' + this.getUTCDate() +
-        'T' + String(this.getUTCHours()-offset) + //
-        ':' + this.getUTCMinutes() +
-        ':' + this.getUTCSeconds() +
-        '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
-        'Z';
-    };
 var exports=module.exports={};
-exports.updateLogout=function(requestObject)
+//Running sql query
+exports.runSqlQuery=function(query, parameters)
 {
-  var r=Q.defer();
-  connection.query(queries.updateLogout(requestObject),function(err, rows, fields){
-    if(err) r.reject(err);
-    console.log(rows);
+  connection.query(query,parameters, function(err,rows,fields){
+    var r=Q.defer();
+    if (err) r.reject(error);
     r.resolve(rows);
   });
-  return r.promise;
 }
+
 //Function that refreshes a table and sends it to table in mysql
 exports.refreshField=function(UserID, field)
 {
@@ -77,7 +66,6 @@ exports.refreshField=function(UserID, field)
     var functionField=tableMappings[field];
     functionField(UserID).then(function(fieldObject)
     {
-
       objectData[field]=fieldObject;
       r.resolve(objectData);
     });
@@ -128,20 +116,31 @@ exports.cascadeFunction=function(UserID,queue,startObject)
 
   return r.promise;
 }
+
 exports.getAllPatientFields=function(userid)
 {
   var r=Q.defer();
   var tablePromisesArray;
   var objectToFirebase={};
-   Q.all(tablePromisesArray).then(function(response){
-    for (var i = 0; i < response.length; i++) {
-      objectToFirebase[tableNames[i]]=response[i];
+  
+   Q.all(preparePromiseArray(userid)).then(function(response){
+    for (var key in tableMappings) {
+      objectToFirebase[key]=response[i];
     }
     r.resolve(objectToFirebase);
   },function(error){
     r.reject(error);
   });
   return r.promise;
+}
+function preparePromiseArray(userid)
+{
+  console.log(userid);
+  var array=[];
+  for (var key in tableMappings) {
+    array.push(tableMappings[key](userid));
+  }
+  return array;
 }
 //Gets the patient fields in patient table and converts user image to base64
 exports.getPatient=function(UserID)
@@ -379,6 +378,7 @@ exports.getUsersPassword=function(username)
   var r=Q.defer();
   connection.query(queries.userPassword(username),function(error,rows,fields)
   {
+    console.log(error);
     if(error) r.reject(error);
     r.resolve(rows[0].Password);
   });
@@ -435,6 +435,17 @@ exports.getPatientDeviceLastActivity=function(userid,device)
   connection.query(queries.getPatientDeviceLastActivity(userid,device),function(error,rows,fields)
   {
     if(error) r.reject(error);
+    r.resolve(rows[0]);
+  });
+  return r.promise;
+}
+
+exports.updateLogout=function(requestObject)
+{
+  var r=Q.defer();
+  connection.query(queries.updateLogout(requestObject),function(err, rows, fields){
+    if(err) r.reject(err);
+    console.log(rows);
     r.resolve(rows);
   });
   return r.promise;
@@ -505,7 +516,7 @@ var LoadDocuments = function (rows)
       var n = rows[key].FinalFileName.lastIndexOf(".");
       var substring=rows[key].FinalFileName.substring(n+1,rows[key].FinalFileName.length);
       rows[key].DocumentType=substring;
-      rows[key].Content=filesystem.readFileSync('/home/VarianFILEDATA/Documents/' + rows[key].FinalFileName,'base64',function(error,data){
+      rows[key].Content=filesystem.readFileSync(__dirname+'/Documents/' + rows[key].FinalFileName,'base64',function(error,data){
         if(error) r.reject(error);
       });
 
@@ -557,7 +568,7 @@ function loadImageDoctor(rows){
       var n = rows[key].ProfileImage.lastIndexOf(".");
       var substring=rows[key].ProfileImage.substring(n+1,rows[key].ProfileImage.length);
       rows[key].DocumentType=substring;
-      rows[key].ProfileImage=filesystem.readFileSync('/home/VarianFILEDATA/Doctors/'+rows[key].ProfileImage,'base64' );
+      rows[key].ProfileImage=filesystem.readFileSync(__dirname+'/Doctors/'+rows[key].ProfileImage,'base64' );
 
     }
   }

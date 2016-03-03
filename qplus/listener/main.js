@@ -11,7 +11,7 @@ var api=require('./api.js');
 var processApiRequest=require('./processApiRequest.js');
 var ref=new Firebase(credentials.FIREBASE_URL);
 
-
+ref.auth(credentials.FIREBASE_SECRET);
 ref.child('requests').on('child_added',function(requestsFromFirebase){
   var requestObject=requestsFromFirebase.val();
   var requestKey=requestsFromFirebase.key();
@@ -198,13 +198,6 @@ function completeRequest(requestKey, requestObject, invalid)
   //Clear request
   ref.child('requests').child(requestKey).set(null);
   //Log Request
-  if(invalid!==undefined)
-  {
-    api.logRequest(requestObject);
-  }else{
-    requestObject.reason='Error wrong arguments';
-    api.logRequest(requestObject);
-  }
 
 
 }

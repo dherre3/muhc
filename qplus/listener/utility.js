@@ -14,46 +14,26 @@ var sqlConfig={
 *Re-connecting the sql database, NodeJS has problems and disconnects if inactive,
 The handleDisconnect deals with that
 */
-var connection = mysql.createConnection(sqlConfig);
-
-function handleDisconnect(myconnection) {
-  myconnection.on('error', function(err) {
-    console.log('Re-connecting lost connection');
-    connection.destroy();
-    connection = mysql.createConnection(sqlConfig);
-    handleDisconnect(connection);
-    connection.connect();
-  });
-}
-
-handleDisconnect(connection);
-Date.prototype.toISOString = function() {
-  var a=this.getTimezoneOffset();
-
-  var offset=a/60;
-      return this.getUTCFullYear() +
-        '-' + String(this.getUTCMonth() + 1) +
-        '-' + this.getUTCDate() +
-        'T' + String(this.getUTCHours()-offset) + //
-        ':' + this.getUTCMinutes() +
-        ':' + this.getUTCSeconds() +
-        '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
-        'Z';
-};
 
 
-//Running sql query
-exports.runSqlQuery=function(query, parameters)
+
+exports.toMYSQLString=function(date)
 {
-  connection.query(query,parameters, function(err,rows,fields){
-    var r=Q.defer();
-    if (err) r.reject(error);
-    r.resolve(rows);
-  });
+  var month=date.getMonth();
+  var day=date.getDate();
+  var hours=date.getHours();
+  var minutes=date.getMinutes();
+  var seconds=date.getSeconds();
+  month++;
+  if(hours<10) hours='0'+hours;
+  if(minutes<10) minutes='0'+minutes;
+  if(seconds<10) seconds='0'+seconds;
+  if (day<10) day='0'+day;
+  if (month<10) month='0'+month;
+
+  return date.getFullYear()+'-'+month+'-'+day+' '+hours+':'+minutes+':'+seconds;
+
 }
-
-
-
 
 
 exports.encryptObject=function(object,secret)

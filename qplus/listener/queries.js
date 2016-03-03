@@ -247,13 +247,9 @@ exports.getPatientFromUserId=function(userID)
 {
   return "SELECT UserTypeSerNum, UserSerNum FROM Users WHERE Username LIKE"+"\'"+ userID+"\'"+" AND UserType LIKE 'Patient'";
 }
-exports.logActivity=function(requestObject,time)
+exports.logActivity=function(requestObject)
 {
-  if(typeof time!=='undefined')
-  {
-    return "INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`Username`, `DeviceId`,`SessionId`,`DateTime`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.UserID+ "', '"+requestObject.DeviceId+"','"+requestObject.Token+"', "+requestObject.Timestamp+" ,CURRENT_TIMESTAMP )";
 
-  }
   return "INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`Username`, `DeviceId`,`SessionId`,`DateTime`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.UserID+ "', '"+requestObject.DeviceId+"','"+requestObject.Token+"', CURRENT_TIMESTAMP ,CURRENT_TIMESTAMP )";
 }
 
@@ -276,8 +272,7 @@ exports.patientLabResultsQuery=function(userID)
 }
 exports.updateLogout=function(requestObject)
 {
-  console.log("UPDATE PatientActivityLog SET DateTime= NOW() WHERE Token='"+requestObject.Token+"' AND Request='Logout';");
-  return "UPDATE PatientActivityLog SET DateTime= NOW() WHERE SessionId='"+requestObject.Token+"' AND Request='Logout';";
+  return "INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`Username`, `DeviceId`,`SessionId`,`DateTime`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.Username+ "', '"+requestObject.DeviceId+"','"+requestObject.SessionId+"', '"+requestObject.DateTime+"' ,CURRENT_TIMESTAMP )";
 }
 
 exports.getMapLocation=function(qrCode)

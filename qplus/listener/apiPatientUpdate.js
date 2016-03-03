@@ -16,19 +16,24 @@ exports.login = function (requestObject) {
     var device=requestObject.DeviceId;
     var objectToFirebase = {};
     sqlInterface.getPatientDeviceLastActivity(UserID,device).then(function(result){
-      console.log(result);
-      if(result.Request=='Login')
+      var date=new Date(result.DateTime);
+      date.setDate(date.getDate()+1);
+      var today=new Date();
+      if(result.Request=='Login'&&date<today)
       {
-          var date=new Date(result.DateTime);
-          date=date.setDate(date.getDate()-1);
-          result.Request='Logout';
-          result.Timestamp=date.getTime();
-          sqlInterface.addToActivityLog(result);
+         result.Request='Logout';
+         result.DateTime=utility.toMYSQLString(date);
+         sqlInterface.updateLogout(result);
       }
     });
     if(!validate('Login',UserID))
     {
-      sqlInterface.getPatient(UserID).then(function (rows) {
+      sqlInterface.getAllPatientFields(UserID).then(function(objectToFirebase)
+      {
+        sqlInterface.addToActivityLog(requestObject);
+        r.resolve(objectToFirebase);
+      });
+      /*sqlInterface.getPatient(UserID).then(function (rows) {
           objectToFirebase.Patient = rows;
 
           sqlInterface.getPatientDoctors(UserID).then(function (rows) {
@@ -53,9 +58,7 @@ exports.login = function (requestObject) {
                                       objectToFirebase.Tasks = rows;
 
                                       sqlInterface.getPatientLabTests(UserID).then(function(rows){
-                                         /*
-                                       * Add additional fields for login in here!!!!
-                                       */
+
                                         objectToFirebase.LabTests=rows;
                                         sqlInterface.addToActivityLog(requestObject);
                                         r.resolve(objectToFirebase);
@@ -69,7 +72,7 @@ exports.login = function (requestObject) {
                   });
               });
           });
-      });
+      });*/
     }else{
       r.reject('Invalid');
     }
@@ -105,7 +108,7 @@ exports.refresh = function (requestObject) {
             r.resolve(objectToFirebase);
         });
     } else if(parameters=='All'){
-      sqlInterface.getAllPatientFields(requestObject).then(function(objectToFirebase){
+      sqlInterface.getAllPatientFields(requestObject.UserID).then(function(objectToFirebase){
         r.resolve(objectToFirebase);
       }).catch(function(error){
         r.reject(error);
