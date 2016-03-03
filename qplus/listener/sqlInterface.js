@@ -8,23 +8,24 @@ var buffer=require('buffer');
 
 
 
-var sqlConfig={
+/*var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
   password:'root',
   database:'QPlusApp',
   dateStrings:true
-};
+};*/
 /*
 *Connecting to mysql database
 */
 
-/*var sqlConfig={
+var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,
-  database:credentials.MYSQL_DATABASE
-};*/
+  database:credentials.MYSQL_DATABASE,
+  dateStrings:true
+};
 /*
 *Re-connecting the sql database, NodeJS has problems and disconnects if inactive,
 The handleDisconnect deals with that
@@ -453,31 +454,9 @@ exports.updateLogout=function(requestObject)
 }
 
 /*
-Table mappings for cascade synchronous function
+Table mappings for cascade asynchronous function
 */
-var tablePromisesArray=[
-  exports.getPatientMessages,
-  exports.getPatient,
-  exports.getPatientDoctors,
-  exports.getPatientDiagnoses,
-  exports.getPatientAppointments,
-  exports.getPatientNotifications,
-  exports.getPatientTasks,
-  exports.getPatientDocuments,
-  exports.getPatientLabTests
-];
-var tableNames=
-[
-  'Messages',
-  'Patient',
-  'Doctors',
-  'Diagnoses',
-  'Appointments',
-  'Notifications',
-  'Tasks',
-  'Documents',
-  'LabTests'
-];
+
 var tableMappings=
 {
   'Messages':exports.getPatientMessages,
