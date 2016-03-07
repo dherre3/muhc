@@ -184,7 +184,8 @@ exports.getPatientFieldsForPasswordReset=function(userID)
 }
 exports.setNewPassword=function(password,patientSerNum, token)
 {
-  return "UPDATE Users SET Password='"+password+"', SessionId='"+token+"' WHERE UserType LIKE 'Patient' AND UserTypeSerNum="+patientSerNum;
+  console.log("UPDATE Users SET Password='"+password+"', SessionId='"+token+"' WHERE UserType = 'Patient' AND UserTypeSerNum="+patientSerNum);
+  return "UPDATE Users SET Password='"+password+"', SessionId='"+token+"' WHERE UserType = 'Patient' AND UserTypeSerNum="+patientSerNum;
 }
 exports.patientTasksQuery=function(userID)
 {

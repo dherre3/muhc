@@ -71,7 +71,7 @@ exports.processRequest=function(requestObject)
     });
   }else if(type=='Logout')
   {
-    api.logActivity(requestObject).then(function(response)
+    apiHospitalUpdate.logout(requestObject).then(function(response)
     {
       r.resolve(response);
     }).catch(function(response)

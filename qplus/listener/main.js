@@ -5,17 +5,35 @@ var updateServer=require('./updateServer.js');
 var credentials=require('./credentials.js');
 var sqlInterface=require('./sqlInterface.js');
 var resetPasswordApi=require('./resetPassword.js');
-var CryptoJS=require('crypto-js')
+var CryptoJS=require('crypto-js');
 var q=require('q');
 var api=require('./api.js');
 var processApiRequest=require('./processApiRequest.js');
 var ref=new Firebase(credentials.FIREBASE_URL);
 
 ref.auth(credentials.FIREBASE_SECRET);
+setInterval(function(){
+  ref.child('Users').on('value',function(snapshot){
+        console.log(snapshot.val());
+        var now=(new Date()).getTime();
+        var usersData=snapshot.val();
+        for (var user in usersData) {
+          console.log(user);
+          for(var device in usersData[user])
+          {
+            console.log(device);
+            if(now-usersData[user][device].Timestamp>240000)
+            {
+              ref.child('Users/'+user+'/'+device).set(null);
+            }
+          }
+        };
+    });
+},60000);
 ref.child('requests').on('child_added',function(requestsFromFirebase){
   var requestObject=requestsFromFirebase.val();
   var requestKey=requestsFromFirebase.key();
-  if(requestObject.Request=='VerifySSN'||requestObject.Request=='SetNewPassword')
+  if(requestObject.Request=='VerifySSN'||requestObject.Request=='SetNewPassword'||requestObject.Request=='VerifySecurityAnswer')
   {
     resetPasswordApi.resetPasswordRequest(requestKey,requestObject).then(function(results)
     {
@@ -47,7 +65,21 @@ function handleResponse(data)
 exports.apiRequest=function(requestKey,requestObject)
 {
   var r=q.defer();
-  sqlInterface.getUsersPassword(requestObject.UserID).then(function(key){
+  sqlInterface.getUsersPassword(requestObject.UserID).then(function(rows){
+    if(rows.length>1||rows.length==0)
+    {
+      console.log('Rejecting request');
+      var firebaseObject={
+        requestKey:requestKey,
+        requestObject:{},
+        type:'CompleteRequest',
+        Invalid:'Invalid',
+        response:'Error',
+        reason:'Injection attack'
+      };
+      r.resolve(firebaseObject);
+    }
+    var key=rows[0].Password;
     requestObject.Request=utility.decryptObject(requestObject.Request,key);
     var encryptionKey=key;
     console.log(requestObject.Request);
@@ -181,10 +213,17 @@ function uploadToFirebase(requestKey,encryptionKey,requestObject,object)
   //console.log(request);
   object=utility.encryptObject(object,encryptionKey);
   //console.log(object);
+  var request='';
+  if(requestObject.Request=='Login'||requestObject.Parameters=='All')
+  {
+    request='All'
+  }
   var deviceId=requestObject.DeviceId;
   var UserID=requestObject.UserID;
-  var userFieldsPath='Users/'+UserID+'/'+deviceId;
-  object.timestamp=Firebase.ServerValue.TIMESTAMP;
+  var userFieldsPath='Users/'+UserID+'/'+deviceId+'/'+request;
+  console.log(userFieldsPath);
+  console.log(object);
+  object.Timestamp=Firebase.ServerValue.TIMESTAMP;
     console.log('I am about to write to firebase');
   ref.child(userFieldsPath).update(object, function(){
     console.log('I just finished writing to firebase');

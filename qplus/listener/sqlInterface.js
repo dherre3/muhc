@@ -8,24 +8,24 @@ var buffer=require('buffer');
 
 
 
-/*var sqlConfig={
+var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
   password:'root',
   database:'QPlusApp',
   dateStrings:true
-};*/
+};
 /*
 *Connecting to mysql database
 */
 
-var sqlConfig={
+/*var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,
   database:credentials.MYSQL_DATABASE,
   dateStrings:true
-};
+};*/
 /*
 *Re-connecting the sql database, NodeJS has problems and disconnects if inactive,
 The handleDisconnect deals with that
@@ -382,7 +382,7 @@ exports.getUsersPassword=function(username)
   {
     console.log(error);
     if(error) r.reject(error);
-    r.resolve(rows[0].Password);
+    r.resolve(rows);
   });
   return r.promise;
 }
@@ -417,7 +417,7 @@ exports.getPatientFieldsForPasswordReset=function(userID)
   connection.query(queries.getPatientFieldsForPasswordReset(userID),function(error,rows,fields)
   {
     if(error) r.reject(error);
-    r.resolve(rows[0]);
+    r.resolve(rows);
   });
   return r.promise;
 }

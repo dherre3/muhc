@@ -18,7 +18,7 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
             for(var device in usersData[user])
             {
               console.log(device);
-              if(now-usersData[user][device].timestamp>240000)
+              if(now-usersData[user][device].Timestamp>240000)
               {
                 ref.child('Users/'+user+'/'+device).set(null);
               }
@@ -26,7 +26,7 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
           };
       });
   },60000);
-  
+
   ref.child('requests').on('child_added',function(request){
     $.post("http://172.26.66.41:8020/login",{key: request.key(),objectRequest: request.val()}, function(data){
       console.log(data);
@@ -48,12 +48,16 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
 
   function uploadToFirebase(requestKey,encryptionKey,requestObject,object)
   {
-    console.log(requestObject); 
+    console.log(requestObject);
     console.log('I am about to go to into encrypting');
     //console.log(request);
     object=encryptObject(object,encryptionKey);
     //console.log(object);
-    object.timestamp=Firebase.ServerValue.TIMESTAMP;
+    if(requestObject.Request=='Login'||requestObject.Parameters=='All')
+    {
+      request='All'
+    }
+    object.Timestamp=Firebase.ServerValue.TIMESTAMP;
     var deviceId=requestObject.DeviceId;
     var UserID=requestObject.UserID;
     var userFieldsPath='Users/'+UserID+'/'+deviceId;

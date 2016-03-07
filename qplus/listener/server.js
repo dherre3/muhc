@@ -27,7 +27,7 @@ app.post('/login',function(req,res,next){
   console.log(requestKey);
     console.log(requestObject);
 
-    if(requestObject.Request=='VerifySSN'||requestObject.Request=='SetNewPassword')
+    if(requestObject.Request=='VerifySSN'||requestObject.Request=='SetNewPassword'||requestObject.Request=='VerifySecurityAnswer')
     {
       console.log(requestObject);
       resetPasswordApi.resetPasswordRequest(requestKey,requestObject).then(function(results)
