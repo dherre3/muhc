@@ -48,6 +48,7 @@ exports.patientDoctorsQuery=function(userID)
 exports.patientDiagnosesQuery=function(userID)
 {
   return 'SELECT '+
+                      'Diagnosis.CreationDate, '+
                       'Diagnosis.Description_EN, '+
                       'Diagnosis.Description_FR '+
                       'FROM '+
@@ -115,10 +116,34 @@ exports.patientAppointmentsQuery=function(userID)
 
 exports.patientDocumentsQuery=function(userID)
 {
+  console.log('SELECT '+
+                      'Document.FinalFileName, '+
+                      'Alias.AliasName_EN, ' +
+                      'Alias.AliasName_FR, '+
+                      'Document.ReadStatus',+
+                      'Alias.AliasDescription_EN, '+
+                      'Alias.AliasDescription_FR, '+
+                      'Document.DocumentSerNum, ' +
+                      'Document.DateAdded ' +
+                    'From '+
+                      'Document,'+
+                      'Patient, '+
+                      'Alias, '+
+                      'AliasExpression, ' +
+                      'Users ' +
+
+                    'WHERE '+
+                      'Document.AliasExpressionSerNum = AliasExpression.AliasExpressionSerNum AND '+
+                      "Document.ValidEntry = 'Y' AND " +
+                      'AliasExpression.AliasSerNum = Alias.AliasSerNum AND '+
+                      'Patient.PatientSerNum = Document.PatientSerNum AND '+
+                      'Users.UserTypeSerNum=Patient.PatientSerNum AND '+
+                      'Users.Username Like '+"'"+ userID+"'");
   return 'SELECT '+
                       'Document.FinalFileName, '+
                       'Alias.AliasName_EN, ' +
                       'Alias.AliasName_FR, '+
+                      'Document.ReadStatus, '+
                       'Alias.AliasDescription_EN, '+
                       'Alias.AliasDescription_FR, '+
                       'Document.DocumentSerNum, ' +
@@ -137,6 +162,7 @@ exports.patientDocumentsQuery=function(userID)
                       'Patient.PatientSerNum = Document.PatientSerNum AND '+
                       'Users.UserTypeSerNum=Patient.PatientSerNum AND '+
                       'Users.Username Like '+"'"+ userID+"'";
+
 
 }
 exports.patientNotificationsQuery=function(userID)
@@ -293,4 +319,8 @@ exports.changeReadStatus=function(table, patientSerNum)
 exports.getPatientDeviceLastActivity=function(userid,device)
 {
   return "SELECT * FROM PatientActivityLog WHERE Username='"+userid+"' AND DeviceId='"+device+"' ORDER BY ActivitySerNum DESC LIMIT 1;";
+}
+exports.getEducationMaterial=function(userId)
+{
+    return "SELECT E.DateAdded, E.ReadStatus, E.EducationalMaterialSerNum, P.PostName_FR, P.PostName_EN, P.Body_FR, P.Body_EN FROM EducationalMaterial as E, Users as U, Patient as Pa, Post as P WHERE Pa.PatientSerNum=E.PatientSerNum AND U.UserTypeSerNum=Pa.PatientSerNum AND U.Username LIKE '"+userID+"'";
 }
