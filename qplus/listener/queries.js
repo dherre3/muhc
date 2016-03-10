@@ -20,6 +20,10 @@ exports.patientQuery=function(userID)
                     'WHERE '+
                       'Users.Username LIKE '+"\'"+ userID+"\'"+'AND Users.UserTypeSerNum = Patient.PatientSerNum';
 }
+exports.patientTableFields=function()
+{
+  return "SELECT Patient.PatientSerNum,Patient.FirstName, Patient.LastName, Patient.TelNum, Patient.PatientId, Patient.Email, Patient.Alias, Patient.Language, Patient.EnableSMS,Patient.ProfileImage, Patient.SSN FROM Patient, Users WHERE Users.Username LIKE ? AND Users.UserTypeSerNum=Patient.PatientSerNum AND Patient.LastUpdated > ?;"
+}
 exports.patientDoctorsQuery=function(userID)
 {
   return 'SELECT '+
@@ -44,6 +48,10 @@ exports.patientDoctorsQuery=function(userID)
                         'PatientDoctor.PatientSerNum = Patient.PatientSerNum AND '+
                         'Doctor.DoctorSerNum = PatientDoctor.DoctorSerNum';
 }
+exports.patientDoctorTableFields=function()
+{
+  return "SELECT Doctor.FirstName, Doctor.LastName, Doctor.DoctorSerNum, PatientDoctor.PrimaryFlag, PatientDoctor.OncologistFlag, Doctor.Email,Doctor.Phone, Doctor.ProfileImage, Doctor.Address FROM Doctor, PatientDoctor, Patient, Users WHERE Users.Username Like ? AND Patient.PatientSerNum=Users.UserTypeSerNum AND PatientDoctor.PatientSerNum = Patient.PatientSerNum AND Doctor.DoctorSerNum = PatientDoctor.DoctorSerNum AND Doctor.LastUpdated > ?;"
+}
 
 exports.patientDiagnosesQuery=function(userID)
 {
@@ -61,7 +69,10 @@ exports.patientDiagnosesQuery=function(userID)
                        'Users.UserTypeSerNum=Patient.PatientSerNum AND '+
                         'Diagnosis.PatientSerNum = Patient.PatientSerNum';
 }
-
+exports.patientDiagnosisTableFields=function()
+{
+  return "SELECT Diagnosis.CreationDate, Diagnosis.Description_EN, Diagnosis.Description_FR FROM Diagnosis, Patient, Users WHERE Users.UserTypeSerNum=Patient.PatientSerNum AND Diagnosis.PatientSerNum = Patient.PatientSerNum AND Users.Username Like ? AND Diagnosis.LastUpdated > ?;";
+}
 exports.patientMessagesQuery=function(userID)
 {
   return 'SELECT '+
@@ -83,7 +94,10 @@ exports.patientMessagesQuery=function(userID)
                        'Patient.PatientSerNum=Users.UserTypeSerNum AND' +
                         "( (Messages.ReceiverRole='Patient' AND Patient.PatientSerNum = Messages.ReceiverSerNum) OR (Messages.SenderRole='Patient' AND Patient.PatientSerNum = Messages.SenderSerNum) )";
 }
-
+exports.patientMessageTableFields=function()
+{
+  return "SELECT Messages.MessageSerNum, Messages.LastUpdated, Messages.SenderRole, Messages.ReceiverRole, Messages.SenderSerNum, Messages.ReceiverSerNum, Messages.MessageContent, Messages.ReadStatus, Messages.MessageDate FROM Messages, Patient, Users WHERE Patient.PatientSerNum=Users.UserTypeSerNum AND ((Messages.ReceiverRole='Patient' AND Patient.PatientSerNum = Messages.ReceiverSerNum) OR (Messages.SenderRole='Patient' AND Patient.PatientSerNum = Messages.SenderSerNum)) AND Users.Username Like ? AND Messages.LastUpdated > ?;"
+}
 exports.patientAppointmentsQuery=function(userID)
 {
   return 'SELECT '+
@@ -116,29 +130,6 @@ exports.patientAppointmentsQuery=function(userID)
 
 exports.patientDocumentsQuery=function(userID)
 {
-  console.log('SELECT '+
-                      'Document.FinalFileName, '+
-                      'Alias.AliasName_EN, ' +
-                      'Alias.AliasName_FR, '+
-                      'Document.ReadStatus',+
-                      'Alias.AliasDescription_EN, '+
-                      'Alias.AliasDescription_FR, '+
-                      'Document.DocumentSerNum, ' +
-                      'Document.DateAdded ' +
-                    'From '+
-                      'Document,'+
-                      'Patient, '+
-                      'Alias, '+
-                      'AliasExpression, ' +
-                      'Users ' +
-
-                    'WHERE '+
-                      'Document.AliasExpressionSerNum = AliasExpression.AliasExpressionSerNum AND '+
-                      "Document.ValidEntry = 'Y' AND " +
-                      'AliasExpression.AliasSerNum = Alias.AliasSerNum AND '+
-                      'Patient.PatientSerNum = Document.PatientSerNum AND '+
-                      'Users.UserTypeSerNum=Patient.PatientSerNum AND '+
-                      'Users.Username Like '+"'"+ userID+"'");
   return 'SELECT '+
                       'Document.FinalFileName, '+
                       'Alias.AliasName_EN, ' +
@@ -164,6 +155,10 @@ exports.patientDocumentsQuery=function(userID)
                       'Users.Username Like '+"'"+ userID+"'";
 
 
+}
+exports.patientDocumentTableField=function()
+{
+  return "SELECT Document.FinalFileName, Alias.AliasName_EN, Alias.AliasName_FR, Document.ReadStatus, Alias.AliasDescription_EN, Alias.AliasDescription_FR, Document.DocumentSerNum, Document.DateAdded FROM Document, Patient, Alias, AliasExpression, Users WHERE Document.AliasExpressionSerNum=AliasExpression.AliasExpressionSerNum AND Document.ValidEntry='Y' AND AliasExpression.AliasSerNum=Alias.AliasSerNum AND Patient.PatientSerNum=Document.PatientSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND Document.LastUpdated > ?;";
 }
 exports.patientNotificationsQuery=function(userID)
 {

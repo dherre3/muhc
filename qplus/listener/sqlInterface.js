@@ -45,15 +45,7 @@ function handleDisconnect(myconnection) {
 handleDisconnect(connection);
 
 var exports=module.exports={};
-//Running sql query
-exports.runSqlQuery=function(query, parameters)
-{
-  connection.query(query,parameters, function(err,rows,fields){
-    var r=Q.defer();
-    if (err) r.reject(error);
-    r.resolve(rows);
-  });
-}
+
 
 //Function that refreshes a table and sends it to table in mysql
 exports.refreshField=function(UserID, field)
@@ -97,7 +89,31 @@ exports.apiRequestField=function(UserID, query, callbackFunction)
 *@return (object) Return the object containing the patient information with
 for all the fields listed in the queue
 */
+//Running sql query
 
+exports.runSqlQuery=function(query, parameters, processRawFunction)
+{
+  var r=Q.defer();
+  connection.query(query, parameters, function(err,rows,fields){
+    if (err) r.reject(err);
+    if(typeof rows[0] !=='undefined')
+    {
+
+      if(processRawFunction&&typeof processRawFunction !=='undefined')
+      {
+        processRawFunction(rows).then(function(result)
+        {
+          r.resolve(result);
+        });
+      }else{
+        r.resolve(rows);
+      }
+    }else{
+      r.resolve([]);
+    }
+  });
+  return r.promise;
+}
 exports.cascadeFunction=function(UserID,queue,startObject)
 {
   var r=Q.defer();
@@ -144,13 +160,52 @@ exports.getAllPatientFields=function(userid)
   return r.promise;
 }
 
+exports.requestMappings=
+{
+
+  'Patient':{
+    sql:queries.patientTableFields(),
+    processFunction:loadProfileImagePatient
+  },
+  'Documents':
+  {
+    sql:queries.patientDocumentTableField(),
+    processFunction:LoadDocuments
+  },
+  'Doctors':{
+    sql:queries.patientDoctorTableFields(),
+    processFunction:loadImageDoctor
+  },
+  'Diagnosis':{
+    sql:queries.patientDiagnosisTableFields()
+  },
+  'Messages':{
+    sql:queries.patientMessageTableFields(),
+    processFunction:LoadAttachments
+  },
+  'Appointments':
+  {
+    sql:queries.patientAppointmentsQuery()
+  },
+  'Notifications':
+  {
+    sql:queries.patientNotificationsQuery()
+  },
+  'Tasks':
+  {
+    sql:queries.patientTasksQuery()
+  },
+
+  'LabTests':{
+    sql:queries.patientLabResultsQuery
+  }
+};
 //Gets the patient fields in patient table and converts user image to base64
 exports.getPatient=function(UserID)
 {
   var r=Q.defer();
   connection.query(queries.patientQuery(UserID), function(error, rows, fields)
   {
-
     if (error) r.reject(error);
     loadProfileImagePatient(rows).then(function(rows){
     r.resolve(rows[0]);
@@ -342,8 +397,6 @@ exports.updateAccountField=function(requestObject)
         r.resolve(requestObject);
       });
     }
-
-
   });
   return r.promise;
 }
@@ -469,6 +522,7 @@ var tableMappings=
   'Documents':exports.getPatientDocuments,
   'LabTests':exports.getPatientLabTests
 };
+
 function getPatientFromUserID(UserID)
 {
   var r=Q.defer();
@@ -479,7 +533,7 @@ function getPatientFromUserID(UserID)
   return r.promise;
 }
 
-var LoadDocuments = function (rows)
+function LoadDocuments(rows)
 {
   /**
   * @ngdoc method

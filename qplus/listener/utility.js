@@ -34,6 +34,11 @@ exports.toMYSQLString=function(date)
   return date.getFullYear()+'-'+month+'-'+day+' '+hours+':'+minutes+':'+seconds;
 
 }
+exports.unixToMYSQLTimestamp(time)
+{
+  var date=new Date(time);
+  return exports.toMYSQLString(date);  
+}
 
 
 exports.encryptObject=function(object,secret)
