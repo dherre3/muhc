@@ -9,28 +9,38 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
   var ref=new Firebase('https://brilliant-inferno-7679.firebaseio.com/dev');
   ref.auth('9HeH3WPYe4gdTuqa88dtE3KmKy7rqfb4gItDRkPF');
   setInterval(function(){
-    ref.child('Users').on('value',function(snapshot){
-          console.log(snapshot.val());
-          var now=(new Date()).getTime();
-          var usersData=snapshot.val();
-          for (var user in usersData) {
-            console.log(user);
-            for(var device in usersData[user])
+ref.child('Users').on('value',function(snapshot){
+        //console.log(snapshot.val());
+        var now=(new Date()).getTime();
+        var usersData=snapshot.val();
+        for (var user in usersData) {
+
+          for(var device in usersData[user])
+          {
+            if(typeof usersData[user][device].Timestamp!=='undefined')
             {
-              console.log(device);
               if(now-usersData[user][device].Timestamp>240000)
               {
-                ref.child('Users/'+user+'/'+device).set(null);
+                console.log('Deleting', user);
+                ref.child('Users/'+user+'/'+device).set({});
+              }
+            }else{
+              for(var request in usersData[user][device])
+              {
+                if(now-usersData[user][device][request].Timestamp>240000)
+                {
+                  console.log('Deleting', user);
+                  ref.child('Users/'+user+'/'+device).set({});
+                }
               }
             }
-          };
-      });
-  },60000);
+          }
+        };
+    });
+},60000);
 
   ref.child('requests').on('child_added',function(request){
-    $.post("http://172.26.66.41:8020/login",{key: request.key(),objectRequest: request.val()}, function(data){
-      console.log(data);
-
+    $.post("http://172.26.66.41:8010/login",{key: request.key(),objectRequest: request.val()}, function(data){
       if(data.type=='UploadToFirebase')
       {
         uploadToFirebase(data.requestKey, data.encryptionKey,data.requestObject, data.object);
@@ -50,7 +60,7 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
     console.log(requestObject);
     console.log('I am about to go to into encrypting');
     //console.log(request);
-    object=utility.encryptObject(object,encryptionKey);
+    object=encryptObject(object,encryptionKey);
     //console.log(object);
     var request=uploadSection(requestObject);
 

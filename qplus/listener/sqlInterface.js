@@ -8,7 +8,7 @@ var buffer=require('buffer');
 
 
 
-var sqlConfig={
+/*var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
   password:'root',
@@ -19,13 +19,13 @@ var sqlConfig={
 *Connecting to mysql database
 */
 
-/*var sqlConfig={
+var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,
   database:credentials.MYSQL_DATABASE,
   dateStrings:true
-};*/
+};
 /*
 *Re-connecting the sql database, NodeJS has problems and disconnects if inactive,
 The handleDisconnect deals with that
@@ -165,7 +165,8 @@ function processSelectRequest(table, userId, timestamp)
   if(typeof timestamp!=='undefined')
   {
     console.log('asdtime')
-    date=new Date(timestamp);
+    date=new Date(Number(timestamp));
+    console.log(date);
   }
 
   exports.runSqlQuery(requestMappingObject.sql, [userId,date],
