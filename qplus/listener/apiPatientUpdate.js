@@ -26,57 +26,13 @@ exports.login = function (requestObject) {
          sqlInterface.updateLogout(result);
       }
     });
-    if(!validate('Login',UserID))
+    sqlInterface.getPatientTableFields(UserID).then(function(objectToFirebase)
     {
-      sqlInterface.getAllPatientFields(UserID).then(function(objectToFirebase)
-      {
-        sqlInterface.addToActivityLog(requestObject);
-        r.resolve(objectToFirebase);
-      });
-      /*sqlInterface.getPatient(UserID).then(function (rows) {
-          objectToFirebase.Patient = rows;
-
-          sqlInterface.getPatientDoctors(UserID).then(function (rows) {
-              objectToFirebase.Doctors = rows;
-
-              sqlInterface.getPatientDiagnoses(UserID).then(function (rows) {
-                  objectToFirebase.Diagnoses = rows;
-
-                  sqlInterface.getPatientMessages(UserID).then(function (rows) {
-                      objectToFirebase.Messages = rows;
-
-                      sqlInterface.getPatientAppointments(UserID).then(function (rows) {
-                          objectToFirebase.Appointments = rows;
-
-                          sqlInterface.getPatientDocuments(UserID).then(function (rows) {
-                              objectToFirebase.Documents = rows;
-
-                              sqlInterface.getPatientNotifications(UserID).then(function (rows) {
-                                  objectToFirebase.Notifications = rows;
-
-                                  sqlInterface.getPatientTasks(UserID).then(function (rows) {
-                                      objectToFirebase.Tasks = rows;
-
-                                      sqlInterface.getPatientLabTests(UserID).then(function(rows){
-
-                                        objectToFirebase.LabTests=rows;
-                                        sqlInterface.addToActivityLog(requestObject);
-                                        r.resolve(objectToFirebase);
-                                      });
-
-
-                                  });
-                              });
-                          });
-                      });
-                  });
-              });
-          });
-      });*/
-    }else{
-      r.reject('Invalid');
-    }
-
+      sqlInterface.addToActivityLog(requestObject);
+      r.resolve(objectToFirebase);
+    },function(reason){
+      r.resolve(reason);
+    });
     return r.promise;
 };
 /*
@@ -86,41 +42,53 @@ exports.login = function (requestObject) {
 *@parameter(string) Parameters, either an array of fields to be uploaded,
 or a single table field.
 */
+exports.resume=function(requestObject)
+{
+  var r = Q.defer();
+  var UserId=requestObject.UserID;
+  sqlInterface.getPatientTableFields(UserId).then(function(objectToFirebase){
+    r.resolve(objectToFirebase);
+  }).catch(function(error){
+    r.reject(error);
+  });
+  return r.promise;
+};
 exports.refresh = function (requestObject) {
-    var UserID=requestObject.UserID;
-    var parameters=requestObject.Parameters;
     var r = Q.defer();
+    var UserId=requestObject.UserID;
+    var parameters=requestObject.Parameters;
+    var timestamp=requestObject.Timestamp;
+    console.log(requestObject);
     var objectToFirebase = {};
     if(!validate("Defined",parameters))
     {
 
       r.reject('Invalid');
     }
-    var paramArray=parameters.replace(" ","").split(",");
-    if (paramArray.length>1) {
-        if (!validate('RefreshArray', paramArray)) {
-            r.reject('Invalid');
-        }
-        var queue = utility.Queue();
-        queue.enqueueArray(paramArray);
-        sqlInterface.cascadeFunction(UserID, queue, {}).then(function (rows) {
-            objectToFirebase = rows;
-            r.resolve(objectToFirebase);
-        });
-    } else if(parameters=='All'){
-      sqlInterface.getAllPatientFields(requestObject.UserID).then(function(objectToFirebase){
+    if(parameters=='All'){
+      sqlInterface.getPatientTableFields(UserId,timestamp).then(function(objectToFirebase){
+        console.log('Timestamp',timestamp);
+        objectToFirebase=utility.resolveEmptyResponse(objectToFirebase);
+        console.log(objectToFirebase);
         r.resolve(objectToFirebase);
       }).catch(function(error){
         r.reject(error);
       });
     }else {
-        if (!validate('RefreshField', parameters)) {
+      console.log(parameters);
+      if(!(typeof parameters.constructor !=='undefined'&&parameters.constructor=== Array)) parameters=[parameters];
+      console.log(parameters);
+      console.log(timestamp);
+        if (!validate('RefreshArray', parameters)) {
             r.reject('Invalid');
         }
-        //validate(parameters)
-        sqlInterface.refreshField(UserID, parameters).then(function (rows) {
+        sqlInterface.getPatientTableFields(UserId, timestamp, parameters).then(function (rows) {
             objectToFirebase = rows;
+            objectToFirebase=utility.resolveEmptyResponse(objectToFirebase);
             r.resolve(objectToFirebase);
+        },function(reason)
+        {
+          r.reject(reason);
         });
     }
     return r.promise;

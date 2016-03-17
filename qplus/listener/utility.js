@@ -15,7 +15,17 @@ var sqlConfig={
 The handleDisconnect deals with that
 */
 
-
+exports.resolveEmptyResponse=function(data)
+{
+  for (var key in data) {
+    if(data[key].length>0)
+    {
+      return data;
+    }else{
+      return {Response:'No Results'};
+    }
+  }
+}
 
 exports.toMYSQLString=function(date)
 {
@@ -34,10 +44,10 @@ exports.toMYSQLString=function(date)
   return date.getFullYear()+'-'+month+'-'+day+' '+hours+':'+minutes+':'+seconds;
 
 }
-exports.unixToMYSQLTimestamp(time)
+exports.unixToMYSQLTimestamp=function(time)
 {
   var date=new Date(time);
-  return exports.toMYSQLString(date);  
+  return exports.toMYSQLString(date);
 }
 
 
@@ -46,7 +56,6 @@ exports.encryptObject=function(object,secret)
   /*console.log(object.Appointments[0].ScheduledStartTime);
   var dateString=object.Appointments[0].ScheduledStartTime.toISOString();
   console.log(dateString);*/
-console.log(secret);
   //var object=JSON.parse(JSON.stringify(object));
   if(typeof object=='string')
   {

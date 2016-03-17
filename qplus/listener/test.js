@@ -1,34 +1,42 @@
-
+var credentials=require('./credentials.js');
 var sqlInterface=require('./sqlInterface.js');
 var queries=require('./queries.js');
+var Firebase    =require('firebase');
 var q=require('Q');
 
 
 
-function processSelectRequest(table, userId, timestamp)
+
+/*sqlInterface.getPatientTableFields('ac6eaeaa-f725-4b07-bdc0-72faef725985','2015-12-14 11:16:16',['Patient','Documents']).then(function(result){
+  console.log(result);
+});
+testParameters('david',12312312,['1131','312312']);
+testParameters('david',['1131','312312']);
+testParameters('david',12312312);
+testParameters('david');
+
+function testParameters(userId, timestamp, array)
 {
-  var r=q.defer();
-  var requestMappingObject=sqlInterface.requestMappings[table];
-  if(typeof timestamp=='undefined')
+  if(arguments.length==3)
   {
-    var date=new Date(0);
+    console.log('all three parameters, update only some fields')
+  }else if(arguments.length==2)
+  {
+    if(typeof arguments[1] === 'object' && arguments[1].constructor === Array)
+    {
+      console.log('array')
+    }else{
+      console.log('timestamp')
+    }
   }else{
-    var date=new Date(timestamp);
+    console.log('User name grab all fields');
   }
-  sqlInterface.runSqlQuery(requestMappingObject.sql, [userId,date],
-    requestMappingObject.processFunction).then(function(rows)
-    {
-      console.log(rows);
-      r.resolve(rows);
-    },function(err)
-    {
-      console.log(err);
-      r.reject(err);
-    });
-  return r.promise;
-}
-//processSelectRequest('Messages','ac6eaeaa-f725-4b07-bdc0-72faef725985');
-processSelectRequest('Messages','ac6eaeaa-f725-4b07-bdc0-72faef725985','2015-12-14 11:16:16');
+}*/
+
+
+//if(variable.constructor === Array)
+
+//processSelectRequest('Tasks','ac6eaeaa-f725-4b07-bdc0-72faef725985','2015-12-14 11:16:16');
 
 
 /*var requestSim={};
@@ -48,4 +56,26 @@ sqlInterface.getPatientDeviceLastActivity(username, deviceId).then(function(resu
       sqlInterface.updateLogout(result);
   }
 });
+function processSelectRequest(table, userId, timestamp)
+{
+  var r=q.defer();
+  var requestMappingObject=sqlInterface.requestMappings[table];
+  if(typeof timestamp=='undefined')
+  {
+    var date=new Date(0);
+  }else{
+    var date=new Date(timestamp);
+  }
+  sqlInterface.runSqlQuery(requestMappingObject.sql, [userId,date],
+    requestMappingObject.processFunction).then(function(rows)
+    {
+      r.resolve(rows);
+    },function(err)
+    {
+      console.log(err);
+      r.reject(err);
+    });
+  return r.promise;
+}
+
 */

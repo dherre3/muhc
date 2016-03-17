@@ -11,6 +11,7 @@ exports.processRequest=function(requestObject)
   var UserID=requestObject.UserID;
   var parameters=requestObject.Parameters;
   var objectToFirebase={};
+  console.log(requestObject);
   //Types account change, Notification read, messages read, checkin,
   //Message
   if(!validate('DefinedObjectRequest',requestObject))
@@ -25,6 +26,15 @@ exports.processRequest=function(requestObject)
     {
       r.reject(response);
     });
+  }else if(type=='Resume')
+  {
+    apiPatientUpdate.resume(requestObject).then(function(objectToFirebase)
+    {
+      r.resolve(objectToFirebase);
+    }).catch(function(response)
+    {
+      r.reject(response);
+    });
   }else if(type=='Refresh')
   {
     apiPatientUpdate.refresh(requestObject).then(function(objectToFirebase)
@@ -32,7 +42,7 @@ exports.processRequest=function(requestObject)
       r.resolve(objectToFirebase);
     }).catch(function(response)
     {
-      r.reject(reponse);
+      r.reject(response);
     });
   }else if(type=='MapLocation'){
     apiPatientUpdate.getMapLocation(requestObject).then(function(objectToFirebase)
@@ -80,6 +90,7 @@ exports.processRequest=function(requestObject)
     });
   }else if(type=='Message')
   {
+    console.log('I am about the send a message');
     apiHospitalUpdate.sendMessage(requestObject).then(function(response){
         r.resolve(response);
     }).catch(function(response)

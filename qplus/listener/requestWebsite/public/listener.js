@@ -44,23 +44,26 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
 
     });
   });
-
-
   function uploadToFirebase(requestKey,encryptionKey,requestObject,object)
   {
+    console.log(requestKey);
     console.log(requestObject);
     console.log('I am about to go to into encrypting');
     //console.log(request);
-    object=encryptObject(object,encryptionKey);
+    object=utility.encryptObject(object,encryptionKey);
     //console.log(object);
-    if(requestObject.Request=='Login'||requestObject.Parameters=='All')
+    var request=uploadSection(requestObject);
+
+    if(requestObject.Request=='Login'||requestObject.Request=='Resume'||requestObject.Request=='All')
     {
-      request='All'
+      console.log(requestObject);
+      request='All';
     }
-    object.Timestamp=Firebase.ServerValue.TIMESTAMP;
     var deviceId=requestObject.DeviceId;
     var UserID=requestObject.UserID;
-    var userFieldsPath='Users/'+UserID+'/'+deviceId;
+    var userFieldsPath='Users/'+UserID+'/'+deviceId+'/'+request;
+    console.log(userFieldsPath);
+    object.Timestamp=Firebase.ServerValue.TIMESTAMP;
       console.log('I am about to write to firebase');
     ref.child(userFieldsPath).update(object, function(){
       console.log('I just finished writing to firebase');
@@ -68,6 +71,20 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
       //logRequest(requestObject);
     });
   }
+  
+  function uploadSection(requestObject)
+  {
+    if(requestObject.Request=='Login'||requestObject.Request=='Resume'||requestObject.Request=='All'||(requestObject.Request=='Refresh'&&requestObject.Parameters=='All'))
+    {
+      console.log(requestObject);
+      return 'All';
+    }else if((requestObject.Request=='Refresh'&&requestObject.Parameters instanceof Array)){
+      return 'ArrayFields';
+    }else if(requestObject.Request=='Refresh'){
+      return requestObject.Parameters;
+    }
+  }
+
   function resetPasswordError(requestKey,requestObject)
   {
     var response={};

@@ -11,7 +11,7 @@ exports.logout=function(requestObject)
       r.reject('Invalid');
   } else {
       sqlInterface.addToActivityLog(requestObject);
-      r.resolve(requestObject);
+      r.resolve('Hospital Request Proccessed');
   }
   return r.promise;
 }
@@ -21,10 +21,8 @@ exports.sendMessage=function(requestObject)
   if (!validate(requestObject)) {
       r.reject('Invalid');
   } else {
-
       sqlInterface.sendMessage(requestObject).then(function (objectRequest) {
-          //sqlInterface.addToActivityLog(requestObject);
-          r.resolve(objectRequest);
+          r.resolve('Hospital Request Proccessed');
       });
   }
   return r.promise;
@@ -37,7 +35,7 @@ exports.inputFeedback=function(requestObject)
   } else {
       sqlInterface.inputFeedback(requestObject).then(function (requestObject) {
           //sqlInterface.addToActivityLog(requestObject);
-        r.resolve(requestObject);
+        r.resolve('Hospital Request Proccessed');
       }).catch(function(error){
         r.reject(error);
       });
@@ -46,7 +44,7 @@ exports.inputFeedback=function(requestObject)
 }
 exports.accountChange = function (requestObject) {
     var r = Q.defer();
-    if (!validate(requestObject)) {
+    if (!validate('Hospital Request Proccessed')) {
         r.reject('Invalid');
     } else {
         sqlInterface.updateAccountField(requestObject).then(function (requestObject) {
@@ -59,7 +57,7 @@ exports.accountChange = function (requestObject) {
 };
 exports.checkIn = function (requestObject) {
     var r = Q.defer();
-    if (!validate(requestObject)) {
+    if (!validate('Hospital Request Proccessed')) {
         r.reject('Invalid');
     } else {
         sqlInterface.checkIn(requestObject).then(function (requestObject) {

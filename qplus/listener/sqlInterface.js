@@ -47,53 +47,53 @@ handleDisconnect(connection);
 var exports=module.exports={};
 
 
-//Function that refreshes a table and sends it to table in mysql
-exports.refreshField=function(UserID, field)
-{
-  var r=Q.defer();
-  var objectData={};
 
-  if(tableMappings[field])
+//Table mappings and process data functions for results obtained from the database.
+exports.requestMappings=
+{
+  'Patient':{
+    sql:queries.patientTableFields(),
+    processFunction:loadProfileImagePatient
+  },
+  'Documents':
   {
-
-    var functionField=tableMappings[field];
-    functionField(UserID).then(function(fieldObject)
-    {
-      objectData[field]=fieldObject;
-      r.resolve(objectData);
-    });
-  }else{
-    r.reject('Invalid');
+    sql:queries.patientDocumentTableFields(),
+    processFunction:LoadDocuments
+  },
+  'Doctors':{
+    sql:queries.patientDoctorTableFields(),
+    processFunction:loadImageDoctor
+  },
+  'Diagnosis':{
+    sql:queries.patientDiagnosisTableFields()
+  },
+  'Messages':{
+    sql:queries.patientMessageTableFields(),
+    processFunction:LoadAttachments
+  },
+  'Appointments':
+  {
+    sql:queries.patientAppointmentsTableFields()
+  },
+  'Notifications':
+  {
+    sql:queries.patientNotificationsTableFields()
+  },
+  'Tasks':
+  {
+    sql:queries.patientTasksTableFields()
+  },
+  'LabTests':{
+    sql:queries.patientTestResultsTableFields()
   }
-  return r.promise;
-}
-//Utility function to run queries, accepts UserID, query, and callbackfunction with
-//the results from the query
-exports.apiRequestField=function(UserID, query, callbackFunction)
-{
-  connection.query(query, function(err,rows,fields){
-    var r=Q.defer();
-    if (err) r.reject(error);
-    callbackFunction(rows).then(function(rows){
-      r.resolve(rows);
-    });
-  });
-  return r.promise;
-}
-/*
-*@name cascadeFunction
-*@param(string) UserID The patients user id
-@param(string) queue queue of promises to be processed.
-@param(startObject) startObject Object to return
-@description Takes a queue of promises and executes them all sequentially
-*@return (object) Return the object containing the patient information with
-for all the fields listed in the queue
-*/
-//Running sql query
+};
 
+//Query processing function
 exports.runSqlQuery=function(query, parameters, processRawFunction)
 {
   var r=Q.defer();
+  console.log(query);
+  console.log(parameters);
   connection.query(query, parameters, function(err,rows,fields){
     if (err) r.reject(err);
     if(typeof rows[0] !=='undefined')
@@ -114,207 +114,90 @@ exports.runSqlQuery=function(query, parameters, processRawFunction)
   });
   return r.promise;
 }
-exports.cascadeFunction=function(UserID,queue,startObject)
+
+//Gets Patient tables based on userID,  if timestamp defined sends requests
+//that are only updated after timestamp, third parameter is an array of table names, if not present all tables are gathered
+exports.getPatientTableFields=function(userId,timestamp,arrayTables)
 {
   var r=Q.defer();
-  if(queue.isEmpty())
+  var timestp=0;
+  if(arguments.length>2)
   {
-
-    r.resolve(startObject);
+    timestp=timestamp;
+    console.log('Grab', arrayTables);
+  }else if(arguments.length==2)
+  {
+    timestp=timestamp;
   }else{
-    var field=queue.dequeue();
-    var functionField=tableMappings[field];
-    functionField(UserID).then(function(rows){
-      startObject[field]=rows;
-      r.resolve(exports.cascadeFunction(UserID,queue,startObject));
-    });
+    console.log('User name grab all fields');
   }
-
-
-  return r.promise;
-}
-function preparePromiseArray(userid)
-{
-  console.log(userid);
-  var array=[];
-  for (var key in tableMappings) {
-    array.push(tableMappings[key](userid));
-  }
-  return array;
-}
-exports.getAllPatientFields=function(userid)
-{
-  var r=Q.defer();
-  var tablePromisesArray;
   var objectToFirebase={};
   var index=0;
-   Q.all(preparePromiseArray(userid)).then(function(response){
-    for (var key in tableMappings) {
-      objectToFirebase[key]=response[index];
-      index++;
-    }
-    r.resolve(objectToFirebase);
+  console.log(timestp);
+  console.log('Inside patient fields');
+   Q.all(preparePromiseArrayFields(userId,timestp,arrayTables)).then(function(response){
+     if(typeof arrayTables!=='undefined')
+     {
+      console.log('BOOM');
+       for (var i = 0; i < arrayTables.length; i++) {
+         objectToFirebase[arrayTables[i]]=response[index];
+         index++;
+       }
+     }else{
+       for (var key in exports.requestMappings) {
+         objectToFirebase[key]=response[index];
+         index++;
+       }
+     }
+      r.resolve(objectToFirebase);
   },function(error){
     r.reject(error);
   });
   return r.promise;
 }
-
-exports.requestMappings=
+//Helper function to format the table, userId and timestamp
+function processSelectRequest(table, userId, timestamp)
 {
-
-  'Patient':{
-    sql:queries.patientTableFields(),
-    processFunction:loadProfileImagePatient
-  },
-  'Documents':
+  var r=Q.defer();
+  var requestMappingObject=exports.requestMappings[table];
+  var date=new Date(0);
+  console.log('time',timestamp)
+  if(typeof timestamp!=='undefined')
   {
-    sql:queries.patientDocumentTableField(),
-    processFunction:LoadDocuments
-  },
-  'Doctors':{
-    sql:queries.patientDoctorTableFields(),
-    processFunction:loadImageDoctor
-  },
-  'Diagnosis':{
-    sql:queries.patientDiagnosisTableFields()
-  },
-  'Messages':{
-    sql:queries.patientMessageTableFields(),
-    processFunction:LoadAttachments
-  },
-  'Appointments':
-  {
-    sql:queries.patientAppointmentsQuery()
-  },
-  'Notifications':
-  {
-    sql:queries.patientNotificationsQuery()
-  },
-  'Tasks':
-  {
-    sql:queries.patientTasksQuery()
-  },
-
-  'LabTests':{
-    sql:queries.patientLabResultsQuery
+    console.log('asdtime')
+    date=new Date(timestamp);
   }
-};
-//Gets the patient fields in patient table and converts user image to base64
-exports.getPatient=function(UserID)
-{
-  var r=Q.defer();
-  connection.query(queries.patientQuery(UserID), function(error, rows, fields)
-  {
-    if (error) r.reject(error);
-    loadProfileImagePatient(rows).then(function(rows){
-    r.resolve(rows[0]);
+
+  exports.runSqlQuery(requestMappingObject.sql, [userId,date],
+    requestMappingObject.processFunction).then(function(rows)
+    {
+       r.resolve(rows);
+    },function(err)
+    {
+      r.reject(err);
     });
-  });
   return r.promise;
 }
 
-//Obtaints the patient lab tests from lab test table
-exports.getPatientLabTests=function(UserID)
+//Preparing a promise array for later retrieval
+function preparePromiseArrayFields(userId,timestamp,arrayTables)
 {
-  var r=Q.defer();
-  connection.query(queries.patientLabResultsQuery(UserID), function(error, rows, fields)
+  console.log('PreparePromise',timestamp);
+  var array=[];
+  if(typeof arrayTables!=='undefined')
   {
-    if (error) r.reject(error);
-    r.resolve(rows);
-  });
-  return r.promise;
+    for (var i = 0; i < arrayTables.length; i++) {
+      array.push(processSelectRequest(arrayTables[i],userId,timestamp));
+    }
+  }else{
+    for (var key in exports.requestMappings) {
+      array.push(processSelectRequest(key,userId,timestamp));
+    }
+  }
+  return array;
 }
 
-//Obtains the patient doctors
-exports.getPatientDoctors=function(UserID)
-{
-  var r=Q.defer();
-  connection.query(queries.patientDoctorsQuery(UserID),function(error,rows,fields){
-      if (error) r.reject(error);
-      loadImageDoctor(rows).then(function(rows){
-        r.resolve(rows);
-      });
-  });
-  return r.promise;
-}
 
-//Obtains patient diagnosis
-exports.getPatientDiagnoses=function(UserID)
-{
-  var r=Q.defer();
-  connection.query(queries.patientDiagnosesQuery(UserID),function(error,rows,fields){
-      if (error) r.reject(error);
-      r.resolve(rows);
-  });
-  return r.promise;
-}
-
-//Api call to obtain patient messages;
-exports.getPatientMessages=function(UserID)
-{
-  var r=Q.defer();
-  connection.query(queries.patientMessagesQuery(UserID),function(error,rows,fields){
-      if (error) r.reject(error);
-      LoadAttachments(rows).then(function(rows){
-        r.resolve(rows);
-      });
-  });
-  return r.promise;
-}
-//Api call to obtain patient appointments
-exports.getPatientAppointments=function(UserID)
-{
-  var r=Q.defer();
-  connection.query(queries.patientAppointmentsQuery(UserID),function(error,rows,fields){
-      if (error) r.reject(error);
-      r.resolve(rows);
-  });
-  return r.promise;
-}
-//Gets patient documents
-exports.getPatientDocuments=function(UserID)
-{
-  var r=Q.defer();
-  connection.query(queries.patientDocumentsQuery(UserID),function(error,rows,fields){
-      if (error) r.reject(error);
-      LoadDocuments(rows).then(function(response){
-      if(response=='All images were loaded!')
-      {
-        r.resolve(rows);
-      }else{
-        r.resolve(response);
-      }
-
-      },function(error){r.resolve(rows)});
-  });
-  return r.promise;
-}
-//Api call to obtain patient notifications
-exports.getPatientNotifications=function(UserID)
-{
-  var r=Q.defer();
-  console.log(queries.patientNotificationsQuery(UserID));
-  connection.query(queries.patientNotificationsQuery(UserID),function(error,rows,fields){
-      console.log(error);
-      if (error) r.reject(error);
-      console.log(rows);
-      r.resolve(rows);
-  });
-  return r.promise;
-
-
-}
-//Api call to obtain patient tasks
-exports.getPatientTasks=function(UserID)
-{
-  var r=Q.defer();
-  connection.query(queries.patientTasksQuery(UserID),function(error,rows,fields){
-      if (error) r.reject(error);
-      r.resolve(rows);
-  });
-  return r.promise;
-}
 //Api call to insert a message into messages table
 exports.sendMessage=function(requestObject)
 {
@@ -372,7 +255,7 @@ exports.updateAccountField=function(requestObject)
 {
   var r=Q.defer();
   var UserID=requestObject.UserID;
-  getPatientFromUserID(UserID).then(function(user)
+  getUserFromUserID(UserID).then(function(user)
   {
 
     var patientSerNum=user.UserTypeSerNum;
@@ -405,7 +288,7 @@ exports.inputFeedback=function(requestObject)
 {
   var r =Q.defer();
   var UserID=requestObject.UserID;
-  getPatientFromUserID(UserID).then(function(user)
+  getUserFromUserID(UserID).then(function(user)
   {
     var userSerNum=user.UserSerNum;
     var content=requestObject.Parameters.FeedbackContent;
@@ -506,27 +389,10 @@ exports.updateLogout=function(requestObject)
   return r.promise;
 }
 
-/*
-Table mappings for cascade asynchronous function
-*/
-
-var tableMappings=
-{
-  'Messages':exports.getPatientMessages,
-  'Patient':exports.getPatient,
-  'Doctors':exports.getPatientDoctors,
-  'Diagnoses':exports.getPatientDiagnoses,
-  'Appointments':exports.getPatientAppointments,
-  'Notifications':exports.getPatientNotifications,
-  'Tasks':exports.getPatientTasks,
-  'Documents':exports.getPatientDocuments,
-  'LabTests':exports.getPatientLabTests
-};
-
-function getPatientFromUserID(UserID)
+function getUserFromUserID(UserID)
 {
   var r=Q.defer();
-  connection.query(queries.getPatientFromUserId(UserID),function(error, rows, fields){
+  connection.query(queries.getUserFromUserID(UserID),function(error, rows, fields){
     if(error) r.reject(error);
     r.resolve(rows[0]);
   });
@@ -564,6 +430,47 @@ function LoadDocuments(rows)
     return deferred.promise;
 };
 
+
+//Function toobtain Doctors images
+function loadImageDoctor(rows){
+  var deferred = Q.defer();
+  for (var key in rows){
+    if((typeof rows[key].ProfileImage !=="undefined" )&&rows[key].ProfileImage){
+
+      var n = rows[key].ProfileImage.lastIndexOf(".");
+      var substring=rows[key].ProfileImage.substring(n+1,rows[key].ProfileImage.length);
+      rows[key].DocumentType=substring;
+      rows[key].ProfileImage=filesystem.readFileSync(__dirname+'/Doctors/'+rows[key].ProfileImage,'base64' );
+
+    }
+  }
+  deferred.resolve(rows);
+  return deferred.promise;
+}
+
+//function to format patient image to base 64
+function loadProfileImagePatient(rows){
+  var deferred = Q.defer();
+
+  if(rows[0]&&rows[0].ProfileImage && rows[0].ProfileImage!=='')
+  {
+    var buffer=new Buffer(rows[0].ProfileImage,'hex');
+    var base64Buffer=buffer.toString('base64');
+    rows[0].DocumentType='jpg';
+    rows[0].ProfileImage=base64Buffer;
+    deferred.resolve(rows);
+    /*var n = rows[0].ProfileImage.lastIndexOf(".");
+    var substring=rows[0].ProfileImage.substring(n+1,rows[0].ProfileImage.length);
+    rows[0].DocumentType=substring;
+    rows[0].ProfileImage=filesystem.readFileSync(__dirname + '/Patients/'+ rows[0].ProfileImage,'base64' );
+    deferred.resolve(rows);*/
+  }else{
+    deferred.resolve(rows);
+  }
+
+  return deferred.promise;
+}
+
 var LoadAttachments = function (rows )
 {
   /**
@@ -593,41 +500,3 @@ var LoadAttachments = function (rows )
     }
     return deferred.promise;*/
   };
-
-function loadImageDoctor(rows){
-  var deferred = Q.defer();
-  for (var key in rows){
-    if((typeof rows[key].ProfileImage !=="undefined" )&&rows[key].ProfileImage){
-
-      var n = rows[key].ProfileImage.lastIndexOf(".");
-      var substring=rows[key].ProfileImage.substring(n+1,rows[key].ProfileImage.length);
-      rows[key].DocumentType=substring;
-      rows[key].ProfileImage=filesystem.readFileSync(__dirname+'/Doctors/'+rows[key].ProfileImage,'base64' );
-
-    }
-  }
-  deferred.resolve(rows);
-  return deferred.promise;
-}
-
-
-function loadProfileImagePatient(rows){
-  var deferred = Q.defer();
-  if(rows[0].ProfileImage && rows[0].ProfileImage!=='')
-  {
-    var buffer=new Buffer(rows[0].ProfileImage,'hex');
-    var base64Buffer=buffer.toString('base64');
-    rows[0].DocumentType='jpg';
-    rows[0].ProfileImage=base64Buffer;
-    deferred.resolve(rows);
-    /*var n = rows[0].ProfileImage.lastIndexOf(".");
-    var substring=rows[0].ProfileImage.substring(n+1,rows[0].ProfileImage.length);
-    rows[0].DocumentType=substring;
-    rows[0].ProfileImage=filesystem.readFileSync(__dirname + '/Patients/'+ rows[0].ProfileImage,'base64' );
-    deferred.resolve(rows);*/
-  }else{
-    deferred.resolve(rows);
-  }
-
-  return deferred.promise;
-}

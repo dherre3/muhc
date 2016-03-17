@@ -1,5 +1,4 @@
-var tableFields=[  'Messages','Patient','Doctors','Diagnoses','Appointments','Notifications',
-  'Tasks','Documents','LabTests'];
+var tableFields=[  'Messages','Patient','Doctors','Diagnosis','Appointments','Notifications','Tasks','Documents','LabTests'];
 var exports=module.exports=function(type, parameters)
 {
   if(type=='Login')
