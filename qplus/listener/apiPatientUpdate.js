@@ -68,6 +68,8 @@ exports.refresh = function (requestObject) {
     if(parameters=='All'){
       sqlInterface.getPatientTableFields(UserId,timestamp).then(function(objectToFirebase){
         objectToFirebase=utility.resolveEmptyResponse(objectToFirebase);
+        console.log(objectToFirebase);
+
         r.resolve(objectToFirebase);
       }).catch(function(error){
         r.reject(error);
@@ -82,7 +84,9 @@ exports.refresh = function (requestObject) {
         }
         sqlInterface.getPatientTableFields(UserId, timestamp, parameters).then(function (rows) {
             objectToFirebase = rows;
+
             objectToFirebase=utility.resolveEmptyResponse(objectToFirebase);
+              console.log(objectToFirebase);
             r.resolve(objectToFirebase);
         },function(reason)
         {

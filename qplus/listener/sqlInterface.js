@@ -7,7 +7,7 @@ var CryptoJS=require('crypto-js');
 var buffer=require('buffer');
 
 
-/*
+
 var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
@@ -18,7 +18,7 @@ var sqlConfig={
 /*
 *Connecting to mysql database
 */
-
+/*
 var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
@@ -418,12 +418,10 @@ function LoadDocuments(rows)
   *@name LoadImages
   *@description  Uses the q module to make a promise to load images. The promise is resolved after all of them have been read from file system using the fs module. The code continues to run only if the promise is resolved.
   **/
-   console.log('Inside document fetching function');
-   console.log(rows);
     var imageCounter=0 ;
     var deferred = Q.defer();
     if (rows.length==0) { deferred.resolve('All images were loaded!'); }
-    for (var key = 0; key < rows.length; key++) 
+    for (var key = 0; key < rows.length; key++)
     {
 
       var n = rows[key].FinalFileName.lastIndexOf(".");
@@ -432,14 +430,12 @@ function LoadDocuments(rows)
       rows[key].Content=filesystem.readFileSync(__dirname+'/Documents/' + rows[key].FinalFileName,'base64',function(error,data){
         if(error) r.reject(error);
       });
-
+      console.log(rows[key].Content.length);
       imageCounter++;
-      //console.log('imagecounter is : ',imageCounter);
-      if (imageCounter == Object.keys(rows).length )
-       {
-         deferred.resolve(rows);
-       }
+      console.log('Image Counter ', imageCounter);
+      console.log(rows.length);
     }
+     deferred.resolve(rows);
     return deferred.promise;
 };
 

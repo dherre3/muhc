@@ -18,6 +18,8 @@ The handleDisconnect deals with that
 exports.resolveEmptyResponse=function(data)
 {
   var counter=0;
+  console.log('I am yoloing!!!');
+  console.log(data['Notifications']);
   for (var key in data) {
     if(data[key].length>0)
     {

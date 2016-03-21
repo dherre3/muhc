@@ -186,8 +186,6 @@ function resetPasswordError(requestKey,requestObject)
 }
 function uploadToFirebase(requestKey,encryptionKey,requestObject,object)
 {
-  console.log(requestKey);
-  console.log(requestObject);
   console.log('I am about to go to into encrypting');
   //console.log(request);
   object=utility.encryptObject(object,encryptionKey);
