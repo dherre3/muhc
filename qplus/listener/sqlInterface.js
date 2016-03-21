@@ -8,7 +8,7 @@ var buffer=require('buffer');
 
 
 
-/*var sqlConfig={
+var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
   password:'root',
@@ -19,7 +19,7 @@ var buffer=require('buffer');
 *Connecting to mysql database
 */
 
-var sqlConfig={
+/*var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,
@@ -53,38 +53,47 @@ exports.requestMappings=
 {
   'Patient':{
     sql:queries.patientTableFields(),
-    processFunction:loadProfileImagePatient
+    processFunction:loadProfileImagePatient,
+    numberOfLastUpdated:1
   },
   'Documents':
   {
     sql:queries.patientDocumentTableFields(),
-    processFunction:LoadDocuments
+    processFunction:LoadDocuments,
+    numberOfLastUpdated:2
   },
   'Doctors':{
     sql:queries.patientDoctorTableFields(),
-    processFunction:loadImageDoctor
+    processFunction:loadImageDoctor,
+    numberOfLastUpdated:2
   },
   'Diagnosis':{
-    sql:queries.patientDiagnosisTableFields()
+    sql:queries.patientDiagnosisTableFields(),
+    numberOfLastUpdated:1
   },
   'Messages':{
     sql:queries.patientMessageTableFields(),
-    processFunction:LoadAttachments
+    processFunction:LoadAttachments,
+    numberOfLastUpdated:1
   },
   'Appointments':
   {
-    sql:queries.patientAppointmentsTableFields()
+    sql:queries.patientAppointmentsTableFields(),
+    numberOfLastUpdated:2
   },
   'Notifications':
   {
-    sql:queries.patientNotificationsTableFields()
+    sql:queries.patientNotificationsTableFields(),
+    numberOfLastUpdated:2
   },
   'Tasks':
   {
-    sql:queries.patientTasksTableFields()
+    sql:queries.patientTasksTableFields(),
+    numberOfLastUpdated:2
   },
   'LabTests':{
-    sql:queries.patientTestResultsTableFields()
+    sql:queries.patientTestResultsTableFields(),
+    numberOfLastUpdated:1
   }
 };
 
@@ -168,8 +177,9 @@ function processSelectRequest(table, userId, timestamp)
     date=new Date(Number(timestamp));
     console.log(date);
   }
-
-  exports.runSqlQuery(requestMappingObject.sql, [userId,date],
+  var paramArray=[userId,date];
+  if(requestMappingObject.numberOfLastUpdated==2) paramArray.push(date);
+  exports.runSqlQuery(requestMappingObject.sql,paramArray,
     requestMappingObject.processFunction).then(function(rows)
     {
        r.resolve(rows);

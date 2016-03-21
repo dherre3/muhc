@@ -7,7 +7,7 @@ exports.patientTableFields=function()
 
 exports.patientDoctorTableFields=function()
 {
-  return "SELECT Doctor.FirstName, Doctor.LastName, Doctor.DoctorSerNum, PatientDoctor.PrimaryFlag, PatientDoctor.OncologistFlag, Doctor.Email,Doctor.Phone, Doctor.ProfileImage, Doctor.Address FROM Doctor, PatientDoctor, Patient, Users WHERE Users.Username Like ? AND Patient.PatientSerNum=Users.UserTypeSerNum AND PatientDoctor.PatientSerNum = Patient.PatientSerNum AND Doctor.DoctorSerNum = PatientDoctor.DoctorSerNum AND Doctor.LastUpdated > ?;"
+  return "SELECT Doctor.FirstName, Doctor.LastName, Doctor.DoctorSerNum, PatientDoctor.PrimaryFlag, PatientDoctor.OncologistFlag, Doctor.Email,Doctor.Phone, Doctor.ProfileImage, Doctor.Address FROM Doctor, PatientDoctor, Patient, Users WHERE Users.Username Like ? AND Patient.PatientSerNum=Users.UserTypeSerNum AND PatientDoctor.PatientSerNum = Patient.PatientSerNum AND Doctor.DoctorSerNum = PatientDoctor.DoctorSerNum AND (Doctor.LastUpdated > ? OR PatientDoctor.LastUpdated > ?);"
 }
 
 exports.patientDiagnosisTableFields=function()
@@ -22,22 +22,22 @@ exports.patientMessageTableFields=function()
 
 exports.patientAppointmentsTableFields=function()
 {
-  return "SELECT Alias.AliasName_EN AS AppointmentType_EN, Alias.AliasName_FR AS AppointmentType_FR, Alias.AliasDescription_EN AS AppointmentDescription_EN, Alias.AliasDescription_FR AS AppointmentDescription_FR, Appointment.ScheduledStartTime, Appointment.AppointmentSerNum, Appointment.ScheduledEndTime,Appointment.Location, Appointment.Checkin,Appointment.Checkin, Appointment.Checkin, Appointment.ReadStatus, Appointment.ChangeRequest, Resource.ResourceName, HospitalMap.MapUrl,HospitalMap.MapName_EN,HospitalMap.MapName_FR,HospitalMap.MapDescription_EN,HospitalMap.MapDescription_FR FROM Appointment, AliasExpression, Alias,Resource, Patient, HospitalMap, Users WHERE HospitalMap.HospitalMapSerNum = Appointment.Location AND Resource.ResourceSerNum = Appointment.ResourceSerNum AND Patient.PatientSerNum = Appointment.PatientSerNum AND AliasExpression.AliasExpressionSerNum=Appointment.AliasExpressionSerNum AND AliasExpression.AliasSerNum=Alias.AliasSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND Appointment.LastUpdated > ?;";
+  return "SELECT Alias.AliasName_EN AS AppointmentType_EN, Alias.AliasName_FR AS AppointmentType_FR, Alias.AliasDescription_EN AS AppointmentDescription_EN, Alias.AliasDescription_FR AS AppointmentDescription_FR, Appointment.ScheduledStartTime, Appointment.AppointmentSerNum, Appointment.ScheduledEndTime,Appointment.Location, Appointment.Checkin,Appointment.Checkin, Appointment.Checkin, Appointment.ReadStatus, Appointment.ChangeRequest, Resource.ResourceName, HospitalMap.MapUrl,HospitalMap.MapName_EN,HospitalMap.MapName_FR,HospitalMap.MapDescription_EN,HospitalMap.MapDescription_FR FROM Appointment, AliasExpression, Alias,Resource, Patient, HospitalMap, Users WHERE HospitalMap.HospitalMapSerNum = Appointment.Location AND Resource.ResourceSerNum = Appointment.ResourceSerNum AND Patient.PatientSerNum = Appointment.PatientSerNum AND AliasExpression.AliasExpressionSerNum=Appointment.AliasExpressionSerNum AND AliasExpression.AliasSerNum=Alias.AliasSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND (Appointment.LastUpdated > ? OR Alias.LastUpdated > ?);";
 }
 
 exports.patientDocumentTableFields=function()
 {
-  return "SELECT Document.FinalFileName, Alias.AliasName_EN, Alias.AliasName_FR, Document.ReadStatus, Alias.AliasDescription_EN, Alias.AliasDescription_FR, Document.DocumentSerNum, Document.DateAdded FROM Document, Patient, Alias, AliasExpression, Users WHERE Document.AliasExpressionSerNum=AliasExpression.AliasExpressionSerNum AND Document.ValidEntry='Y' AND AliasExpression.AliasSerNum=Alias.AliasSerNum AND Patient.PatientSerNum=Document.PatientSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND Document.LastUpdated > ?;";
+  return "SELECT Document.FinalFileName, Alias.AliasName_EN, Alias.AliasName_FR, Document.ReadStatus, Alias.AliasDescription_EN, Alias.AliasDescription_FR, Document.DocumentSerNum, Document.DateAdded FROM Document, Patient, Alias, AliasExpression, Users WHERE Document.AliasExpressionSerNum=AliasExpression.AliasExpressionSerNum AND Document.ValidEntry='Y' AND AliasExpression.AliasSerNum=Alias.AliasSerNum AND Patient.PatientSerNum=Document.PatientSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND (Document.LastUpdated > ? OR Alias.LastUpdated > ?);";
 }
 
 exports.patientNotificationsTableFields=function()
 {
-  return "SELECT Notifications.NotificationSerNum, Notifications.Type, Notifications.TypeSerNum, Notifications.AliasSerNum, Notifications.ReadStatus, Notifications.DateAdded, Alias.AliasName_FR, Alias.AliasDescription_EN, Alias.AliasName_EN, Alias.AliasDescription_FR FROM Notifications, Patient, Users,Alias WHERE Alias.AliasSerNum = Notifications.AliasSerNum AND Patient.PatientSerNum = Notifications.PatientSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND Notifications.LastUpdated > ?;";
+  return "SELECT Notifications.NotificationSerNum, Notifications.Type, Notifications.TypeSerNum, Notifications.AliasSerNum, Notifications.ReadStatus, Notifications.DateAdded, Alias.AliasName_FR, Alias.AliasDescription_EN, Alias.AliasName_EN, Alias.AliasDescription_FR FROM Notifications, Patient, Users,Alias WHERE Alias.AliasSerNum = Notifications.AliasSerNum AND Patient.PatientSerNum = Notifications.PatientSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND (Notifications.LastUpdated > ? OR Alias.LastUpdated > ?);";
 }
 
 exports.patientTasksTableFields=function()
 {
-  return "SELECT Alias.AliasName_EN AS TaskName_EN,Alias.AliasName_FR AS TaskName_FR,Alias.AliasDescription_EN AS TaskDescription_EN,Alias.AliasDescription_FR AS TaskDescription_FR,Task.DueDateTime FROM Task,Alias,AliasExpression,Patient,Users WHERE Patient.PatientSerNum = Task.PatientSerNum AND AliasExpression.AliasExpressionSerNum =Task.AliasExpressionSerNum AND AliasExpression.AliasSerNum = Alias.AliasSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND Task.LastUpdated > ?;";
+  return "SELECT Alias.AliasName_EN AS TaskName_EN,Alias.AliasName_FR AS TaskName_FR,Alias.AliasDescription_EN AS TaskDescription_EN,Alias.AliasDescription_FR AS TaskDescription_FR,Task.DueDateTime FROM Task,Alias,AliasExpression,Patient,Users WHERE Patient.PatientSerNum = Task.PatientSerNum AND AliasExpression.AliasExpressionSerNum =Task.AliasExpressionSerNum AND AliasExpression.AliasSerNum = Alias.AliasSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND (Task.LastUpdated > ? OR Alias.LastUpdated > ?);";
 }
 exports.patientTestResultsTableFields=function()
 {
