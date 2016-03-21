@@ -2,11 +2,17 @@ var credentials=require('./credentials.js');
 var sqlInterface=require('./sqlInterface.js');
 var queries=require('./queries.js');
 var Firebase    =require('firebase');
-var q=require('Q');
+//var q=require('Q');
 
 
 
-
+sqlInterface.runSqlQuery("SELECT Document.FinalFileName, Alias.AliasName_EN, Alias.AliasName_FR, Document.ReadStatus, Alias.AliasDescription_EN, Alias.AliasDescription_FR, Document.DocumentSerNum, Document.DateAdded FROM Document, Patient, Alias, AliasExpression, Users WHERE Document.AliasExpressionSerNum=AliasExpression.AliasExpressionSerNum AND Document.ValidEntry='Y' AND AliasExpression.AliasSerNum=Alias.AliasSerNum AND Patient.PatientSerNum=Document.PatientSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND (Document.LastUpdated > ? OR Alias.LastUpdated > ?);"
+,[ 'ac6eaeaa-f725-4b07-bdc0-72faef725985',
+  new Date('Mon Mar 21 2016 11:14:18 GMT-0400 (EDT)'),
+  new Date('Mon Mar 21 2016 11:14:18 GMT-0400 (EDT)') ]
+).then(function(res){
+  console.log(res);
+})
 /*sqlInterface.getPatientTableFields('ac6eaeaa-f725-4b07-bdc0-72faef725985','2015-12-14 11:16:16',['Patient','Documents']).then(function(result){
   console.log(result);
 });

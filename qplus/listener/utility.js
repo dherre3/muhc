@@ -17,14 +17,19 @@ The handleDisconnect deals with that
 
 exports.resolveEmptyResponse=function(data)
 {
+  var counter=0;
   for (var key in data) {
     if(data[key].length>0)
+    {
+      counter++;
+    }
+  }
+  if(counter>0)
     {
       return data;
     }else{
       return {Response:'No Results'};
     }
-  }
 }
 
 exports.toMYSQLString=function(date)
