@@ -48,13 +48,23 @@ exports.accountChange = function (requestObject) {
         r.reject('Invalid');
     } else {
         sqlInterface.updateAccountField(requestObject).then(function (requestObject) {
-          r.resolve(requestObject);
+          r.resolve('Hospital Request Proccessed');
         }).catch(function(error){
           r.reject(error);
         });
     }
     return r.promise;
 };
+exports.updateReadStatus=function(requestObject)
+{
+  var r=Q.defer();
+  sqlInterface.updateReadStatus(requestObject.UserID,requestObject.Parameters).then(function(result)
+  {
+    r.resolve('Hospital Request Proccessed');
+  }).catch(function(error){
+    r.reject(error);
+  });
+}
 exports.checkIn = function (requestObject) {
     var r = Q.defer();
     if (!validate('Hospital Request Proccessed')) {
@@ -62,7 +72,7 @@ exports.checkIn = function (requestObject) {
     } else {
         sqlInterface.checkIn(requestObject).then(function (requestObject) {
           //sqlInterface.addToActivityLog(requestObject);
-          r.resolve(requestObject);
+          r.resolve('Hospital Request Proccessed');
         });
     }
     return r.promise;

@@ -4,15 +4,24 @@ var queries=require('./queries.js');
 var Firebase    =require('firebase');
 //var q=require('Q');
 
+sqlInterface.updateReadStatus('ac6eaeaa-f725-4b07-bdc0-72faef725985',{Field:'TxTeamMessages',Id:'2'}).then(function(result)
+{
+  console.log(result);
+}).catch(function(error)
+{
+  console.log(error);
+})
 
-
-sqlInterface.runSqlQuery("SELECT Document.FinalFileName, Alias.AliasName_EN, Alias.AliasName_FR, Document.ReadStatus, Alias.AliasDescription_EN, Alias.AliasDescription_FR, Document.DocumentSerNum, Document.DateAdded FROM Document, Patient, Alias, AliasExpression, Users WHERE Document.AliasExpressionSerNum=AliasExpression.AliasExpressionSerNum AND Document.ValidEntry='Y' AND AliasExpression.AliasSerNum=Alias.AliasSerNum AND Patient.PatientSerNum=Document.PatientSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND (Document.LastUpdated > ? OR Alias.LastUpdated > ?);"
-,[ 'ac6eaeaa-f725-4b07-bdc0-72faef725985',
-  new Date('Mon Mar 21 2016 11:14:18 GMT-0400 (EDT)'),
-  new Date('Mon Mar 21 2016 11:14:18 GMT-0400 (EDT)') ]
+/*sqlInterface.runSqlQuery("SELECT Records.RecordSerNum, Records.DateAdded, Records.ReadStatus, EduMat.EducationalMaterialSerNum, EduMat.EducationalMaterialType_EN, EduMat.EducationalMaterialType_FR, EduMat.Name_EN, EduMat.Name_FR, EduMat.URL_EN, EduMat.URL_FR, EduMat.PhaseInTreatment, EduMat.DateAdded FROM EducationalMaterialTOC as TOC, Records as Records, EducationalMaterial  as EduMat, Patient WHERE EduMat.EducationalMaterialSerNum=Records.EducationalMaterialSerNum AND TOC.EducationalMaterialSerNum=EduMat.EducationalMaterialSerNum AND Patient.PatientSerNum = Records.PatientSerNum AND Patient.PatientSerNum=Users.UserTypeSerNum AND Users.Username = 'ac6eaeaa-f725-4b07-bdc0-72faef725985'  AND (EduMat.LastUpdated > ? OR Records.LastUpdated > ? OR TOC.LastUpdated > ?);",
+[ 'ac6eaeaa-f725-4b07-bdc0-72faef725985',
+  new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'),
+  new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'),
+  new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)')]
 ).then(function(res){
   console.log(res);
-})
+})*/
+
+
 /*sqlInterface.getPatientTableFields('ac6eaeaa-f725-4b07-bdc0-72faef725985','2015-12-14 11:16:16',['Patient','Documents']).then(function(result){
   console.log(result);
 });

@@ -34,7 +34,22 @@ exports.patientNotificationsTableFields=function()
 {
   return "SELECT Notifications.NotificationSerNum, Notifications.Type, Notifications.TypeSerNum, Notifications.AliasSerNum, Notifications.ReadStatus, Notifications.DateAdded, Alias.AliasName_FR, Alias.AliasDescription_EN, Alias.AliasName_EN, Alias.AliasDescription_FR FROM Notifications, Patient, Users,Alias WHERE Alias.AliasSerNum = Notifications.AliasSerNum AND Patient.PatientSerNum = Notifications.PatientSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND (Notifications.LastUpdated > ? OR Alias.LastUpdated > ?);";
 }
-
+exports.patientTeamMessagesTableFields=function()
+{
+  return "SELECT TxRecords.RecordSerNum, TxRecords.DateAdded, TxRecords.ReadStatus, Post.PostType, Post.Body_EN, Post.Body_FR, Post.PostName_EN, Post.PostName_FR FROM Post, TxTeamMessageRecords as TxRecords, Patient, Users WHERE Post.PostSerNum=TxRecords.PostSerNum AND TxRecords.PatientSerNum=Patient.PatientSerNum AND Patient.PatientSerNum=Users.UserTypeSerNum AND Users.Username= ? AND (TxRecords.LastUpdated > ? OR Post.LastUpdated > ?);"
+}
+exports.patientAnnouncementsTableFields=function()
+{
+  return "SELECT Announcement.RecordSerNum, Announcement.DateAdded, Announcement.ReadStatus, Post.PostType, Post.Body_EN, Post.Body_FR, Post.PostName_EN, Post.PostName_FR FROM Post, AnnouncementRecords as Announcement, Users, Patient WHERE Post.PostSerNum=Announcement.PostSerNum AND Announcement.PatientSerNum=Patient.PatientSerNum AND Patient.PatientSerNum=Users.UserTypeSerNum AND Users.Username= ? AND (Announcement.LastUpdated > ? OR Post.LastUpdated > ?);";
+}
+exports.patientEducationalMaterialTableFields=function()
+{
+  return "SELECT Records.RecordSerNum, Records.DateAdded, Records.ReadStatus, EduMat.EducationalMaterialSerNum, EduMat.EducationalMaterialType_EN, EduMat.EducationalMaterialType_FR, EduMat.Name_EN, EduMat.Name_FR, EduMat.URL_EN, EduMat.URL_FR, EduMat.PhaseInTreatment, EduMat.DateAdded FROM EducationalMaterialTOC as TOC, EducationalMaterialRecords as Records, EducationalMaterial  as EduMat, Patient, Users WHERE EduMat.EducationalMaterialSerNum=Records.EducationalMaterialSerNum AND TOC.EducationalMaterialSerNum=EduMat.EducationalMaterialSerNum AND Patient.PatientSerNum = Records.PatientSerNum AND Patient.PatientSerNum=Users.UserTypeSerNum AND Users.Username = ?  AND (EduMat.LastUpdated > ? OR Records.LastUpdated > ? OR TOC.LastUpdated > ?);";
+}
+exports.patientEducationalMaterialContents=function()
+{
+  return "SELECT OrderNum, Name_EN, Name_FR, URL_EN, URL_FR, DateAdded FROM EducationalMaterialTOC WHERE EducationalMaterialSerNum = ? ORDER BY EducationalMaterialSerNum, OrderNum;";
+}
 exports.patientTasksTableFields=function()
 {
   return "SELECT Alias.AliasName_EN AS TaskName_EN,Alias.AliasName_FR AS TaskName_FR,Alias.AliasDescription_EN AS TaskDescription_EN,Alias.AliasDescription_FR AS TaskDescription_FR,Task.DueDateTime FROM Task,Alias,AliasExpression,Patient,Users WHERE Patient.PatientSerNum = Task.PatientSerNum AND AliasExpression.AliasExpressionSerNum =Task.AliasExpressionSerNum AND AliasExpression.AliasSerNum = Alias.AliasSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND (Task.LastUpdated > ? OR Alias.LastUpdated > ?);";
@@ -58,6 +73,7 @@ exports.readMessage=function(MessageSerNum,token)
 {
   return "UPDATE `Messages` SET ReadStatus=1, SessionId='"+token+"' WHERE Messages.MessageSerNum='"+MessageSerNum+"'";
 }
+
 exports.checkin=function(AppointmentSerNum,token)
 {
   return "UPDATE Appointment SET Checkin=1, SessionId='"+token+"' WHERE Appointment.Checkin=0 AND Appointment.AppointmentSerNum='"+AppointmentSerNum+"'";
@@ -122,6 +138,10 @@ exports.getMapLocation=function(qrCode)
 exports.changeReadStatus=function(table, patientSerNum)
 {
   return "UPDATE '"+table+"' SET ReadStatus=1 WHERE PatientSerNum="+patientSerNum;
+}
+exports.updateReadStatus=function()
+{
+  return "UPDATE ?? , Patient, Users SET ReadStatus = 0 WHERE ?? = ? AND Patient.PatientSerNum = ?? AND Patient.PatientSerNum = Users.UserTypeSerNum AND Users.Username = ?;";
 }
 exports.getPatientDeviceLastActivity=function(userid,device)
 {

@@ -60,7 +60,9 @@ exports.requestMappings=
   {
     sql:queries.patientDocumentTableFields(),
     processFunction:LoadDocuments,
-    numberOfLastUpdated:2
+    numberOfLastUpdated:2,
+    table:'Document',
+    serNum:'DocumentSerNum'
   },
   'Doctors':{
     sql:queries.patientDoctorTableFields(),
@@ -74,7 +76,9 @@ exports.requestMappings=
   'Messages':{
     sql:queries.patientMessageTableFields(),
     processFunction:LoadAttachments,
-    numberOfLastUpdated:1
+    numberOfLastUpdated:1,
+    table:'Messages',
+    serNum:'MessagesSerNum'
   },
   'Appointments':
   {
@@ -84,7 +88,9 @@ exports.requestMappings=
   'Notifications':
   {
     sql:queries.patientNotificationsTableFields(),
-    numberOfLastUpdated:2
+    numberOfLastUpdated:2,
+    table:'Notifications',
+    serNum:'NotificationSerNum'
   },
   'Tasks':
   {
@@ -94,16 +100,36 @@ exports.requestMappings=
   'LabTests':{
     sql:queries.patientTestResultsTableFields(),
     numberOfLastUpdated:1
+  },
+  'TxTeamMessages':{
+    sql:queries.patientTeamMessagesTableFields(),
+    numberOfLastUpdated:2,
+    table:'TxTeamMessageRecords',
+    serNum:'RecordSerNum'
+  },
+  'EducationalMaterial':{
+    sql:queries.patientEducationalMaterialTableFields(),
+    processFunction:getEducationalMaterialTableOfContents,
+    numberOfLastUpdated:3,
+    table:'EducationalMaterialRecords',
+    serNum:'RecordSerNum'
+  },
+  'Announcements':{
+    sql:queries.patientAnnouncementsTableFields(),
+    numberOfLastUpdated:2,
+    table:'AnnouncementRecords',
+    serNum:'RecordSerNum'
   }
 };
-
 //Query processing function
 exports.runSqlQuery=function(query, parameters, processRawFunction)
 {
   var r=Q.defer();
-  console.log(query);
   console.log(parameters);
-  connection.query(query, parameters, function(err,rows,fields){
+
+  var querVal=connection.query(query, parameters, function(err,rows,fields){
+    console.log(query);
+    console.log(parameters);
     if (err) r.reject(err);
     if(typeof rows[0] !=='undefined')
     {
@@ -121,6 +147,8 @@ exports.runSqlQuery=function(query, parameters, processRawFunction)
       r.resolve([]);
     }
   });
+  console.log(querVal);
+
   return r.promise;
 }
 
@@ -178,7 +206,11 @@ function processSelectRequest(table, userId, timestamp)
     console.log(date);
   }
   var paramArray=[userId,date];
-  if(requestMappingObject.numberOfLastUpdated==2) paramArray.push(date);
+  if(requestMappingObject.numberOfLastUpdated>1){
+    for (var i = 1; i < requestMappingObject.numberOfLastUpdated; i++) {
+      paramArray.push(date);
+    }
+  }
   exports.runSqlQuery(requestMappingObject.sql,paramArray,
     requestMappingObject.processFunction).then(function(rows)
     {
@@ -207,7 +239,24 @@ function preparePromiseArrayFields(userId,timestamp,arrayTables)
   }
   return array;
 }
-
+//Update read status for a table
+exports.updateReadStatus=function(userId, parameters)
+{
+  var r= Q.defer();
+  table=exports.requestMappings[parameters.Field]['table'];
+  tableSerNum=exports.requestMappings[parameters.Field]['serNum'];
+  id=parameters.Id;
+  var query=connection.query(queries.updateReadStatus(),[table, tableSerNum, id, table+'.PatientSerNum', userId],
+  function(err,results){
+    if(err) {
+      r.reject(err);
+    }else{
+      r.resolve(results);
+    }
+  });
+  console.log(query.sql);
+  return r.promise;
+}
 
 //Api call to insert a message into messages table
 exports.sendMessage=function(requestObject)
@@ -423,7 +472,7 @@ function LoadDocuments(rows)
     var imageCounter=0 ;
     var deferred = Q.defer();
     if (rows.length==0) { deferred.resolve('All images were loaded!'); }
-    for (var key = 0; key < rows.length; key++) 
+    for (var key = 0; key < rows.length; key++)
     {
 
       var n = rows[key].FinalFileName.lastIndexOf(".");
@@ -483,7 +532,27 @@ function loadProfileImagePatient(rows){
 
   return deferred.promise;
 }
-
+function getEducationalMaterialTableOfContents(rows)
+{
+  var r = Q.defer();
+  if(rows.length>0)
+  {
+    var array=[];
+    for (var i = 0; i < rows.length; i++) {
+      array.push(connection.query(queries.patientEducationalMaterialContents(), [rows[i].EducationalMaterialSerNum]));
+    }
+    Q.all(array).then(function(results)
+    {
+      for (var i = 0; i < results.length; i++) {
+        rows[i].TableContents=results[i];
+      }
+      r.resolve(rows);
+    });
+  }else{
+    r.resolve(rows);
+  }
+  return r.promise;
+}
 var LoadAttachments = function (rows )
 {
   /**

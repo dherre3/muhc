@@ -88,6 +88,14 @@ exports.processRequest=function(requestObject)
     {
       r.reject(response);
     });
+  }else if(type=='Read')
+  {
+    apiHospitalUpdate.updateReadStatus(requestObject).then(function(response)
+    {
+      r.resolve(response);
+    }).catch(function(response){
+      r.reject(response);
+    });
   }else if(type=='Message')
   {
     console.log('I am about the send a message');
