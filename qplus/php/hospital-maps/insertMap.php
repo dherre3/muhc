@@ -4,6 +4,7 @@
 	$array=array();
 	if ( isset($_POST["MapAliasName"]) && isset($_POST["MapName_EN"])&&isset($_POST["MapName_FR"])&&isset($_POST["MapDescription_EN"])&&isset($_POST["MapDescription_FR"])&&isset($_POST["MapUrl"]))
 	{
+		//$path to save image
 		$path = 'qrCodes/'.$_POST['MapAliasName'].'.png';
 		
 		if(!file_exists($path))
