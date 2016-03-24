@@ -32,7 +32,7 @@ exports.patientDocumentTableFields=function()
 
 exports.patientNotificationsTableFields=function()
 {
-  return "SELECT Notifications.NotificationSerNum, Notifications.Type, Notifications.TypeSerNum, Notifications.AliasSerNum, Notifications.ReadStatus, Notifications.DateAdded, Alias.AliasName_FR, Alias.AliasDescription_EN, Alias.AliasName_EN, Alias.AliasDescription_FR FROM Notifications, Patient, Users,Alias WHERE Alias.AliasSerNum = Notifications.AliasSerNum AND Patient.PatientSerNum = Notifications.PatientSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND (Notifications.LastUpdated > ? OR Alias.LastUpdated > ?);";
+  return "SELECT NotificationRecords.NotificationSerNum, NotificationRecords.DateAdded, NotificationRecords.ReadStatus, NotificationRecords.NotificationCount, Notification.NotificationType, Notification.Name_EN, Notification.Name_FR, Notification.Description_EN, Notification.Description_FR FROM NotificationRecords, Notification, Patient, Users WHERE Notification.NotificationSerNum=NotificationRecords.NotificationSerNum AND NotificationRecords.PatientSerNum=Patient.PatientSerNum AND Patient.PatientSerNum=Users.UserTypeSerNum AND Users.Username= ? AND (NotificationRecords.LastUpdated > ? OR Notification.LastUpdated > ?);"
 }
 exports.patientTeamMessagesTableFields=function()
 {

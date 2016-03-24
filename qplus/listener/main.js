@@ -191,14 +191,9 @@ function uploadToFirebase(requestKey,encryptionKey,requestObject,object)
   object=utility.encryptObject(object,encryptionKey);
   //console.log(object);
   var request=uploadSection(requestObject);
-
-  if(requestObject.Request=='Login'||requestObject.Request=='Resume'||requestObject.Request=='All')
-  {
-    console.log(requestObject);
-    request='All';
-  }
   var deviceId=requestObject.DeviceId;
   var UserID=requestObject.UserID;
+  console.log(request);
   var userFieldsPath='Users/'+UserID+'/'+deviceId+'/'+request;
   console.log(userFieldsPath);
   object.Timestamp=Firebase.ServerValue.TIMESTAMP;
@@ -226,6 +221,8 @@ function uploadSection(requestObject)
   }else if((requestObject.Request=='Refresh'&&requestObject.Parameters instanceof Array)){
     return 'ArrayFields';
   }else if(requestObject.Request=='Refresh'){
-    return requestObject.Parameters;
+    return 'Field';
+  }else{
+    return 'Field';
   }
 }

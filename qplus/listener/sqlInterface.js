@@ -127,9 +127,10 @@ exports.runSqlQuery=function(query, parameters, processRawFunction)
   var r=Q.defer();
   console.log(parameters);
 
-  var querVal=connection.query(query, parameters, function(err,rows,fields){
+  connection.query(query, parameters, function(err,rows,fields){
     console.log(query);
     console.log(parameters);
+    console.log(err);
     if (err) r.reject(err);
     if(typeof rows[0] !=='undefined')
     {
@@ -147,8 +148,6 @@ exports.runSqlQuery=function(query, parameters, processRawFunction)
       r.resolve([]);
     }
   });
-  console.log(querVal);
-
   return r.promise;
 }
 
