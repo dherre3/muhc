@@ -538,7 +538,7 @@ function getEducationalMaterialTableOfContents(rows)
   {
     var array=[];
     for (var i = 0; i < rows.length; i++) {
-      array.push(connection.query(queries.patientEducationalMaterialContents(), [rows[i].EducationalMaterialSerNum]));
+      array.push(exports.runSqlQuery(queries.patientEducationalMaterialContents(), [rows[i].EducationalMaterialSerNum]));
     }
     Q.all(array).then(function(results)
     {
