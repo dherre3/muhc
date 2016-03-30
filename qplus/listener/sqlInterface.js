@@ -7,7 +7,7 @@ var CryptoJS=require('crypto-js');
 var buffer=require('buffer');
 
 
-
+/*
 var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
@@ -18,7 +18,7 @@ var sqlConfig={
 /*
 *Connecting to mysql database
 */
-/*
+
 var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
@@ -83,7 +83,9 @@ exports.requestMappings=
   'Appointments':
   {
     sql:queries.patientAppointmentsTableFields(),
-    numberOfLastUpdated:2
+    numberOfLastUpdated:2,
+    table:'Appointments',
+    serNum:'MessagesSerNum'
   },
   'Notifications':
   {
