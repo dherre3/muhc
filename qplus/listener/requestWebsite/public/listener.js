@@ -63,12 +63,6 @@ ref.child('Users').on('value',function(snapshot){
     object=encryptObject(object,encryptionKey);
     //console.log(object);
     var request=uploadSection(requestObject);
-
-    if(requestObject.Request=='Login'||requestObject.Request=='Resume'||requestObject.Request=='All')
-    {
-      console.log(requestObject);
-      request='All';
-    }
     var deviceId=requestObject.DeviceId;
     var UserID=requestObject.UserID;
     var userFieldsPath='Users/'+UserID+'/'+deviceId+'/'+request;
@@ -81,7 +75,7 @@ ref.child('Users').on('value',function(snapshot){
       //logRequest(requestObject);
     });
   }
-  
+
   function uploadSection(requestObject)
   {
     if(requestObject.Request=='Login'||requestObject.Request=='Resume'||requestObject.Request=='All'||(requestObject.Request=='Refresh'&&requestObject.Parameters=='All'))
@@ -91,10 +85,11 @@ ref.child('Users').on('value',function(snapshot){
     }else if((requestObject.Request=='Refresh'&&requestObject.Parameters instanceof Array)){
       return 'ArrayFields';
     }else if(requestObject.Request=='Refresh'){
-      return requestObject.Parameters;
+      return 'Field';
+    }else{
+      return 'Field';
     }
   }
-
   function resetPasswordError(requestKey,requestObject)
   {
     var response={};
