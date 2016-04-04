@@ -74,7 +74,10 @@ exports.readMessage=function(MessageSerNum,token)
 {
   return "UPDATE `Messages` SET ReadStatus=1, SessionId='"+token+"' WHERE Messages.MessageSerNum='"+MessageSerNum+"'";
 }
-
+exports.getCheckinFieldsQuery=function()
+{
+  return "SELECT Appointment.AppointmentAriaSer FROM Patient, Users, Appointment WHERE Users.Username = ? AND Appointment.AppointmentSerNum = ? AND Patient.PatientSerNum = Users.UserTypeSerNum ";
+}
 exports.checkin=function(AppointmentSerNum,token)
 {
   return "UPDATE Appointment SET Checkin=1, SessionId='"+token+"' WHERE Appointment.Checkin=0 AND Appointment.AppointmentSerNum='"+AppointmentSerNum+"'";

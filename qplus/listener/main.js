@@ -7,6 +7,7 @@ var sqlInterface=require('./sqlInterface.js');
 var resetPasswordApi=require('./resetPassword.js');
 var CryptoJS=require('crypto-js');
 var q=require('q');
+var timeEstimate = require('./timeEstimate.js');
 var api=require('./api.js');
 var processApiRequest=require('./processApiRequest.js');
 var ref=new Firebase(credentials.FIREBASE_URL);
@@ -204,6 +205,8 @@ function uploadToFirebase(requestKey,encryptionKey,requestObject,object)
     //logRequest(requestObject);
   });
 }
+
+
 function completeRequest(requestKey, requestObject, invalid)
 {
 

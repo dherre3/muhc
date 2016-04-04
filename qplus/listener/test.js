@@ -5,9 +5,49 @@ var Firebase    =require('firebase');
 var CryptoJS = require('crypto-js');
 var utility = require('./utility.js');
 var http = require('http');
+var timeEstimate = require('../../../ackeem/waitingTimeEstimator.js');
 
-//The url we want is: 'www.random.org/integers/?num=1&min=1&max=10&col=1&base=10&format=plain&rnd=new'
-var options = {
+
+var requestObject = {
+  UserID:'ac6eaeaa-f725-4b07-bdc0-72faef725985',
+  AppointmentSerNum:'13',
+  DeviceId:'browser'
+};
+var ref=new Firebase(credentials.FIREBASE_URL);
+ref.auth(credentials.FIREBASE_SECRET);
+getCheckinEstimate(requestObject);
+function getCheckinEstimate(requestObject)
+{
+  var serNum = requestObject.AppointmentSerNum;
+  sqlInterface.runSqlQuery(queries.getCheckinFieldsQuery(),[requestObject.UserID,serNum]).then(function(result)
+  {
+    result = result[0];
+    console.log(result);
+    var deviceId=requestObject.DeviceId;
+    var UserID=requestObject.UserID;
+    var userFieldsPath='Users/'+UserID+'/'+deviceId+'/'+'Checkin';
+    var interval = setInterval(function(){
+      timeEstimate.getEstimate(result.AppointmentAriaSer).then(function(result)
+      {
+        console.log('Estimate:', result);
+        if(typeof result == 'string'&& result =='Closed')
+        {
+          clearInterval(interval);
+        }else{
+          ref.child(userFieldsPath).update(result,function(){
+            console.log('I just finished writing to firebase');
+
+          });
+        }
+      });
+    },2000)
+
+  });
+}
+
+
+
+/*var options = {
     host: 'localhost',
     port: 8888,
     path: '/muhc/qplus/php/try.php',
@@ -25,7 +65,7 @@ var x = http.request(options,function(res){
     });
 });
 
-x.end();
+x.end();*/
 //var q=require('Q');
 
 /*sqlInterface.runSqlQuery(sqlInterface.requestMappings['EducationalMaterial'].sql, [ 'ac6eaeaa-f725-4b07-bdc0-72faef725985', new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'), new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'),new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'), new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'),new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)')], sqlInterface.requestMappings['EducationalMaterial'].processFunction).then(
