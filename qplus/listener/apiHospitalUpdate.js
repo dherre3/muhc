@@ -64,6 +64,7 @@ exports.updateReadStatus=function(requestObject)
   }).catch(function(error){
     r.reject(error);
   });
+  return r.promise;
 }
 exports.checkIn = function (requestObject) {
     var r = Q.defer();

@@ -1,13 +1,14 @@
 var mysql       = require('mysql');
 var filesystem  =require('fs');
 var Q           =require('q');
+var utility = require('./utility.js')
 var queries=require('./queries.js');
 var credentials=require('./credentials.js');
 var CryptoJS=require('crypto-js');
 var buffer=require('buffer');
 
 
-/*
+
 var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
@@ -18,7 +19,7 @@ var sqlConfig={
 /*
 *Connecting to mysql database
 */
-
+/*
 var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
@@ -83,15 +84,15 @@ exports.requestMappings=
   'Appointments':
   {
     sql:queries.patientAppointmentsTableFields(),
-    numberOfLastUpdated:2,
-    table:'Appointments',
+    numberOfLastUpdated:5,
+    table:'Appointment',
     serNum:'MessagesSerNum'
   },
   'Notifications':
   {
     sql:queries.patientNotificationsTableFields(),
     numberOfLastUpdated:2,
-    table:'Notifications',
+    table:'Notification',
     serNum:'NotificationSerNum'
   },
   'Tasks':
@@ -106,21 +107,21 @@ exports.requestMappings=
   'TxTeamMessages':{
     sql:queries.patientTeamMessagesTableFields(),
     numberOfLastUpdated:2,
-    table:'TxTeamMessageRecords',
-    serNum:'RecordSerNum'
+    table:'TxTeamMessage',
+    serNum:'TxTeamMessageSerNum'
   },
   'EducationalMaterial':{
     sql:queries.patientEducationalMaterialTableFields(),
-    processFunction:getEducationalMaterialTableOfContents,
-    numberOfLastUpdated:3,
-    table:'EducationalMaterialRecords',
-    serNum:'RecordSerNum'
+    processFunction:getEducationTableOfContents,
+    numberOfLastUpdated:5,
+    table:'EducationalMaterial',
+    serNum:'EducationalMaterialSerNum'
   },
   'Announcements':{
     sql:queries.patientAnnouncementsTableFields(),
     numberOfLastUpdated:2,
-    table:'AnnouncementRecords',
-    serNum:'RecordSerNum'
+    table:'Announcement',
+    serNum:'AnnouncementSerNum'
   }
 };
 //Query processing function
@@ -247,13 +248,11 @@ exports.updateReadStatus=function(userId, parameters)
   table=exports.requestMappings[parameters.Field]['table'];
   tableSerNum=exports.requestMappings[parameters.Field]['serNum'];
   id=parameters.Id;
-  var query=connection.query(queries.updateReadStatus(),[table, tableSerNum, id, table+'.PatientSerNum', userId],
-  function(err,results){
-    if(err) {
-      r.reject(err);
-    }else{
-      r.resolve(results);
-    }
+  console.log('Affected Id', id);
+  var query=connection.query(queries.updateReadStatus(),[table,table, tableSerNum, id, table, 'PatientSerNum', userId],
+  function(err,rows,fields){
+    if(err) r.reject(err);
+    r.resolve(rows);
   });
   console.log(query.sql);
   return r.promise;
@@ -540,7 +539,7 @@ function getEducationalMaterialTableOfContents(rows)
   {
     var array=[];
     for (var i = 0; i < rows.length; i++) {
-      array.push(exports.runSqlQuery(queries.patientEducationalMaterialContents(), [rows[i].EducationalMaterialSerNum]));
+      array.push(exports.runSqlQuery(queries.patientEducationalMaterialContents(), [rows[i].EducationalMaterialControlSerNum]));
     }
     Q.all(array).then(function(results)
     {
@@ -554,6 +553,48 @@ function getEducationalMaterialTableOfContents(rows)
   }
   return r.promise;
 }
+function getEducationTableOfContents(rows)
+{
+  var r = Q.defer();
+  var indexes = [];
+  var promises =[];
+  for (var i = rows.length-1; i >= 0; i--) {
+    if(!rows[i].URL_EN || typeof rows[i].URL_EN=='undefined'|| rows[i].URL_EN.length ==0)
+    {
+      var array=[];
+      for (var j = rows.length-1; j >= 0; j--) {
+        if(rows[j].EducationalMaterialSerNum == rows[i].EducationalMaterialSerNum && rows[j].EducationalMaterialControlSerNum !== rows[i].EducationalMaterialControlSerNum)
+        {
+          indexes.push(j);
+        }
+      }
+    }
+  }
+  for (var i = 0; i < indexes.length; i++) {
+    rows.splice(indexes[i],1);
+  }
+  for (var i = 0; i < rows.length; i++) {
+    promises.push(exports.runSqlQuery(queries.patientEducationalMaterialContents(),[rows[i].EducationalMaterialControlSerNum] ));
+  }
+  Q.all(promises).then(
+    function(results){
+      for (var i = 0; i < results.length; i++) {
+        if(results[i].length !== 0)
+        {
+            for (var j = 0; j < rows.length; j++) {
+              if(rows[j].EducationalMaterialControlSerNum ==results[i][0].ParentSerNum)
+              {
+                rows[j].TableContents = results[i];
+              }
+            }
+        }
+      }
+      r.resolve(rows);
+    }
+  ).catch(function(error){r.reject(error)});
+  return r.promise;
+}
+
 var LoadAttachments = function (rows )
 {
   /**

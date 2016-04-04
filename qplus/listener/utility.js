@@ -132,6 +132,14 @@ exports.decryptObject=function(object,secret)
   }
   return object;
 };
+exports.copyObject = function(object)
+{
+  var copy = {};
+  for (var key in object) {
+    copy[key] = object[key];
+  }
+  return copy;
+}
 exports.Queue=function(){
   return new Queue();
 }

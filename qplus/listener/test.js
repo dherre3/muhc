@@ -2,17 +2,63 @@ var credentials=require('./credentials.js');
 var sqlInterface=require('./sqlInterface.js');
 var queries=require('./queries.js');
 var Firebase    =require('firebase');
+var CryptoJS = require('crypto-js');
+var utility = require('./utility.js');
+var http = require('http');
+
+//The url we want is: 'www.random.org/integers/?num=1&min=1&max=10&col=1&base=10&format=plain&rnd=new'
+var options = {
+    host: 'localhost',
+    port: 8888,
+    path: '/muhc/qplus/php/try.php',
+    method: 'GET',
+    headers: {
+        accept: 'application/json'
+    }
+};
+
+console.log("Start");
+var x = http.request(options,function(res){
+    console.log("Connected");
+    res.on('data',function(data){
+        console.log(data.toString());
+    });
+});
+
+x.end();
 //var q=require('Q');
 
-
-sqlInterface.runSqlQuery(sqlInterface.requestMappings['EducationalMaterial'].sql, [ 'ac6eaeaa-f725-4b07-bdc0-72faef725985', new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'), new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'),new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)')], sqlInterface.requestMappings['EducationalMaterial'].processFunction).then(
+/*sqlInterface.runSqlQuery(sqlInterface.requestMappings['EducationalMaterial'].sql, [ 'ac6eaeaa-f725-4b07-bdc0-72faef725985', new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'), new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'),new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'), new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'),new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)')], sqlInterface.requestMappings['EducationalMaterial'].processFunction).then(
   function(result)
   {
     console.log(result);
     console.log(result[0].TableContents);
   }).catch(function(error){
     console.log('afasda');
-  });
+  });*/
+/*sqlInterface.updateReadStatus('ac6eaeaa-f725-4b07-bdc0-72faef725985',{Field:'Notifications',Id:'2'}).then(function(result)
+{
+  console.log(result);
+}).catch(function(error)
+{
+  console.log(error);
+})
+/*sqlInterface.runSqlQuery(sqlInterface.requestMappings['Appointments'].sql, [ 'ac6eaeaa-f725-4b07-bdc0-72faef725985', new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'), new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'),new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'), new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'),new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)')], sqlInterface.requestMappings['EducationalMaterial'].processFunction).then(
+  function(result)
+  {
+    console.log(result);
+    console.log(result[0].TableContents);
+  }).catch(function(error){
+    console.log('afasda');
+  });*/
+
+/*var ref = new Firebase('https://brilliant-inferno-7679.firebaseio.com');
+ref.auth(credentials.FIREBASE_SECRET);
+ref.child('/Users/d4232c51-e11d-410e-bfe5-d3aaf1a11443/demo').on('value',function(snapshot){
+    var snap = snapshot.val();
+    var voom = utility.decryptObject(snap, CryptoJS.SHA256('12345').toString());
+    console.log(voom);
+});*/
 /*sqlInterface.runSqlQuery("SELECT Records.RecordSerNum, Records.DateAdded, Records.ReadStatus, EduMat.EducationalMaterialSerNum, EduMat.EducationalMaterialType_EN, EduMat.EducationalMaterialType_FR, EduMat.Name_EN, EduMat.Name_FR, EduMat.URL_EN, EduMat.URL_FR, EduMat.PhaseInTreatment, EduMat.DateAdded FROM EducationalMaterialTOC as TOC, Records as Records, EducationalMaterial  as EduMat, Patient WHERE EduMat.EducationalMaterialSerNum=Records.EducationalMaterialSerNum AND TOC.EducationalMaterialSerNum=EduMat.EducationalMaterialSerNum AND Patient.PatientSerNum = Records.PatientSerNum AND Patient.PatientSerNum=Users.UserTypeSerNum AND Users.Username = 'ac6eaeaa-f725-4b07-bdc0-72faef725985'  AND (EduMat.LastUpdated > ? OR Records.LastUpdated > ? OR TOC.LastUpdated > ?);",
 [ 'ac6eaeaa-f725-4b07-bdc0-72faef725985',
   new Date('Wed Dec 31 1969 19:00:00 GMT-0500 (EST)'),
