@@ -5,7 +5,8 @@ var Firebase    =require('firebase');
 var CryptoJS = require('crypto-js');
 var utility = require('./utility.js');
 var http = require('http');
-var timeEstimate = require('../../../ackeem/waitingTimeEstimator.js');
+var q = require('q');
+var timeEstimate = require('./timeEstimate.js');
 
 
 var requestObject = {
@@ -13,9 +14,28 @@ var requestObject = {
   AppointmentSerNum:'13',
   DeviceId:'browser'
 };
+
+sqlInterface.runSqlQuery("SELECT AppointmentSerNum FROM Appointment WHERE PatientSerNum = ? ORDER BY ScheduledStartTime ASC",[51]).then(function(results){
+  console.log(results);
+  var today = new Date();
+  today.setHours(18,0,0,0);
+  later = new Date(today);
+  later.setMinutes(today.getMinutes()+15);
+  var array = [];
+  for (var i = 0; i < results.length; i++) {
+    array.push(sqlInterface.runSqlQuery("UPDATE Appointment SET ScheduledStartTime = ?, ScheduledEndTime = ? WHERE AppointmentSerNum = ?",[today,later,results[i].AppointmentSerNum]));
+    console.log(today);
+    console.log(later);
+    today.setDate(today.getDate()+1);
+    later.setDate(today.getDate()+1);
+  }
+  Q.all(array).then(function(results){
+    console.log(results);
+  });
+});
 var ref=new Firebase(credentials.FIREBASE_URL);
 ref.auth(credentials.FIREBASE_SECRET);
-getCheckinEstimate(requestObject);
+//getCheckinEstimate(requestObject);
 function getCheckinEstimate(requestObject)
 {
   var serNum = requestObject.AppointmentSerNum;

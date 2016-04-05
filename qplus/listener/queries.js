@@ -145,7 +145,7 @@ exports.changeReadStatus=function(table, patientSerNum)
 }
 exports.updateReadStatus=function()
 {
-  return "UPDATE ?? , Patient, Users SET ReadStatus = 0 WHERE ??.?? = ? AND Patient.PatientSerNum = ??.?? AND Patient.PatientSerNum = Users.UserTypeSerNum AND Users.Username = ?;";
+  return "UPDATE ?? , Patient, Users SET ReadStatus = 1 WHERE ??.?? = ? AND Patient.PatientSerNum = ??.?? AND Patient.PatientSerNum = Users.UserTypeSerNum AND Users.Username = ?;";
 }
 exports.getPatientDeviceLastActivity=function(userid,device)
 {
