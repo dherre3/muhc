@@ -3,6 +3,7 @@ var Q = require('q');
 var utility = require('./utility.js');
 var sqlInterface = require('./sqlInterface.js');
 var validate = require('./validate.js');
+var timeEstimate = require('./timeEstimate.js');
 
 exports.logout=function(requestObject)
 {
@@ -55,6 +56,8 @@ exports.accountChange = function (requestObject) {
     }
     return r.promise;
 };
+
+
 exports.updateReadStatus=function(requestObject)
 {
   var r=Q.defer();

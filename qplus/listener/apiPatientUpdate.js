@@ -3,6 +3,8 @@ var Q = require('q');
 var sqlInterface = require('./sqlInterface.js');
 var utility = require('./utility.js');
 var validate = require('./validate.js');
+var queries = require('./queries.js');
+var timeEstimate = require('./timeEstimate.js');
 /*
  *@name login
  *@requires slqInterface
@@ -95,7 +97,28 @@ exports.refresh = function (requestObject) {
     }
     return r.promise;
 };
-
+exports.checkinUpdate = function(requestObject)
+{
+  var r = Q.defer();
+  var serNum = requestObject.Parameters.AppointmentSerNum;
+  console.log(serNum);
+  sqlInterface.runSqlQuery(queries.getCheckinFieldsQuery(),[requestObject.UserID,serNum]).then(function(result)
+  {
+    result = result[0];
+    console.log('results query', result);
+    console.log(result.AppointmentAriaSer);
+    timeEstimate.getEstimate(result.AppointmentAriaSer).then(
+      function(estimate){
+          console.log('Estimate:', estimate);
+          r.resolve({Checkin: estimate});
+      },function(error)
+      {
+        console.log('Estimate:', estimate);
+        r.resolve({Checkin: 'Could not fetch data'});
+    });
+  });
+  return r.promise;
+}
 exports.getMapLocation=function(requestObject)
 {
   var r=Q.defer();
