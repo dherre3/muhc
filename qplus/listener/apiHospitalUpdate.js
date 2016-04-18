@@ -77,6 +77,9 @@ exports.checkIn = function (requestObject) {
         sqlInterface.checkIn(requestObject).then(function (requestObject) {
           //sqlInterface.addToActivityLog(requestObject);
           r.resolve('Hospital Request Proccessed');
+        }).catch(function(error){
+          console.log(error);
+          r.reject(error);
         });
     }
     return r.promise;

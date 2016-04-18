@@ -6,7 +6,7 @@ var queries=require('./queries.js');
 var credentials=require('./credentials.js');
 var CryptoJS=require('crypto-js');
 var buffer=require('buffer');
-
+var http = require('http');
 
 
 var sqlConfig={
@@ -301,13 +301,19 @@ exports.readNotification=function(requestObject)
 exports.checkIn=function(requestObject)
 {
   var r=Q.defer();
-  var serNum=requestObject.Parameters.AppointmentSerNum;
-
-
-  connection.query(queries.checkin(serNum,requestObject.Token),function(error, rows, fields)
-  {
-    if(error) r.reject(error);
-    r.resolve(requestObject);
+  var serNum = requestObject.AppointmentSerNum;
+  var username = requestObject.UserID;
+  getAppointmentAriaSer(username, serNum).then(function(ariaSerNum){
+    checkInToAria(ariaSerNum).then(function(response){
+      console.log('Checked in successfully', response);
+      r.resolve(response);
+    }).catch(function(error){
+      console.log('Unable to checkin',error);
+      r.reject(error);
+    })
+  }).catch(function(error){
+    console.log('Error while grabbing aria ser num', error);
+    r.reject(error);
   });
   return r.promise;
 }
@@ -625,3 +631,46 @@ var LoadAttachments = function (rows )
     }
     return deferred.promise;*/
   };
+function getAppointmentAriaSer(username, appSerNum)
+{
+  var r = Q.defer();
+  exports.runSqlQuery(queries.getAppointmentAriaSer(),[username, appSerNum]).then(function(response);
+  {
+    console.log(response);
+    r.resolve(response);
+  }).catch(function(error){r.reject(error);});
+  return r.promise;
+
+}
+function checkInToAria(patientActivitySerNum)
+{
+  var r = Q.defer();
+  //Url to checkin
+  var urlCheckin = {
+      path: 'http://medphys/devDocuments/screens/php/checkInPatient.php?CheckinVenue=8225&ScheduledActivitySer='+patientActivitySerNum;
+    }
+  //Url to check the successful or unsuccessful checkin
+  var urlCheckCheckin = {
+      path: 'http://medphys/devDocuments/ackeem/getCheckins.php?AppointmentAriaSer='+patientActivitySerNum
+  }
+  //making request to checkin
+      var x = http.request(urlCheckin,function(res){
+          res.on('data',function(data){
+
+            //Check if it successfully checked in
+            var y = http.request(urlCheckCheckin,function(response){
+              response.on('data',function(data){
+                  data = data.toString();
+                  if(data.length== 0)
+                  {
+                    r.reject('Failed');
+                  }else{
+                    r.resolve('Success');
+                  }
+                });
+              }).end();
+
+          });
+      }).end();
+  return r.promise;
+}
