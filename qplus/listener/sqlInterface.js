@@ -8,7 +8,7 @@ var CryptoJS=require('crypto-js');
 var buffer=require('buffer');
 
 
-/*
+
 var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
@@ -20,7 +20,7 @@ var sqlConfig={
 *Connecting to mysql database
 */
 
-var sqlConfig={
+/*var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,
@@ -302,6 +302,7 @@ exports.checkIn=function(requestObject)
 {
   var r=Q.defer();
   var serNum=requestObject.Parameters.AppointmentSerNum;
+
 
   connection.query(queries.checkin(serNum,requestObject.Token),function(error, rows, fields)
   {
