@@ -5,18 +5,6 @@ exports.getEstimate=function(AriaSerNum, Id)
   var r = q.defer();
   console.log("Inside get estimate;", 100*Math.random());
   var objectToSend = {};
-  if(100*Math.random()>85)
-  {
-    objectToSend =  {
-      response:{
-        type:'close'
-      },
-      info:{
-        patientId:'51'
-      }
-    };
-    r.resolve(objectToSend);
-  }else{
     objectToSend =  {
       response:{
         type:'success'
@@ -25,19 +13,18 @@ exports.getEstimate=function(AriaSerNum, Id)
         patientId:'51'
       },
       preceding:{
-        'EN':'Patients before you: 5',
-        'FR':'Patients before you: 5'
+        'EN':'2 patients ahead of you',
+        'FR':'2 patients ahead of you'
       },
       estimate:{
-        'EN':'Estimated wait: <5 minutes',
-        'FR':'Estimated wait: <5 minutes'
+        'EN':'20 - 30',
+        'FR':'20 - 30'
       },
       schedule:{
-        'EN':'10 minutes ahead of schedule',
-        'FR':'10 minutes ahead of schedule'
+        'EN':'Approximately 10 minutes ahead of schedule',
+        'FR':'Approximately 10 minutes ahead of schedule'
       }
     }
     r.resolve(objectToSend);
-  }
   return r.promise;
 }

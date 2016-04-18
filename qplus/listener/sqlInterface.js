@@ -8,7 +8,7 @@ var CryptoJS=require('crypto-js');
 var buffer=require('buffer');
 
 
-
+/*
 var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
@@ -19,7 +19,7 @@ var sqlConfig={
 /*
 *Connecting to mysql database
 */
-/*
+
 var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
@@ -135,7 +135,7 @@ exports.runSqlQuery=function(query, parameters, processRawFunction)
     console.log(parameters);
     console.log(err);
     if (err) r.reject(err);
-    if(typeof rows[0] !=='undefined')
+    if(typeof rows !=='undefined')
     {
 
       if(processRawFunction&&typeof processRawFunction !=='undefined')
@@ -471,7 +471,7 @@ function LoadDocuments(rows)
    console.log(rows);
     var imageCounter=0 ;
     var deferred = Q.defer();
-    if (rows.length==0) { deferred.resolve('All images were loaded!'); }
+    if (rows.length==0) { deferred.resolve([]); }
     for (var key = 0; key < rows.length; key++)
     {
 
