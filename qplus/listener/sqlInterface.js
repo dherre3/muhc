@@ -9,7 +9,8 @@ var buffer=require('buffer');
 var http = require('http');
 
 
-var sqlConfig={
+
+/*var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
   password:'root',
@@ -19,8 +20,7 @@ var sqlConfig={
 /*
 *Connecting to mysql database
 */
-
-/*var sqlConfig={
+var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,
@@ -297,23 +297,73 @@ exports.readNotification=function(requestObject)
   });
   return r.promise;
 }
+
+//Check if user is already checkedin 
+exports.checkCheckinInAria = function(requestObject)
+{
+  var r = Q.defer();
+  var serNum = requestObject.Parameters.AppointmentSerNum;
+  var username = requestObject.UserID;
+  //Get the appointment aria ser
+   getAppointmentAriaSer(username, serNum).then(function(response){
+    var ariaSerNum = response[0].AppointmentAriaSer;
+    console.log('Appointment aria ser', ariaSerNum);
+    //Check using Ackeem's script whether the patient has checked in at the kiosk
+    checkIfCheckedIntoAriaHelper(ariaSerNum).then(function(success){
+      console.log('the user has checkhed in ', success);
+      //Check in the user into mysql if they have indeed checkedin at kiosk
+      exports.runSqlQuery(queries.checkin(),['Kiosk', serNum, username]);
+      r.resolve(success);
+    }).catch(function(error){
+      //Returns false to whether the patient has checked in.
+      r.reject(error);
+    });
+  });
+  return r.promise;
+}
+
+
+
 //Api call to checkin to an Appointment (Implementation in Aria is yet to be done)
 exports.checkIn=function(requestObject)
 {
   var r=Q.defer();
-  var serNum = requestObject.AppointmentSerNum;
+  var serNum = requestObject.Parameters.AppointmentSerNum;
+  var latitude = requestObject.Parameters.Latitude;
+  var longitude = requestObject.Parameters.Longitude;
+  var accuracy = requestObject.Parameters.Accuracy;
   var username = requestObject.UserID;
-  getAppointmentAriaSer(username, serNum).then(function(ariaSerNum){
-    checkInToAria(ariaSerNum).then(function(response){
-      console.log('Checked in successfully', response);
-      r.resolve(response);
+  var session = requestObject.Token;
+  var deviceId = requestObject.DeviceId;
+  //Getting the appointment ariaSer to checkin to aria
+  getAppointmentAriaSer(username, serNum).then(function(response){
+    var ariaSerNum = response[0].AppointmentAriaSer;
+    console.log('Appointment aria ser', ariaSerNum);
+    //Check in to aria using Johns script
+    checkIntoAria(ariaSerNum).then(function(response){
+      console.log('Checked in successfully done in aria', response);
+
+      //If successfully checked in change field in mysql
+      exports.runSqlQuery(queries.checkin(),[session, serNum, username]).then(function(result){
+        console.log('Checkin to appointment in sql', result);
+        exports.runSqlQuery(queries.logCheckin(),[serNum, deviceId,latitude, longitude, accuracy, new Date()]).then(function(response){
+          console.log('Checkin done successfully', 'Finished writint to database');
+          r.resolve({Checkin:{response:'success'}});
+        }).catch(function(error){
+          console.log('error login checkin', error);
+          r.resolve({Checkin:{response:'failure'}});
+        })
+      }).catch(function(error){
+        console.log('Error inserting in sql', error)
+        r.resolve({Checkin:{response:'failure'}});
+      });
     }).catch(function(error){
-      console.log('Unable to checkin',error);
-      r.reject(error);
+      console.log('Unable to checkin to aria',error);
+      r.resolve({Checkin:{response:'failure'}});
     })
   }).catch(function(error){
     console.log('Error while grabbing aria ser num', error);
-    r.reject(error);
+    r.resolve({Checkin:{response:'failure'}});
   });
   return r.promise;
 }
@@ -445,10 +495,10 @@ exports.getPatientDeviceLastActivity=function(userid,device)
   return r.promise;
 }
 
-exports.updateLogout=function(requestObject)
+exports.updateLogout=function(fields)
 {
   var r=Q.defer();
-  connection.query(queries.updateLogout(requestObject),function(err, rows, fields){
+  connection.query(queries.updateLogout(),fields,function(err, rows, fields){
     if(err) r.reject(err);
     console.log(rows);
     r.resolve(rows);
@@ -634,7 +684,7 @@ var LoadAttachments = function (rows )
 function getAppointmentAriaSer(username, appSerNum)
 {
   var r = Q.defer();
-  exports.runSqlQuery(queries.getAppointmentAriaSer(),[username, appSerNum]).then(function(response);
+  exports.runSqlQuery(queries.getAppointmentAriaSer(),[username, appSerNum]).then(function(response)
   {
     console.log(response);
     r.resolve(response);
@@ -642,12 +692,12 @@ function getAppointmentAriaSer(username, appSerNum)
   return r.promise;
 
 }
-function checkInToAria(patientActivitySerNum)
+function checkIntoAria(patientActivitySerNum)
 {
   var r = Q.defer();
   //Url to checkin
   var urlCheckin = {
-      path: 'http://medphys/devDocuments/screens/php/checkInPatient.php?CheckinVenue=8225&ScheduledActivitySer='+patientActivitySerNum;
+      path: 'http://medphys/devDocuments/screens/php/checkInPatient.php?CheckinVenue=8225&ScheduledActivitySer='+patientActivitySerNum
     }
   //Url to check the successful or unsuccessful checkin
   var urlCheckCheckin = {
@@ -656,21 +706,35 @@ function checkInToAria(patientActivitySerNum)
   //making request to checkin
       var x = http.request(urlCheckin,function(res){
           res.on('data',function(data){
-
             //Check if it successfully checked in
-            var y = http.request(urlCheckCheckin,function(response){
-              response.on('data',function(data){
-                  data = data.toString();
-                  if(data.length== 0)
-                  {
-                    r.reject('Failed');
-                  }else{
-                    r.resolve('Success');
-                  }
-                });
-              }).end();
-
+            checkIfCheckedIntoAriaHelper(patientActivitySerNum).then(function(response){
+              r.resolve(response);
+            }).catch(function(error){
+              r.reject(error);
+            });
           });
       }).end();
   return r.promise;
 }
+//Check if checked in for an appointment in aria
+function checkIfCheckedIntoAriaHelper(patientActivitySerNum)
+{
+  var r = Q.defer();
+    var urlCheckCheckin = {
+      path: 'http://medphys/devDocuments/ackeem/getCheckins.php?AppointmentAriaSer='+patientActivitySerNum
+    }
+    var y = http.request(urlCheckCheckin,function(response){
+      response.on('data',function(data){
+          data = data.toString();
+          console.log('Checking in aria if checked in', data);
+          if(data.length== 0)
+          {
+            r.reject('failure');
+          }else{
+            r.resolve('success');
+          }
+        });
+      }).end();
+    return r.promise;
+}
+

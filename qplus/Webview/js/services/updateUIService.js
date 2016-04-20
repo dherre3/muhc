@@ -143,6 +143,7 @@ myApp.service('UpdateUI', ['EncryptionService','$http','$filter', 'Patient','Doc
         var pathToSection=''
         var username=UserAuthorizationInfo.getUserName();
         var deviceId=RequestToServer.getIdentifier();
+        deviceId = 'demo';
         console.log(deviceId);
         if(section!=='UserPreferences'){
             pathToSection=username+'/'+deviceId+'/'+section;
@@ -193,7 +194,7 @@ myApp.service('UpdateUI', ['EncryptionService','$http','$filter', 'Patient','Doc
                     break;
                 }
                 console.log(data);
-                ref.child(pathToSection).set(null);
+                //ref.child(pathToSection).set(null);
                 ref.child(pathToSection).off();
 
                 r.resolve(true);

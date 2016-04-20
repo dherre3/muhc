@@ -21,7 +21,7 @@ app.controller('LoginController',['$rootScope','$state', '$scope','UpdateUI', 'U
    };
 
    function signin(email, password){
-       var myDataRef = new Firebase('https://luminous-heat-8715.firebaseio.com');
+       var myDataRef = new Firebase('https://brilliant-inferno-7679.firebaseio.com');
        var username = email;
        var password = password;
 

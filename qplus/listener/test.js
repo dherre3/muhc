@@ -11,11 +11,15 @@ var timeEstimate = require('./timeEstimate.js');
 
 var requestObject = {
   UserID:'ac6eaeaa-f725-4b07-bdc0-72faef725985',
-  AppointmentSerNum:'13',
-  DeviceId:'browser'
+  Token:'sdfasdfasdfasdf',
+  DeviceId:'browser', 
+  Parameters:{'AppointmentSerNum':13, Latitude:'123.12312312', Longitude:'41.123123', Accuracy:'41'}
 };
-
-sqlInterface.runSqlQuery("SELECT AppointmentSerNum FROM Appointment WHERE PatientSerNum = ? ORDER BY ScheduledStartTime ASC",[51]).then(function(results){
+sqlInterface.runSqlQuery(queries.checkin(),['Kiosk', requestObject.UserID, username]);
+/*sqlInterface.checkIn(requestObject).then(function(response){
+  console.log(response);
+});*/
+/*sqlInterface.runSqlQuery("SELECT AppointmentSerNum FROM Appointment WHERE PatientSerNum = ? ORDER BY ScheduledStartTime ASC",[51]).then(function(results){
   console.log(results);
   var today = new Date();
   today.setHours(18,0,0,0);

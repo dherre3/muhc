@@ -74,12 +74,9 @@ exports.checkIn = function (requestObject) {
     if (!validate('Hospital Request Proccessed')) {
         r.reject('Invalid');
     } else {
-        sqlInterface.checkIn(requestObject).then(function (requestObject) {
+        sqlInterface.checkIn(requestObject).then(function (response) {
           //sqlInterface.addToActivityLog(requestObject);
-          r.resolve('Hospital Request Proccessed');
-        }).catch(function(error){
-          console.log(error);
-          r.reject(error);
+          r.resolve(response);
         });
     }
     return r.promise;

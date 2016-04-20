@@ -62,6 +62,17 @@ exports.processRequest=function(requestObject)
     {
       r.reject(response);
     });
+  }
+    else if(type=='CheckCheckin')
+  {
+    apiPatientUpdate.checkCheckin(requestObject).then(function(response)
+    {
+      console.log('Returning response from checkCheckin', response);
+      r.resolve(response);
+    }).catch(function(response)
+    {
+      r.reject(response);
+    });
   }else if(type=='MessageRead')
   {
     apiHospitalUpdate.readMessage(requestObject).then(function(response)

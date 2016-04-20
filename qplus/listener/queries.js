@@ -74,14 +74,23 @@ exports.readMessage=function(MessageSerNum,token)
 {
   return "UPDATE `Messages` SET ReadStatus=1, SessionId='"+token+"' WHERE Messages.MessageSerNum='"+MessageSerNum+"'";
 }
+
+//For checkin
 exports.getAppointmentAriaSer=function()
 {
   return "SELECT Appointment.AppointmentAriaSer FROM Patient, Users, Appointment WHERE Users.Username = ? AND Appointment.AppointmentSerNum = ? AND Patient.PatientSerNum = Users.UserTypeSerNum ";
 }
-exports.checkin=function(AppointmentSerNum,token)
+exports.checkin=function()
 {
-  return "UPDATE Appointment SET Checkin=1, SessionId='"+token+"' WHERE Appointment.Checkin=0 AND Appointment.AppointmentSerNum='"+AppointmentSerNum+"'";
+  return "UPDATE Appointment, Patient, Users SET Appointment.Checkin=1, Appointment.SessionId=? WHERE Appointment.AppointmentSerNum=? AND Appointment.PatientSerNum = Patient.PatientSerNum AND Patient.PatientSerNum = Users.UserTypeSerNum AND Users.Username = ? ";
+} 
+
+exports.logCheckin = function()
+{
+  return "INSERT INTO `CheckinLog`(`CheckinLogSerNum`, `AppointmentSerNum`, `DeviceId`, `Latitude`, `Longitude`, `Accuracy`, `DateAdded`, `LastUpdated`) VALUES (NULL,?,?,?,?,?,?,NULL)";
 }
+
+
 exports.readNotification=function(NotificationSerNum,token)
 {
   return "UPDATE Notifications SET ReadStatus=1, SessionId='"+token+"' WHERE `Notifications`.`NotificationSerNum`='"+NotificationSerNum+"'";
@@ -130,7 +139,7 @@ exports.getSecurityQuestions=function(serNum)
 
 exports.updateLogout=function(requestObject)
 {
-  return "INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`Username`, `DeviceId`,`SessionId`,`DateTime`,`LastUpdated`) VALUES (NULL,'"+requestObject.Request+ "', '"+requestObject.Username+ "', '"+requestObject.DeviceId+"','"+requestObject.SessionId+"', '"+requestObject.DateTime+"' ,CURRENT_TIMESTAMP )";
+  return "INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`Username`, `DeviceId`,`SessionId`,`DateTime`,`LastUpdated`) VALUES (NULL,?,?,?,?,?,CURRENT_TIMESTAMP )";
 }
 
 exports.getMapLocation=function(qrCode)

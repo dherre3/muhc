@@ -18,14 +18,20 @@ exports.login = function (requestObject) {
     var device=requestObject.DeviceId;
     var objectToFirebase = {};
     sqlInterface.getPatientDeviceLastActivity(UserID,device).then(function(result){
+      console.log(result);
       var date=new Date(result.DateTime);
+      console.log('date of login', date)
+      console.log(result);
       date.setDate(date.getDate()+1);
       var today=new Date();
-      if(result.Request=='Login'&&date<today)
+      if(typeof result !=='undefined'&&result.Request=='Login')
       {
          result.Request='Logout';
-         result.DateTime=utility.toMYSQLString(date);
-         sqlInterface.updateLogout(result);
+         sqlInterface.updateLogout([result.Request,result.Username,result.DeviceId,result.SessionId,date]).then(function(response){
+            console.log(response);
+         },function(error){
+            console.log(error);
+         });
       }
     });
     sqlInterface.getPatientTableFields(UserID).then(function(objectToFirebase)
@@ -97,12 +103,23 @@ exports.refresh = function (requestObject) {
     }
     return r.promise;
 };
+exports.checkCheckin = function(requestObject)
+{
+  var r = Q.defer();
+  sqlInterface.checkCheckinInAria(requestObject).then(function(result){
+    r.resolve({CheckCheckin:{response:result, AppointmentSerNum:requestObject.Parameters.AppointmentSerNum}});
+  }).catch(function(error){
+    r.reject({CheckCheckin:{response:result, AppointmentSerNum:requestObject.Parameters.AppointmentSerNum}});
+  });
+  return r.promise;
+}
 exports.checkinUpdate = function(requestObject)
 {
   var r = Q.defer();
   var serNum = requestObject.Parameters.AppointmentSerNum;
   console.log(serNum);
-  sqlInterface.runSqlQuery(queries.getCheckinFieldsQuery(),[requestObject.UserID,serNum]).then(function(result)
+
+  sqlInterface.runSqlQuery(queries.getAppointmentAriaSer(),[requestObject.UserID,serNum]).then(function(result)
   {
     result = result[0];
     console.log('results query', result);
@@ -110,11 +127,11 @@ exports.checkinUpdate = function(requestObject)
     timeEstimate.getEstimate(result.AppointmentAriaSer).then(
       function(estimate){
           console.log('Estimate:', estimate);
-          r.resolve({Checkin: estimate});
+          r.resolve({CheckinUpdate: estimate});
       },function(error)
       {
-        console.log('Estimate:', estimate);
-        r.resolve({Checkin: 'Could not fetch data'});
+        console.log('Estimate:', error);
+        r.resolve({CheckinUpdate: error});
     });
   });
   return r.promise;

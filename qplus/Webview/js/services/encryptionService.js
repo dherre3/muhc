@@ -13,7 +13,7 @@ myApp.service('EncryptionService',function(UserAuthorizationInfo){
 								if(object[key]!='')
 								{
 									try {
-										var decipherbytes = CryptoJS.AES.decrypt(object[key], '12345');
+										var decipherbytes = CryptoJS.AES.decrypt(object[key], CryptoJS.SHA256('12345').toString());
 										object[key]=decipherbytes.toString(CryptoJS.enc.Utf8)
 										}
 										catch(err) {
@@ -30,13 +30,13 @@ myApp.service('EncryptionService',function(UserAuthorizationInfo){
 	{
 
 	 	if (typeof object=='string'){
-	 		var ciphertext = CryptoJS.AES.encrypt(object, '12345');
+	 		var ciphertext = CryptoJS.AES.encrypt(object, '1234');
 	 		var encryptedString=ciphertext.toString();
 
 	 		return encryptedString;
 	 	}else if(typeof object!=='string'&& typeof object!=='object'){
 	 		object=String(object);
-	 		var ciphertext = CryptoJS.AES.encrypt(object, '12345');
+	 		var ciphertext = CryptoJS.AES.encrypt(object, '1234');
 	 		var encryptedString=ciphertext.toString();
 	 		console.log(encryptedString);
 	 		return encryptedString;
@@ -49,7 +49,7 @@ myApp.service('EncryptionService',function(UserAuthorizationInfo){
 			    }else
 			    {
 			      if (typeof object[key] !=='string') object[key]=String(object[key]);
-			      var ciphertext = CryptoJS.AES.encrypt(object[key], '12345');
+			      var ciphertext = CryptoJS.AES.encrypt(object[key], '1234');
 			      object[key]=ciphertext.toString();
 			    }
 			}

@@ -252,7 +252,7 @@ CREATE TABLE `EducationalMaterialTOC` (
 LOCK TABLES `EducationalMaterialTOC` WRITE;
 /*!40000 ALTER TABLE `EducationalMaterialTOC` DISABLE KEYS */;
 
-INSERT INTO `EducationalMaterialTOC` (`EducationalMaterialTOCSerNum`, `ParentSerNum`, `OrderNum`, `EducationalMaterialControlSerNum`, `DateAdded`, `LastUpdated`)
+INSERT INTO `EducationalMaterialTOC` (`EducationalMaterialTOCSerNum`, `EducationalMaterialControlSerNum`, `ParentSerNum`, `OrderNum`, `DateAdded`, `LastUpdated`)
 VALUES
 	(9,8,1,7,'2016-03-21 16:18:33','2016-04-01 09:54:20'),
 	(11,8,2,6,'2016-03-21 16:18:33','2016-04-01 09:54:24');
