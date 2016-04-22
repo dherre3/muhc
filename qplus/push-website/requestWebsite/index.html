@@ -1,0 +1,144 @@
+<html>
+  <head>
+    <title>MUHC Listener</title>
+    <script src="./jquery.min.js">  </script>
+    <script src="./firebase.js"></script>
+    <script src="./aes.js"></script>
+      <script src="./mode-cfb-min.js"/></script>
+      <script src="./bower_components/angular/angular.min.js"/></script>
+      <link href="./styles.css" rel="stylesheet" type="text/css">
+      <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"/></script>
+      <link href="./bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+      <script src="./bower_components/cryptojs/mode-cfb-min.js"/></script>
+      <script src="./bower_components/cryptojs/sha256.js"/></script>
+      <script src="./bower_components/cryptojs/aes.js"/></script>
+    <script src="./bower_components/angular-aria/angular-aria.js"></script>
+    <script src="./bower_components/angular-animate/angular-animate.js"></script>
+    <script src="./bower_components/angular-material/angular-material.js"></script>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="./bower_components/angular-material/angular-material.css">
+
+  </head>
+  <body ng-app="MUHCPushNotifications" ng-controller="MainController">
+    <div layout="column" style="height:100vh;" ng-cloak>
+  <section layout="row" flex>
+    <md-sidenav
+        class="md-sidenav-left"
+        md-component-id="left"
+        md-is-locked-open="$mdMedia('gt-md')"
+        md-disable-backdrop
+        md-whiteframe="4">
+        <md-toolbar class="md-tall md-hue-2">
+    <span flex></span>
+    <div layout="column" class="md-toolbar-tools-bottom inset" style="font-size:small">
+      <div layout="row" layout-align="right center" layout-padding>
+        <img src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/AAEAAQAAAAAAAASZAAAAJGE3NzMwNWE3LTk5MDMtNDQxNC04MTYxLWZhZTcyOWRkNTJkZQ.jpg" style="width:100px;border-radius:50%;border:2px dashed lightblue"></img>
+        <div layout="column">
+          <h4>David Herrera</h4>
+          <div> Software Developer at Glen Hospital</div>
+        </div>
+      </div>
+    </div>
+  </md-toolbar>
+      <md-content layout-padding ng-controller="LeftCtrl">
+        <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">Send push notification</span>
+          </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+          <div style="margin-top:100px">
+          <md-input-container class="md-block">
+            <label>To:</label>
+            <md-select ng-model="name">
+              <md-option  value="'Ackeem'">
+                Ackeem
+              </md-option>
+              <md-option  value="'John'">
+                John
+              </md-option>
+              <md-option  value="'David'">
+                David
+              </md-option>
+            </md-select>
+          </md-input-container>
+          <md-input-container class="md-block">
+               <label>Message</label>
+               <textarea ng-model="message" md-maxlength="150" rows="5" md-select-on-focus></textarea>
+             </md-input-container>
+           </div>
+        </md-card-content>
+        <md-card-actions layout="row" layout-align="end center">
+          <md-button ng-click="sendPush(name, message)">Send</md-button>
+          <md-button ng-click="cancel()">Cancel</md-button>
+        </md-card-actions>
+      </md-card>
+      </md-content>
+    </md-sidenav>
+    <md-content flex>
+      <div layout="column" layout-fill layout-align="top center">
+        <md-card style="width:70%">
+        <md-card-title style="padding:0">
+          <md-toolbar class="md-hue-2">
+            <div class="md-toolbar-tools">
+              <md-button class="md-icon-button" aria-label="Settings" ng-disabled="true">
+                <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
+              </md-button>
+              <h2>
+                <span>List Of Messages</span>
+              </h2>
+              <span flex></span>
+
+            </div>
+          </md-toolbar>
+        </md-card-title>
+        <md-card-content>
+          <md-list flex >
+       <md-subheader class="md-no-sticky">3 line item (with hover)</md-subheader>
+
+       <div class="text-center" style="margin-top:20px" ng-show="todos.length==0"><p style="color:white">No push messages sent!</p></div>
+
+       <md-list-item class="md-3-line" ng-repeat="item in todos" ng-click="null">
+         <div class="md-list-item-text" layout="column">
+           <h3> To: {{ item.who }}</h3>
+           <h4> Date: {{ item.when|date:"EEEE, MMMM d, y 'at' h:mm a" }}</h4>
+           <p>Message:  {{ item.notes }}</p>
+         </div>
+       </md-list-item>
+     </md-list>
+        </md-card-content>
+        <md-card-actions layout="row" layout-align="end center">
+
+        </md-card-actions>
+      </md-card>
+
+
+      </div>
+      <div flex></div>
+    </md-content>
+    <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
+      <md-toolbar class="md-theme-light">
+        <h1 class="md-toolbar-tools">Sidenav Right</h1>
+      </md-toolbar>
+      <md-content ng-controller="RightCtrl" layout-padding>
+        <form>
+          <md-input-container>
+            <label for="testInput">Test input</label>
+            <input type="text" id="testInput"
+                   ng-model="data" md-autofocus>
+          </md-input-container>
+        </form>
+        <md-button ng-click="close()" class="md-primary">
+          Close Sidenav Right
+        </md-button>
+      </md-content>
+    </md-sidenav>
+  </section>
+</div>
+  </body>
+  <!-- Latest compiled and minified CSS -->
+<!-- Optional theme -->
+  <script src="./listener.js"></script>
+
+</html>
