@@ -76,7 +76,7 @@ app.controller('MainController',['$scope','$timeout','$mdSidenav','$log','$rootS
      function sendPushToBackend(name, message)
      {
        //"http://172.26.66.41:8010/login"
-       $.post("http://localhost:3000/login",{name: name,message: message}, function(data){
+       $.post("http://172.26.66.41:3000/login",{name: name,message: message}, function(data){
          if(data.type=='UploadToFirebase')
          {
            uploadToFirebase(data.requestKey, data.encryptionKey,data.requestObject, data.object);
