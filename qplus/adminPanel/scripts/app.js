@@ -21,7 +21,7 @@ var app=angular
     'CredentialsAdminPanel',
     'ngMaterial'
   ]);
- 
+
 app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider, $stateProvider) {
       $urlRouterProvider.otherwise("/");
   $stateProvider

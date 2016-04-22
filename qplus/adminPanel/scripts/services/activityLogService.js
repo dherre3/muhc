@@ -7,7 +7,21 @@ app.service('ActivityLogService',['api','URLs','$q','$filter',function(api, URLs
 	'AppointmentMH':['AppointmentSerNum','AppointmentRevSerNum'],'PatientMH':['PatientSerNum','PatientRevSerNum'],'UsersMH':['UserSerNum', 'UserRevSerNum']};
 	var tableOfUpdatesSession=[];
 	var tableOfInsertsSession=[];
+	
 
+	//Determines whether t
+	function setDeviceLabel(deviceId)
+	{
+		var upperCaseDevice = deviceId;
+		if(deviceId == 'browser') return 'browser';
+
+		if(deviceId.toUpperCase() == deviceId)
+		{
+			return 'IPhone/'+deviceId;
+		}else{
+			return 'Android/'+deviceId;
+		}
+	}
 	function getChangeValues(table, row1,row2)
 	{
 								//code for update!
@@ -70,6 +84,9 @@ app.service('ActivityLogService',['api','URLs','$q','$filter',function(api, URLs
 						objectToLogArray.LastName=activityLogObject[key][i].LastName;
 						objectToLogArray.PatientId=activityLogObject[key][i].PatientId;
 						objectToLogArray.SessionId=activityLogObject[key][i].SessionId;
+
+						objectToLogArray.DeviceId=setDeviceLabel(activityLogObject[key][i].DeviceId);
+
 
 					}
 					if(activityLogObject[key][i].Request=='Login')

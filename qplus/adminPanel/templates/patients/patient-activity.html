@@ -52,6 +52,9 @@
           Last Name
           </th>
            <th class="active"style="text-align:center">
+          Device Id
+          </th>
+           <th class="active"style="text-align:center">
           Login Time
           </th>
           <th class="active"style="text-align:center">
@@ -63,6 +66,7 @@
               <td>{{value.PatientId}}</td>
               <td>{{value.FirstName}}</td>
               <td>{{value.LastName}}</td>
+              <td>{{value.DeviceId|limitTo:30}}...</td>
               <td>{{value.LoginTime|date:'dd/MM/yy h:mm a'}}</td>
               <td>{{value.LogoutTime|date:'dd/MM/yy h:mm a'}}</td>
           </tr>
