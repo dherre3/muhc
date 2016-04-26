@@ -66,7 +66,7 @@ exports.resetPasswordRequest=function(requestKey, requestObject)
   sqlInterface.getPatientFieldsForPasswordReset(requestObject.UserID).then(function(patient){
     console.log(patient);
     //Check for injection attacks by the number of rows the result is returning
-    if(patient.length>1||patient.lenght==0)
+    if(patient.length>1||patient.lenght === 0)
     {
       r.reject('Invalid');
       var response={
@@ -108,7 +108,7 @@ exports.resetPasswordRequest=function(requestKey, requestObject)
 });
   return r.promise;
 
-}
+};
 exports.setNewPassword=function(requestKey, requestObject,patient)
 {
   var r=q.defer();
@@ -167,7 +167,7 @@ exports.setNewPassword=function(requestKey, requestObject,patient)
       }
     });
     return r.promise;
-  }
+  };
 exports.verifySSN=function(requestKey, requestObject,patient)
 {
     var r=q.defer();
@@ -207,4 +207,4 @@ exports.verifySSN=function(requestKey, requestObject,patient)
     }
 
   return r.promise;
-}
+};

@@ -2,8 +2,51 @@ var CryptoJS    =require('crypto-js');
 var mysql       = require('mysql');
 var Q           =require('q');
 var credentials=require('./credentials.js');
+var https = require('https');
 var exports=module.exports={};
-
+exports.sanitize= function(word)
+{
+  word = word.toLowerCase();
+   return word;
+};
+exports.tokenize = function(sentence)
+{
+  return sentence.split(" ");
+};
+var url = 'https://api.github.com/repos/sayenee/build-podcast';
+exports.info = function(callback)
+{
+  var options = {
+    host:'api.github.com',
+    path: '/users/dherre3/events',
+    method:'GET',
+    headers:{
+      'User-Agent':'dherre3'
+    }
+  };
+  var str = '';
+  https.request(options,function(response){
+     response.on('data',function(data)
+     {
+       str+= data;
+     });
+     response.on('end',function(data)
+     {
+       callback(JSON.parse(str));
+     });
+     response.on('error',function(error)
+     {
+       console.log(error);
+     });
+   
+  }).end();
+};
+exports.infoLang = function(infoFunc,callback)
+{
+  infoFunc(function(reply){
+     callback('Language is '+reply.Language);
+  });
+};
 var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
@@ -19,7 +62,7 @@ exports.resolveEmptyResponse=function(data)
 {
   var counter=0;
   console.log('I am yoloing!!!');
-  console.log(data['Notifications']);
+  console.log(data.Notifications);
   for (var key in data) {
     if(data[key].length>0)
     {
@@ -32,7 +75,7 @@ exports.resolveEmptyResponse=function(data)
     }else{
       return {Response:'No Results'};
     }
-}
+};
 
 exports.toMYSQLString=function(date)
 {
@@ -50,12 +93,12 @@ exports.toMYSQLString=function(date)
 
   return date.getFullYear()+'-'+month+'-'+day+' '+hours+':'+minutes+':'+seconds;
 
-}
+};
 exports.unixToMYSQLTimestamp=function(time)
 {
   var date=new Date(time);
   return exports.toMYSQLString(date);
-}
+};
 
 
 exports.encryptObject=function(object,secret)
@@ -66,8 +109,8 @@ exports.encryptObject=function(object,secret)
   //var object=JSON.parse(JSON.stringify(object));
   if(typeof object=='string')
   {
-    var ciphertext = CryptoJS.AES.encrypt(object, secret);
-    object=ciphertext.toString();
+    var ciphertextString = CryptoJS.AES.encrypt(object, secret);
+    object=ciphertextString.toString();
     return object;
   }else{
     for (var key in object)
@@ -79,8 +122,8 @@ exports.encryptObject=function(object,secret)
         if(object[key] instanceof Date )
         {
           object[key]=object[key].toISOString();
-          var ciphertext = CryptoJS.AES.encrypt(object[key], secret);
-          object[key]=ciphertext.toString();
+          var ciphertextDate = CryptoJS.AES.encrypt(object[key], secret);
+          object[key]=ciphertextDate.toString();
         }else{
             exports.encryptObject(object[key],secret);
         }
@@ -105,8 +148,8 @@ exports.decryptObject=function(object,secret)
 {
   if(typeof object =='string')
   {
-    var decipherbytes = CryptoJS.AES.decrypt(object, secret);
-    object=decipherbytes.toString(CryptoJS.enc.Utf8);
+    var decipherbytesString = CryptoJS.AES.decrypt(object, secret);
+    object=decipherbytesString.toString(CryptoJS.enc.Utf8);
   }else{
     for (var key in object)
     {
@@ -139,23 +182,23 @@ exports.copyObject = function(object)
     copy[key] = object[key];
   }
   return copy;
-}
+};
 exports.Queue=function(){
   return new Queue();
-}
+};
 function Queue()
 {
   var array=[];
   var head=0;
   this.isEmpty=function()
   {
-    if(head==0)
+    if(head === 0)
     {
       return true;
     }else{
       return false;
     }
-  }
+  };
   this.enqueueArray=function(arr)
   {
 
@@ -163,20 +206,20 @@ function Queue()
       array.push(arr[i]);
       head++;
     }
-  }
+  };
   this.enqueue=function(field)
   {
     array.push(field);
     head++;
-  }
+  };
   this.dequeue=function()
   {
-    if(head!=0)
+    if(head !== 0)
     {
       head--;
       return array[head];
     }else{
       console.log('Queue is empty');
     }
-  }
-};
+  };
+}

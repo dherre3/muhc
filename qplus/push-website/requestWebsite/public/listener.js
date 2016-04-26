@@ -1,7 +1,7 @@
 var app=angular.module('MUHCPushNotifications',['ngMaterial']);
 app.config(function($mdThemingProvider) {
   $mdThemingProvider.theme('default')
-  .primaryPalette('blue')
+  .primaryPalette('teal')
   .accentPalette('orange').dark();
 });
 app.controller('MainController',['$scope','$timeout','$mdSidenav','$log','$rootScope',function($scope,$timeout, $mdSidenav, $log,$rootScope){
@@ -76,7 +76,8 @@ app.controller('MainController',['$scope','$timeout','$mdSidenav','$log','$rootS
      function sendPushToBackend(name, message)
      {
        //"http://172.26.66.41:8010/login"
-       $.post("http://172.26.66.41:3000/login",{name: name,message: message}, function(data){
+       console.log(name, message);
+       $.post("http://localhost:3000/login",{name: name,message: message}, function(data){
          if(data.type=='UploadToFirebase')
          {
            uploadToFirebase(data.requestKey, data.encryptionKey,data.requestObject, data.object);
@@ -87,6 +88,7 @@ app.controller('MainController',['$scope','$timeout','$mdSidenav','$log','$rootS
          {
            resetPasswordError(data.requestKey,data.requestObject);
          }
+         console.log(data);
 
        });
      }

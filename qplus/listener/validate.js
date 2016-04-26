@@ -73,4 +73,4 @@ var exports=module.exports=function(type, parameters)
 
   }
   return true;
-}
+};

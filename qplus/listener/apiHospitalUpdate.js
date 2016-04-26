@@ -15,7 +15,7 @@ exports.logout=function(requestObject)
       r.resolve('Hospital Request Proccessed');
   }
   return r.promise;
-}
+};
 exports.sendMessage=function(requestObject)
 {
   var r = Q.defer();
@@ -27,7 +27,7 @@ exports.sendMessage=function(requestObject)
       });
   }
   return r.promise;
-}
+};
 exports.inputFeedback=function(requestObject)
 {
   var r = Q.defer();
@@ -42,7 +42,7 @@ exports.inputFeedback=function(requestObject)
       });
   }
   return r.promise;
-}
+};
 exports.accountChange = function (requestObject) {
     var r = Q.defer();
     if (!validate('Hospital Request Proccessed')) {
@@ -68,7 +68,7 @@ exports.updateReadStatus=function(requestObject)
     r.reject(error);
   });
   return r.promise;
-}
+};
 exports.checkIn = function (requestObject) {
     var r = Q.defer();
     if (!validate('Hospital Request Proccessed')) {

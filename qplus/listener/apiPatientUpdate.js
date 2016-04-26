@@ -20,7 +20,7 @@ exports.login = function (requestObject) {
     sqlInterface.getPatientDeviceLastActivity(UserID,device).then(function(result){
       console.log(result);
       var date=new Date(result.DateTime);
-      console.log('date of login', date)
+      console.log('date of login', date);
       console.log(result);
       date.setDate(date.getDate()+1);
       var today=new Date();
@@ -112,7 +112,7 @@ exports.checkCheckin = function(requestObject)
     r.reject({CheckCheckin:{response:result, AppointmentSerNum:requestObject.Parameters.AppointmentSerNum}});
   });
   return r.promise;
-}
+};
 exports.checkinUpdate = function(requestObject)
 {
   var r = Q.defer();
@@ -135,7 +135,7 @@ exports.checkinUpdate = function(requestObject)
     });
   });
   return r.promise;
-}
+};
 exports.getMapLocation=function(requestObject)
 {
   var r=Q.defer();
@@ -150,4 +150,4 @@ exports.getMapLocation=function(requestObject)
     r.reject('Invalid');
   });
   return r.promise;
-}
+};

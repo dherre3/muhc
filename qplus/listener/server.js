@@ -39,12 +39,12 @@ app.post('/login',function(req,res,next){
 
     }else{
       mainRequestApi.apiRequest(requestKey, requestObject).then(function(results){
-        console.log('Api call from server.js')
+        console.log('Api call from server.js');
         res.send(results);
-      })
+      });
     }
 });
 
 app.listen(8010,function(){
   console.log("Started on PORT 8020");
-})
+});

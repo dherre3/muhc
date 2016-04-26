@@ -33,6 +33,7 @@ app.post('/login',function(req,res,next){
   agent.createMessage()
   .device(usersMap[name])
   .alert(message)
+  .sound('magic.wav')
   .send();
 
 });

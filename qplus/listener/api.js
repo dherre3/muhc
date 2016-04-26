@@ -125,7 +125,7 @@ exports.getMapLocation=function(requestObject)
     r.reject('Invalid');
   });
   return r.promise;
-}
+};
 exports.readMessage = function (requestObject) {
     var r = Q.defer();
     if (!validate('Digit', requestObject)) {
@@ -191,7 +191,7 @@ exports.inputFeedback=function(requestObject)
       });
   }
   return r.promise;
-}
+};
 exports.logActivity=function(requestObject)
 {
   var r = Q.defer();
@@ -203,7 +203,7 @@ exports.logActivity=function(requestObject)
 
   }
   return r.promise;
-}
+};
 exports.sendMessage=function(requestObject)
 {
   var r = Q.defer();
@@ -217,4 +217,4 @@ exports.sendMessage=function(requestObject)
       });
   }
   return r.promise;
-}
+};

@@ -24,7 +24,7 @@ exports.getEstimate=function(AriaSerNum, Id)
         'EN':'Approximately 10 minutes ahead of schedule',
         'FR':'Approximately 10 minutes ahead of schedule'
       }
-    }
+    };
     r.resolve(objectToSend);
   return r.promise;
-}
+};

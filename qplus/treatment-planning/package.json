@@ -1,0 +1,44 @@
+{
+  "name": "treatment-planning",
+  "version": "1.0.0",
+  "description": "A website to study the performance of data-clean up in the treatment planning sequence as the MUHC",
+  "main": "main.js",
+  "dependencies": {
+    "express": "^4.13.3",
+    "body-parser": "^1.14.1",
+    "mysql": "^2.9.0",
+    "q": "^1.4.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "grunt": "^1.0.1",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-cssmin": "^1.0.1",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-sass": "^1.0.0",
+    "grunt-contrib-uglify": "^1.0.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-mocha-test": "^0.12.7",
+    "mocha": "^2.4.5"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dherre3/muhc.git"
+  },
+  "keywords": [
+    "treatment-plan",
+    "sequence",
+    "machine",
+    "learning"
+  ],
+  "author": "David Herrera",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dherre3/muhc/issues"
+  },
+  "homepage": "https://github.com/dherre3/muhc#readme"
+}

@@ -1,7 +1,7 @@
 var mysql       = require('mysql');
 var filesystem  =require('fs');
 var Q           =require('q');
-var utility = require('./utility.js')
+var utility = require('./utility.js');
 var queries=require('./queries.js');
 var credentials=require('./credentials.js');
 var CryptoJS=require('crypto-js');
@@ -152,7 +152,7 @@ exports.runSqlQuery=function(query, parameters, processRawFunction)
     }
   });
   return r.promise;
-}
+};
 
 //Gets Patient tables based on userID,  if timestamp defined sends requests
 //that are only updated after timestamp, third parameter is an array of table names, if not present all tables are gathered
@@ -193,17 +193,16 @@ exports.getPatientTableFields=function(userId,timestamp,arrayTables)
     r.reject(error);
   });
   return r.promise;
-}
+};
 //Helper function to format the table, userId and timestamp
 function processSelectRequest(table, userId, timestamp)
 {
   var r=Q.defer();
   var requestMappingObject=exports.requestMappings[table];
   var date=new Date(0);
-  console.log('time',timestamp)
+  console.log('time of update',timestamp);
   if(typeof timestamp!=='undefined')
   {
-    console.log('asdtime')
     date=new Date(Number(timestamp));
     console.log(date);
   }
@@ -245,8 +244,8 @@ function preparePromiseArrayFields(userId,timestamp,arrayTables)
 exports.updateReadStatus=function(userId, parameters)
 {
   var r= Q.defer();
-  table=exports.requestMappings[parameters.Field]['table'];
-  tableSerNum=exports.requestMappings[parameters.Field]['serNum'];
+  table=exports.requestMappings[parameters.Field].table;
+  tableSerNum=exports.requestMappings[parameters.Field].serNum;
   id=parameters.Id;
   console.log('Affected Id', id);
   var query=connection.query(queries.updateReadStatus(),[table,table, tableSerNum, id, table, 'PatientSerNum', userId],
@@ -256,7 +255,7 @@ exports.updateReadStatus=function(userId, parameters)
   });
   console.log(query.sql);
   return r.promise;
-}
+};
 
 //Api call to insert a message into messages table
 exports.sendMessage=function(requestObject)
@@ -271,7 +270,7 @@ exports.sendMessage=function(requestObject)
     r.resolve(requestObject);
   });
   return r.promise;
-}
+};
 
 //Api call to read message
 exports.readMessage=function(requestObject)
@@ -284,7 +283,7 @@ exports.readMessage=function(requestObject)
     r.resolve(requestObject);
   });
   return r.promise;
-}
+};
 //Api call to read notification
 exports.readNotification=function(requestObject)
 {
@@ -296,7 +295,7 @@ exports.readNotification=function(requestObject)
     r.resolve(requestObject);
   });
   return r.promise;
-}
+};
 
 //Check if user is already checkedin 
 exports.checkCheckinInAria = function(requestObject)
@@ -320,7 +319,7 @@ exports.checkCheckinInAria = function(requestObject)
     });
   });
   return r.promise;
-}
+};
 
 
 
@@ -352,21 +351,21 @@ exports.checkIn=function(requestObject)
         }).catch(function(error){
           console.log('error login checkin', error);
           r.resolve({Checkin:{response:'failure'}});
-        })
+        });
       }).catch(function(error){
-        console.log('Error inserting in sql', error)
+        console.log('Error inserting in sql', error);
         r.resolve({Checkin:{response:'failure'}});
       });
     }).catch(function(error){
       console.log('Unable to checkin to aria',error);
       r.resolve({Checkin:{response:'failure'}});
-    })
+    });
   }).catch(function(error){
     console.log('Error while grabbing aria ser num', error);
     r.resolve({Checkin:{response:'failure'}});
   });
   return r.promise;
-}
+};
 //Updating field in the database tables
 exports.updateAccountField=function(requestObject)
 {
@@ -399,7 +398,7 @@ exports.updateAccountField=function(requestObject)
     }
   });
   return r.promise;
-}
+};
 //Inputing feedback into feedback table
 exports.inputFeedback=function(requestObject)
 {
@@ -417,7 +416,7 @@ exports.inputFeedback=function(requestObject)
     });
   });
   return r.promise;
-}
+};
 //Adding action to activity log
 exports.addToActivityLog=function(requestObject)
 {
@@ -426,7 +425,7 @@ exports.addToActivityLog=function(requestObject)
   {
     console.log(rows);
   });
-}
+};
 //Gets user password for encrypting/decrypting
 exports.getUsersPassword=function(username)
 {
@@ -438,7 +437,7 @@ exports.getUsersPassword=function(username)
     r.resolve(rows);
   });
   return r.promise;
-}
+};
 //API call to get Security questions
 exports.getSecurityQuestions=function(PatientSerNum)
 {
@@ -449,7 +448,7 @@ exports.getSecurityQuestions=function(PatientSerNum)
     r.resolve(rows);
   });
   return r.promise;
-}
+};
 exports.getMapLocation=function(requestObject)
 {
   var qrCode=requestObject.Parameters.QRCode;
@@ -462,7 +461,7 @@ exports.getMapLocation=function(requestObject)
     r.resolve(rows[0]);
   });
   return r.promise;
-}
+};
 //Api call to get patient fields for password reset
 exports.getPatientFieldsForPasswordReset=function(userID)
 {
@@ -473,7 +472,7 @@ exports.getPatientFieldsForPasswordReset=function(userID)
     r.resolve(rows);
   });
   return r.promise;
-}
+};
 exports.setNewPassword=function(password,patientSerNum, token)
 {
   var r=Q.defer();
@@ -483,7 +482,7 @@ exports.setNewPassword=function(password,patientSerNum, token)
     r.resolve(rows);
   });
   return r.promise;
-}
+};
 exports.getPatientDeviceLastActivity=function(userid,device)
 {
   var r=Q.defer();
@@ -493,7 +492,7 @@ exports.getPatientDeviceLastActivity=function(userid,device)
     r.resolve(rows[0]);
   });
   return r.promise;
-}
+};
 
 exports.updateLogout=function(fields)
 {
@@ -504,7 +503,7 @@ exports.updateLogout=function(fields)
     r.resolve(rows);
   });
   return r.promise;
-}
+};
 
 function getUserFromUserID(UserID)
 {
@@ -528,14 +527,14 @@ function LoadDocuments(rows)
    console.log(rows);
     var imageCounter=0 ;
     var deferred = Q.defer();
-    if (rows.length==0) { deferred.resolve([]); }
+    if (rows.length === 0) { deferred.resolve([]); }
     for (var key = 0; key < rows.length; key++)
     {
 
       var n = rows[key].FinalFileName.lastIndexOf(".");
       var substring=rows[key].FinalFileName.substring(n+1,rows[key].FinalFileName.length);
       rows[key].DocumentType=substring;
-      rows[key].Content=filesystem.readFileSync(__dirname+'/Documents/' + rows[key].FinalFileName,'base64',function(error,data){
+      rows[key].Content=filesystem.readFileSync(__dirname+'/Documents/' + rows[key].FinalFileName,'base64',errorReport, function(error,data){
         if(error) r.reject(error);
       });
 
@@ -547,7 +546,7 @@ function LoadDocuments(rows)
        }
     }
     return deferred.promise;
-};
+}
 
 
 //Function toobtain Doctors images
@@ -616,7 +615,7 @@ function getEducationTableOfContents(rows)
   var indexes = [];
   var promises =[];
   for (var i = rows.length-1; i >= 0; i--) {
-    if(!rows[i].URL_EN || typeof rows[i].URL_EN=='undefined'|| rows[i].URL_EN.length ==0)
+    if(!rows[i].URL_EN || typeof rows[i].URL_EN == 'undefined'|| rows[i].URL_EN.length === 0)
     {
       var array=[];
       for (var j = rows.length-1; j >= 0; j--) {
@@ -627,11 +626,11 @@ function getEducationTableOfContents(rows)
       }
     }
   }
-  for (var i = 0; i < indexes.length; i++) {
-    rows.splice(indexes[i],1);
+  for (var k = 0; k < indexes.length; k++) {
+    rows.splice(indexes[k],1);
   }
-  for (var i = 0; i < rows.length; i++) {
-    promises.push(exports.runSqlQuery(queries.patientEducationalMaterialContents(),[rows[i].EducationalMaterialControlSerNum] ));
+  for (var l = 0; l < rows.length; l++) {
+    promises.push(exports.runSqlQuery(queries.patientEducationalMaterialContents(),[rows[l].EducationalMaterialControlSerNum] ));
   }
   Q.all(promises).then(
     function(results){
@@ -648,7 +647,7 @@ function getEducationTableOfContents(rows)
       }
       r.resolve(rows);
     }
-  ).catch(function(error){r.reject(error)});
+  ).catch(function(error){r.reject(error);});
   return r.promise;
 }
 
@@ -698,11 +697,11 @@ function checkIntoAria(patientActivitySerNum)
   //Url to checkin
   var urlCheckin = {
       path: 'http://medphys/devDocuments/screens/php/checkInPatient.php?CheckinVenue=8225&ScheduledActivitySer='+patientActivitySerNum
-    }
+    };
   //Url to check the successful or unsuccessful checkin
   var urlCheckCheckin = {
       path: 'http://medphys/devDocuments/ackeem/getCheckins.php?AppointmentAriaSer='+patientActivitySerNum
-  }
+  };
   //making request to checkin
       var x = http.request(urlCheckin,function(res){
           res.on('data',function(data){
@@ -722,12 +721,12 @@ function checkIfCheckedIntoAriaHelper(patientActivitySerNum)
   var r = Q.defer();
     var urlCheckCheckin = {
       path: 'http://medphys/devDocuments/ackeem/getCheckins.php?AppointmentAriaSer='+patientActivitySerNum
-    }
+    };
     var y = http.request(urlCheckCheckin,function(response){
       response.on('data',function(data){
           data = data.toString();
           console.log('Checking in aria if checked in', data);
-          if(data.length== 0)
+          if(data.length === 0)
           {
             r.reject('failure');
           }else{

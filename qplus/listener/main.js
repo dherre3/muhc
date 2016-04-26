@@ -40,7 +40,7 @@ setInterval(function(){
               }
             }
           }
-        };
+        }
     });
 },60000);
 ref.child('requests').on('child_added',function(requestsFromFirebase){
@@ -81,7 +81,7 @@ exports.apiRequest=function(requestKey,requestObject)
   var r=q.defer();
 
   sqlInterface.getUsersPassword(requestObject.UserID).then(function(rows){
-    if(rows.length>1||rows.length==0)
+    if(rows.length>1||rows.length === 0)
     {
       console.log('Rejecting request');
       var firebaseObject={
@@ -98,9 +98,9 @@ exports.apiRequest=function(requestKey,requestObject)
       requestObject.Request=utility.decryptObject(requestObject.Request,key);
       var encryptionKey=key;
       console.log(requestObject.Request);
-      if(requestObject.Request=='') {
+      if(requestObject.Request === '') {
         console.log('Rejecting request');
-        var firebaseObject={
+        var errorObject={
           requestKey:requestKey,
           requestObject:{},
           type:'CompleteRequest',
@@ -108,7 +108,7 @@ exports.apiRequest=function(requestKey,requestObject)
           response:'Error',
           reason:'Incorrect user password hash'
         };
-        r.resolve(firebaseObject);
+        r.resolve(errorObject);
       }else{
         requestObject.Parameters=utility.decryptObject(requestObject.Parameters,key);
         processApiRequest.processRequest(requestObject).then(function(objectToFirebase)
@@ -167,7 +167,7 @@ exports.apiRequest=function(requestKey,requestObject)
   });
 
   return r.promise;
-}
+};
 
 
 function resetPasswordError(requestKey,requestObject)
