@@ -1,5 +1,5 @@
 {
-  "name": "get-post-demo",
+  "name": "opal-backend",
   "version": "0.0.1",
   "dependencies": {
     "body-parser": "^1.8.1",
@@ -33,5 +33,24 @@
     "q": "^1.4.1",
     "sinon": "^1.17.3",
     "sinon-chai": "^2.8.0"
-  }
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "main": "main.js",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": ["muhc","opal","health","oncology"],
+  "author": "David Herrera",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dherre3/muhc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dherre3/muhc/issues"
+  },
+  "homepage": "https://depdocs.com/opal",
+  "description": "Repository for Opal, the oncology patient application"
 }
