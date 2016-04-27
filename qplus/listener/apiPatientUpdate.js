@@ -21,9 +21,9 @@ exports.login = function (requestObject) {
       {
          result.Request='Logout';
          sqlInterface.updateLogout([result.Request,result.Username,result.DeviceId,result.SessionId,date]).then(function(response){
-            console.log(response);
+            console.log('Updating logout', response);
          },function(error){
-            console.log(error);
+            console.log('Error updating logout', error);
          });
       }
     });
@@ -84,7 +84,6 @@ exports.checkCheckin = function(requestObject)
 //Get checkin update API call
 exports.checkinUpdate = function(requestObject)
 {
-  console.log('I am in the checkinUpdate function', requestObject);
   return sqlInterface.runSqlQuery(queries.getAppointmentAriaSer(),[requestObject.UserID,requestObject.Parameters.AppointmentSerNum], sqlInterface.getTimeEstimate);
 };
 

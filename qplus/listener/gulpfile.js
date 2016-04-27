@@ -4,7 +4,7 @@ var gutil = require('gulp-util');
 var jshint = require('gulp-jshint');
 
 gulp.task('test', function() {
-    return gulp.src(['test/testMocha.js'], {
+    return gulp.src(['test/testUtility.js'], {
             read: false
         })
         .pipe(mocha({

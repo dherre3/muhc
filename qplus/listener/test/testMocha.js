@@ -3,6 +3,7 @@ var expect = require('chai').expect;
 var utility = require('../utility.js');
 var sinon = require('sinon');
 var sinonChai = require('sinon-chai');
+var sqlInterface = require('../sqlInterface.js');   
 chai.use(sinonChai);
 
 describe('Sanitize',function(){
@@ -50,4 +51,10 @@ describe('Info Language',function(){
            done(); 
        });
     });
+});
+describe('Testing the eductional material section',function()
+{
+   var rows = {
+       
+   };
 });

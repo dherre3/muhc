@@ -1,68 +1,12 @@
 var CryptoJS    =require('crypto-js');
-var mysql       = require('mysql');
-var Q           =require('q');
 var credentials=require('./credentials.js');
-var https = require('https');
 var exports=module.exports={};
-exports.sanitize= function(word)
-{
-  word = word.toLowerCase();
-   return word;
-};
-exports.tokenize = function(sentence)
-{
-  return sentence.split(" ");
-};
-var url = 'https://api.github.com/repos/sayenee/build-podcast';
-exports.info = function(callback)
-{
-  var options = {
-    host:'api.github.com',
-    path: '/users/dherre3/events',
-    method:'GET',
-    headers:{
-      'User-Agent':'dherre3'
-    }
-  };
-  var str = '';
-  https.request(options,function(response){
-     response.on('data',function(data)
-     {
-       str+= data;
-     });
-     response.on('end',function(data)
-     {
-       callback(JSON.parse(str));
-     });
-     response.on('error',function(error)
-     {
-       console.log(error);
-     });
-   
-  }).end();
-};
-exports.infoLang = function(infoFunc,callback)
-{
-  infoFunc(function(reply){
-     callback('Language is '+reply.Language);
-  });
-};
-var sqlConfig={
-  host:credentials.HOST,
-  user:credentials.MYSQL_USERNAME,
-  password:credentials.MYSQL_PASSWORD,
-  database:credentials.MYSQL_DATABASE
-};
-/*
-*Re-connecting the sql database, NodeJS has problems and disconnects if inactive,
-The handleDisconnect deals with that
-*/
 
+
+//Returns empty response, function used by refresh, resume, login
 exports.resolveEmptyResponse=function(data)
 {
   var counter=0;
-  console.log('I am yoloing!!!');
-  console.log(data.Notifications);
   for (var key in data) {
     if(data[key].length>0)
     {
@@ -77,6 +21,7 @@ exports.resolveEmptyResponse=function(data)
     }
 };
 
+//Converts date object to mysql date
 exports.toMYSQLString=function(date)
 {
   var month=date.getMonth();
@@ -94,13 +39,14 @@ exports.toMYSQLString=function(date)
   return date.getFullYear()+'-'+month+'-'+day+' '+hours+':'+minutes+':'+seconds;
 
 };
+//Convers from milliseconds since 1970 to a mysql date
 exports.unixToMYSQLTimestamp=function(time)
 {
   var date=new Date(time);
   return exports.toMYSQLString(date);
 };
 
-
+//Encrypts an object, array, number, date or string
 exports.encryptObject=function(object,secret)
 {
   /*console.log(object.Appointments[0].ScheduledStartTime);
@@ -144,6 +90,7 @@ exports.encryptObject=function(object,secret)
   }
 
 };
+//Decryption function, returns an object whose values are all strings
 exports.decryptObject=function(object,secret)
 {
   if(typeof object =='string')
@@ -168,13 +115,15 @@ exports.decryptObject=function(object,secret)
         else
         {
           var decipherbytes = CryptoJS.AES.decrypt(object[key], secret);
-          object[key]=decipherbytes.toString(CryptoJS.enc.Utf8);
+          object[key]= decipherbytes.toString(CryptoJS.enc.Utf8);
         }
       }
     }
   }
   return object;
 };
+
+//Create copy of object if no nested object
 exports.copyObject = function(object)
 {
   var copy = {};
@@ -183,9 +132,12 @@ exports.copyObject = function(object)
   }
   return copy;
 };
+
 exports.Queue=function(){
   return new Queue();
 };
+
+//Creates Queue class for cascading purposes
 function Queue()
 {
   var array=[];
@@ -198,6 +150,10 @@ function Queue()
     }else{
       return false;
     }
+  };
+  this.size = function()
+  {
+    return array.length;
   };
   this.enqueueArray=function(arr)
   {
@@ -217,9 +173,58 @@ function Queue()
     if(head !== 0)
     {
       head--;
-      return array[head];
+      var poppedElement = array[head];
+      array.splice(head,1);
+      return poppedElement;
     }else{
       console.log('Queue is empty');
     }
   };
 }
+/*
+* For test mocha
+var https = require('https');
+exports.sanitize= function(word)
+{
+  word = word.toLowerCase();
+   return word;
+};
+exports.tokenize = function(sentence)
+{
+  return sentence.split(" ");
+};
+var url = 'https://api.github.com/repos/sayenee/build-podcast';
+exports.info = function(callback)
+{
+  var options = {
+    host:'api.github.com',
+    path: '/users/dherre3/events',
+    method:'GET',
+    headers:{
+      'User-Agent':'dherre3'
+    }
+  };
+  var str = '';
+  https.request(options,function(response){
+     response.on('data',function(data)
+     {
+       str+= data;
+     });
+     response.on('end',function(data)
+     {
+       callback(JSON.parse(str));
+     });
+     response.on('error',function(error)
+     {
+       console.log(error);
+     });
+   
+  }).end();
+};
+exports.infoLang = function(infoFunc,callback)
+{
+  infoFunc(function(reply){
+     callback('Language is '+reply.Language);
+  });
+};
+*/

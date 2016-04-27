@@ -2,151 +2,37 @@ var exports=module.exports={};
 var Q=require('q');
 var apiPatientUpdate=require('./apiPatientUpdate.js');
 var apiHospitalUpdate=require('./apiHospitalUpdate.js');
-
 var validate=require('./validate.js');
+var API = {
+  'Login':apiPatientUpdate.login,
+  'Resume':apiPatientUpdate.resume,
+  'Refresh':apiPatientUpdate.refresh,
+  'CheckCheckin':apiPatientUpdate.checkCheckin,
+  'Checkin':apiHospitalUpdate.checkIn,
+  'CheckinUpdate':apiPatientUpdate.checkinUpdate,
+  'MapLocation':apiPatientUpdate.getMapLocation,
+  'MessageRead':apiHospitalUpdate.readMessage,
+  'Message':apiHospitalUpdate.sendMessage,
+  'NotificationRead':apiHospitalUpdate.readNotification,
+  'Read':apiHospitalUpdate.updateReadStatus,
+  'AccountChange':apiHospitalUpdate.accountChange,
+  'Feedback':apiHospitalUpdate.inputFeedback,
+  'Logout': apiHospitalUpdate.logout
+};
+
 exports.processRequest=function(requestObject)
 {
   var r=Q.defer();
-  var type=requestObject.Request;
-  var UserID=requestObject.UserID;
-  var parameters=requestObject.Parameters;
-  var objectToFirebase={};
-  console.log(requestObject);
-  //Types account change, Notification read, messages read, checkin,
-  //Message
   if(!validate('DefinedObjectRequest',requestObject))
   {
     r.reject('Invalid');
   }
-  if(type=='Login')
+  var type = requestObject.Request;
+  if(API.hasOwnProperty(type))
   {
-    apiPatientUpdate.login(requestObject).then(function(objectToFirebase){
-      r.resolve(objectToFirebase);
-    }).catch(function(response)
-    {
-      r.reject(response);
-    });
-  }else if(type=='Resume')
-  {
-    apiPatientUpdate.resume(requestObject).then(function(objectToFirebase)
-    {
-      r.resolve(objectToFirebase);
-    }).catch(function(response)
-    {
-      r.reject(response);
-    });
-  }else if(type=='Refresh')
-  {
-    apiPatientUpdate.refresh(requestObject).then(function(objectToFirebase)
-    {
-      r.resolve(objectToFirebase);
-    }).catch(function(response)
-    {
-      r.reject(response);
-    });
-  }else if(type=='MapLocation'){
-    apiPatientUpdate.getMapLocation(requestObject).then(function(objectToFirebase)
-    {
-      r.resolve(objectToFirebase);
-    }).catch(function(response)
-    {
-      r.reject(reponse);
-    });
-  }
-  else if(type=='CheckinUpdate')
-  {
-    apiPatientUpdate.checkinUpdate(requestObject).then(function(response)
-    {
-      r.resolve(response);
-    }).catch(function(response)
-    {
-      r.reject(response);
-    });
-  }
-    else if(type=='CheckCheckin')
-  {
-    apiPatientUpdate.checkCheckin(requestObject).then(function(response)
-    {
-      console.log('Returning response from checkCheckin', response);
-      r.resolve(response);
-    }).catch(function(response)
-    {
-      r.reject(response);
-    });
-  }else if(type=='MessageRead')
-  {
-    apiHospitalUpdate.readMessage(requestObject).then(function(response)
-    {
-      r.resolve(response);
-    }).catch(function(response)
-    {
-      r.reject(response);
-    });
-  }else if(type=='NotificationRead')
-  {
-    apiHospitalUpdate.readNotification(requestObject).then(function(response)
-    {
-      r.resolve(response);
-    }).catch(function(response)
-    {
-      r.reject(response);
-    });
-  }else if(type=='Checkin')
-  {
-    apiHospitalUpdate.checkIn(requestObject).then(function(response)
-    {
-      r.resolve(response);
-    }).catch(function(response)
-    {
-      r.reject(response);
-    });
-  }else if(type=='Logout')
-  {
-    apiHospitalUpdate.logout(requestObject).then(function(response)
-    {
-      r.resolve(response);
-    }).catch(function(response)
-    {
-      r.reject(response);
-    });
-  }else if(type=='Read')
-  {
-    apiHospitalUpdate.updateReadStatus(requestObject).then(function(response)
-    {
-      r.resolve(response);
-    }).catch(function(response){
-      r.reject(response);
-    });
-  }else if(type=='Message')
-  {
-    console.log('I am about the send a message');
-    apiHospitalUpdate.sendMessage(requestObject).then(function(response){
-        r.resolve(response);
-    }).catch(function(response)
-    {
-      r.reject(response);
-    });
-  }else  if(type=='AccountChange')
-  {
-    apiHospitalUpdate.accountChange(requestObject).then(function(response)
-    {
-      r.resolve(response);
-    }).catch(function(response)
-    {
-      r.reject(response);
-    });
-  }else if(type=='Feedback')
-  {
-    apiHospitalUpdate.inputFeedback(requestObject).then(function(response)
-    {
-      r.resolve(response);
-    }).catch(function(response)
-    {
-      r.reject(response);
-    });
+    return  API[type](requestObject);
   }else{
     r.reject('Invalid');
   }
-
   return r.promise;
 };

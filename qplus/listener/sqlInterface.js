@@ -51,8 +51,8 @@ var exports=module.exports={};
 
 
 
-//Table mappings and process data functions for results obtained from the database.
-exports.requestMappings=
+//Table mappings and process data functions for results obtained from the database. Exporting function for testing purposes.
+var requestMappings=
 {
   'Patient':{
     sql:queries.patientTableFields(),
@@ -126,11 +126,15 @@ exports.requestMappings=
     serNum:'AnnouncementSerNum'
   }
 };
+exports.getSqlApiMappings = function()
+{
+  return requestMappings;
+};
+
 //Query processing function
 exports.runSqlQuery = function(query, parameters, processRawFunction)
 {
   var r = Q.defer();
-  console.log('RunSqlQuery parameters', parameters);
 
   connection.query(query, parameters, function(err,rows,fields){
     if (err) r.reject(err);
@@ -138,11 +142,8 @@ exports.runSqlQuery = function(query, parameters, processRawFunction)
     {
       if(processRawFunction&&typeof processRawFunction !=='undefined')
       {
-        console.log('processRawFunction',processRawFunction);
-        
         processRawFunction(rows).then(function(result)
         {
-          console.log('resuls of raw function', result);
           r.resolve(result);
         });
       }else{
@@ -164,17 +165,12 @@ exports.getPatientTableFields = function(userId,timestamp,arrayTables)
   if(arguments.length>2)
   {
     timestp=timestamp;
-    console.log('Grab', arrayTables);
   }else if(arguments.length==2)
   {
     timestp=timestamp;
-  }else{
-    console.log('User name grab all fields');
   }
   var objectToFirebase={};
   var index=0;
-  console.log(timestp);
-  console.log('Inside patient fields');
    Q.all(preparePromiseArrayFields(userId,timestp,arrayTables)).then(function(response){
      if(typeof arrayTables!=='undefined')
      {
@@ -183,7 +179,7 @@ exports.getPatientTableFields = function(userId,timestamp,arrayTables)
          index++;
        }
      }else{
-       for (var key in exports.requestMappings) {
+       for (var key in requestMappings) {
          objectToFirebase[key]=response[index];
          index++;
        }
@@ -198,13 +194,11 @@ exports.getPatientTableFields = function(userId,timestamp,arrayTables)
 function processSelectRequest(table, userId, timestamp)
 {
   var r=Q.defer();
-  var requestMappingObject=exports.requestMappings[table];
+  var requestMappingObject = requestMappings[table];
   var date=new Date(0);
-  console.log('time of update',timestamp);
   if(typeof timestamp!=='undefined')
   {
     date=new Date(Number(timestamp));
-    console.log(date);
   }
   var paramArray=[userId,date];
   if(requestMappingObject.numberOfLastUpdated>1){
@@ -226,7 +220,6 @@ function processSelectRequest(table, userId, timestamp)
 //Preparing a promise array for later retrieval
 function preparePromiseArrayFields(userId,timestamp,arrayTables)
 {
-  console.log('PreparePromise',timestamp);
   var array=[];
   if(typeof arrayTables!=='undefined')
   {
@@ -234,7 +227,7 @@ function preparePromiseArrayFields(userId,timestamp,arrayTables)
       array.push(processSelectRequest(arrayTables[i],userId,timestamp));
     }
   }else{
-    for (var key in exports.requestMappings) {
+    for (var key in requestMappings) {
       array.push(processSelectRequest(key,userId,timestamp));
     }
   }
@@ -246,16 +239,14 @@ function preparePromiseArrayFields(userId,timestamp,arrayTables)
 exports.updateReadStatus=function(userId, parameters)
 {
   var r= Q.defer();
-  table=exports.requestMappings[parameters.Field].table;
-  tableSerNum=exports.requestMappings[parameters.Field].serNum;
+  table = requestMappings[parameters.Field].table;
+  tableSerNum = requestMappings[parameters.Field].serNum;
   id=parameters.Id;
-  console.log('Affected Id', id);
   var query=connection.query(queries.updateReadStatus(),[table,table, tableSerNum, id, table, 'PatientSerNum', userId],
   function(err,rows,fields){
     if(err) r.reject(err);
     r.resolve(rows);
   });
-  console.log(query.sql);
   return r.promise;
 };
 
@@ -263,7 +254,6 @@ exports.updateReadStatus=function(userId, parameters)
 exports.sendMessage=function(requestObject)
 {
   var r=Q.defer();
-  console.log(requestObject);
   connection.query(queries.sendMessage(requestObject),function(error,rows, fields)
   {
 
@@ -425,7 +415,7 @@ exports.addToActivityLog=function(requestObject)
   connection.query(queries.logActivity(requestObject),
   function(error, rows, fields)
   {
-    console.log(rows);
+    console.log('Log Patient Activity', rows);
   });
 };
 //Gets user password for encrypting/decrypting
@@ -454,7 +444,6 @@ exports.getSecurityQuestions=function(PatientSerNum)
 exports.getMapLocation=function(requestObject)
 {
   var qrCode=requestObject.Parameters.QRCode;
-  console.log(requestObject);
   var r=Q.defer();
   connection.query(queries.getMapLocation(qrCode),function(error,rows,fields)
   {
@@ -501,7 +490,6 @@ exports.updateLogout=function(fields)
   var r=Q.defer();
   connection.query(queries.updateLogout(),fields,function(err, rows, fields){
     if(err) r.reject(err);
-    console.log(rows);
     r.resolve(rows);
   });
   return r.promise;
@@ -526,7 +514,6 @@ function LoadDocuments(rows)
   *@description  Uses the q module to make a promise to load images. The promise is resolved after all of them have been read from file system using the fs module. The code continues to run only if the promise is resolved.
   **/
    console.log('Inside document fetching function');
-   console.log(rows);
     var imageCounter=0 ;
     var deferred = Q.defer();
     if (rows.length === 0) { deferred.resolve([]); }
@@ -536,10 +523,7 @@ function LoadDocuments(rows)
       var n = rows[key].FinalFileName.lastIndexOf(".");
       var substring=rows[key].FinalFileName.substring(n+1,rows[key].FinalFileName.length);
       rows[key].DocumentType=substring;
-      rows[key].Content=filesystem.readFileSync(__dirname+'/Documents/' + rows[key].FinalFileName,'base64',function(error,data){
-        if(error) r.reject(error);
-      });
-
+      rows[key].Content=filesystem.readFileSync(__dirname+'/Documents/' + rows[key].FinalFileName,'base64');
       imageCounter++;
       //console.log('imagecounter is : ',imageCounter);
       if (imageCounter == Object.keys(rows).length )
@@ -611,6 +595,7 @@ function getEducationalMaterialTableOfContents(rows)
   }
   return r.promise;
 }
+
 function getEducationTableOfContents(rows)
 {
   var r = Q.defer();
@@ -628,6 +613,7 @@ function getEducationTableOfContents(rows)
       }
     }
   }
+  //Delete 
   for (var k = 0; k < indexes.length; k++) {
     rows.splice(indexes[k],1);
   }
@@ -655,33 +641,15 @@ function getEducationTableOfContents(rows)
 
 var LoadAttachments = function (rows )
 {
-  /**
-  * @ngdoc method
-  * @methodOf Qplus Firebase Listener
-  *@name LoadAttachments
-  *@description  Uses the q module to make a promise to load attachments. The promise is resolved after all of them have been read from file system using the fs module. The code continues to run only if the promise is resolved.
-  **/
+
     var messageCounter=0 ;
     var r = Q.defer();
     r.resolve(rows);
     return r.promise;
-    /*if (Object.keys(rows).length==0) { deferred.resolve('All attachments were loaded!'); }
-    for (var key in rows)
-    {
-      // It fetches all of the attachment every time a user logs in. Very bad for bandwidth !
-      if (rows[key].Attachment && rows[key].Attachment!=="No" )
-      {
-        rows[key].Attachment=filesystem.readFileSync(__dirname + rows[key].Attachment,'base64' );
-      }
-      messageCounter++;
-      if (messageCounter == Object.keys(rows).length )
-       {
-         dataObject.Messages= JSON.parse(JSON.stringify(rows));
-         deferred.resolve('All attachments were loaded!');
-       }
-    }
-    return deferred.promise;*/
-  };
+  
+ };
+  
+
 function getAppointmentAriaSer(username, appSerNum)
 {
   return exports.runSqlQuery(queries.getAppointmentAriaSer(),[username, appSerNum]);
@@ -720,7 +688,6 @@ function checkIfCheckedIntoAriaHelper(patientActivitySerNum)
     var y = http.request(urlCheckCheckin,function(response){
       response.on('data',function(data){
           data = data.toString();
-          console.log('Checking in aria if checked in', data);
           if(data.length === 0)
           {
             r.reject('failure');
