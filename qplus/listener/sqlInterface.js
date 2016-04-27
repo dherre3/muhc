@@ -242,7 +242,7 @@ exports.updateReadStatus=function(userId, parameters)
   table = requestMappings[parameters.Field].table;
   tableSerNum = requestMappings[parameters.Field].serNum;
   id=parameters.Id;
-  var query=connection.query(queries.updateReadStatus(),[table,table, tableSerNum, id, table, 'PatientSerNum', userId],
+  var query=connection.query(queries.updateReadStatus(),[table,table, tableSerNum, id, table, userId],
   function(err,rows,fields){
     if(err) r.reject(err);
     r.resolve(rows);
@@ -259,32 +259,7 @@ exports.sendMessage=function(requestObject)
 
     if(error) r.reject(error);
     //connection.query(queriesMH.sendMessage(objectRequest,id));
-    r.resolve(requestObject);
-  });
-  return r.promise;
-};
-
-//Api call to read message
-exports.readMessage=function(requestObject)
-{
-  var r=Q.defer();
-  var serNum=requestObject.Parameters.MessageSerNum;
-  connection.query(queries.readMessage(serNum, requestObject.Token),function(error, rows, fields)
-  {
-    if(error) r.reject(error);
-    r.resolve(requestObject);
-  });
-  return r.promise;
-};
-//Api call to read notification
-exports.readNotification=function(requestObject)
-{
-  var r=Q.defer();
-  var serNum=requestObject.Parameters.NotificationSerNum;
-  connection.query(queries.readNotification(serNum, requestObject.Token),function(error, rows, fields)
-  {
-    if(error) r.reject(error);
-    r.resolve(requestObject);
+    r.resolve('Hospital Request Proccessed');
   });
   return r.promise;
 };
@@ -404,7 +379,7 @@ exports.inputFeedback=function(requestObject)
     function(error, rows, fields)
     {
       if(error) r.reject(error);
-      r.resolve(requestObject);
+      r.resolve('Hospital Request Proccessed');
     });
   });
   return r.promise;
@@ -416,6 +391,9 @@ exports.addToActivityLog=function(requestObject)
   function(error, rows, fields)
   {
     console.log('Log Patient Activity', rows);
+    if(error) r.reject(error);
+    r.resolve('Hospital Request Proccessed');
+    
   });
 };
 //Gets user password for encrypting/decrypting

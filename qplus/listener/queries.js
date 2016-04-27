@@ -45,7 +45,6 @@ exports.patientAnnouncementsTableFields=function()
 exports.patientEducationalMaterialTableFields=function()
 {
   return "SELECT DISTINCT EduMat.EducationalMaterialSerNum, EduControl.EducationalMaterialControlSerNum, EduMat.DateAdded, EduMat.ReadStatus, EduControl.EducationalMaterialType_EN, EduControl.EducationalMaterialType_FR, EduControl.Name_EN, EduControl.Name_FR, EduControl.URL_EN, EduControl.URL_FR, Phase.Name_EN as PhaseName_EN, Phase.Name_FR as PhaseName_FR FROM Users, Patient, EducationalMaterialControl as EduControl, EducationalMaterial as EduMat, PhaseInTreatment as Phase, EducationalMaterialTOC as TOC WHERE (EduMat.EducationalMaterialControlSerNum = EduControl.EducationalMaterialControlSerNum OR (TOC.ParentSerNum = EduMat.EducationalMaterialControlSerNum AND TOC.EducationalMaterialControlSerNum = EduControl.EducationalMaterialControlSerNum)) AND Phase.PhaseInTreatmentSerNum = EduControl.PhaseInTreatmentSerNum AND  EduMat.PatientSerNum = Patient.PatientSerNum AND Patient.PatientSerNum = Users.UserTypeSerNum AND Users.Username = ? AND (EduMat.LastUpdated > ? OR EduControl.LastUpdated > ? OR Phase.LastUpdated > ? OR TOC.LastUpdated > ?) order by FIELD(PhaseName_EN,'Prior To Treatment','During Treatment','After Treatment') ;";
-  //return "SELECT Records.EducationalMaterialSerNum, Records.DateAdded, Records.ReadStatus, EducationalMaterialControl.EducationalMaterialControlSerNum, EducationalMaterialControl.EducationalMaterialType_EN, EducationalMaterialControl.EducationalMaterialType_FR, EducationalMaterialControl.Name_EN, EducationalMaterialControl.Name_FR, EducationalMaterialControl.URL_EN, EducationalMaterialControl.URL_FR, EducationalMaterialControl.PhaseInTreatment, EducationalMaterialControl.DateAdded FROM EducationalMaterialTOC as TOC, EducationalMaterial as Records, EducationalMaterialControl, Patient, Users WHERE EducationalMaterialControl.EducationalMaterialControlSerNum=Records.EducationalMaterialControlSerNum AND TOC.EducationalMaterialControlSerNum=EducationalMaterialControl.EducationalMaterialControlSerNum AND Patient.PatientSerNum = Records.PatientSerNum AND Patient.PatientSerNum=Users.UserTypeSerNum AND Users.Username = ?  AND (EducationalMaterialControl.LastUpdated > ? OR Records.LastUpdated > ? OR TOC.LastUpdated > ?) ORDER BY field(EducationalMaterialControl.PhaseInTreatment,'PriorToTreatment', 'DuringTreatment', 'AfterTreatment');";
 };
 exports.patientEducationalMaterialContents=function()
 {
@@ -70,11 +69,6 @@ exports.setNewPassword=function(password,patientSerNum, token)
   return "UPDATE Users SET Password='"+password+"', SessionId='"+token+"' WHERE UserType = 'Patient' AND UserTypeSerNum="+patientSerNum;
 };
 
-exports.readMessage=function(MessageSerNum,token)
-{
-  return "UPDATE `Messages` SET ReadStatus=1, SessionId='"+token+"' WHERE Messages.MessageSerNum='"+MessageSerNum+"'";
-};
-
 //For checkin
 exports.getAppointmentAriaSer=function()
 {
@@ -90,11 +84,6 @@ exports.logCheckin = function()
   return "INSERT INTO `CheckinLog`(`CheckinLogSerNum`, `AppointmentSerNum`, `DeviceId`, `Latitude`, `Longitude`, `Accuracy`, `DateAdded`, `LastUpdated`) VALUES (NULL,?,?,?,?,?,?,NULL)";
 };
 
-
-exports.readNotification=function(NotificationSerNum,token)
-{
-  return "UPDATE Notifications SET ReadStatus=1, SessionId='"+token+"' WHERE `Notifications`.`NotificationSerNum`='"+NotificationSerNum+"'";
-};
 exports.accountChange=function( serNum, field, newValue, token)
 {
   return "UPDATE Patient SET "+field+"='"+newValue+"', SessionId='"+token+"' WHERE PatientSerNum LIKE '"+serNum+"'";
@@ -148,19 +137,12 @@ exports.getMapLocation=function(qrCode)
   return "SELECT * FROM HospitalMap WHERE QRMapAlias = '"+qrCode+"';";
 };
 
-exports.changeReadStatus=function(table, patientSerNum)
-{
-  return "UPDATE '"+table+"' SET ReadStatus=1 WHERE PatientSerNum="+patientSerNum;
-};
 exports.updateReadStatus=function()
 {
-  return "UPDATE ?? , Patient, Users SET ReadStatus = 1 WHERE ??.?? = ? AND Patient.PatientSerNum = ??.?? AND Patient.PatientSerNum = Users.UserTypeSerNum AND Users.Username = ?;";
+  return "UPDATE ?? , Patient, Users SET ReadStatus = 1 WHERE ??.?? = ? AND Patient.PatientSerNum = ??.PatientSerNum AND Patient.PatientSerNum = Users.UserTypeSerNum AND Users.Username = ?;";
 };
+
 exports.getPatientDeviceLastActivity=function(userid,device)
 {
   return "SELECT * FROM PatientActivityLog WHERE Username='"+userid+"' AND DeviceId='"+device+"' ORDER BY ActivitySerNum DESC LIMIT 1;";
-};
-exports.getEducationMaterial=function(userId)
-{
-    return "SELECT E.DateAdded, E.ReadStatus, E.EducationalMaterialSerNum, P.PostName_FR, P.PostName_EN, P.Body_FR, P.Body_EN FROM EducationalMaterial as E, Users as U, Patient as Pa, Post as P WHERE Pa.PatientSerNum=E.PatientSerNum AND U.UserTypeSerNum=Pa.PatientSerNum AND U.Username LIKE '"+userID+"'";
 };
