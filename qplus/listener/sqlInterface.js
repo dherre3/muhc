@@ -7,10 +7,12 @@ var credentials=require('./credentials.js');
 var CryptoJS=require('crypto-js');
 var buffer=require('buffer');
 var http = require('http');
+var timeEstimate = require('./timeEstimate.js');
 
 
 
-/*var sqlConfig={
+
+var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
   password:'root',
@@ -20,7 +22,7 @@ var http = require('http');
 /*
 *Connecting to mysql database
 */
-var sqlConfig={
+/*var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,
@@ -125,23 +127,22 @@ exports.requestMappings=
   }
 };
 //Query processing function
-exports.runSqlQuery=function(query, parameters, processRawFunction)
+exports.runSqlQuery = function(query, parameters, processRawFunction)
 {
-  var r=Q.defer();
-  console.log(parameters);
+  var r = Q.defer();
+  console.log('RunSqlQuery parameters', parameters);
 
   connection.query(query, parameters, function(err,rows,fields){
-    console.log(query);
-    console.log(parameters);
-    console.log(err);
     if (err) r.reject(err);
     if(typeof rows !=='undefined')
     {
-
       if(processRawFunction&&typeof processRawFunction !=='undefined')
       {
+        console.log('processRawFunction',processRawFunction);
+        
         processRawFunction(rows).then(function(result)
         {
+          console.log('resuls of raw function', result);
           r.resolve(result);
         });
       }else{
@@ -156,7 +157,7 @@ exports.runSqlQuery=function(query, parameters, processRawFunction)
 
 //Gets Patient tables based on userID,  if timestamp defined sends requests
 //that are only updated after timestamp, third parameter is an array of table names, if not present all tables are gathered
-exports.getPatientTableFields=function(userId,timestamp,arrayTables)
+exports.getPatientTableFields = function(userId,timestamp,arrayTables)
 {
   var r=Q.defer();
   var timestp=0;
@@ -177,7 +178,6 @@ exports.getPatientTableFields=function(userId,timestamp,arrayTables)
    Q.all(preparePromiseArrayFields(userId,timestp,arrayTables)).then(function(response){
      if(typeof arrayTables!=='undefined')
      {
-      console.log('BOOM');
        for (var i = 0; i < arrayTables.length; i++) {
          objectToFirebase[arrayTables[i]]=response[index];
          index++;
@@ -187,8 +187,8 @@ exports.getPatientTableFields=function(userId,timestamp,arrayTables)
          objectToFirebase[key]=response[index];
          index++;
        }
-     }
-      r.resolve(objectToFirebase);
+     }   
+     r.resolve(objectToFirebase);
   },function(error){
     r.reject(error);
   });
@@ -240,6 +240,8 @@ function preparePromiseArrayFields(userId,timestamp,arrayTables)
   }
   return array;
 }
+
+
 //Update read status for a table
 exports.updateReadStatus=function(userId, parameters)
 {
@@ -309,13 +311,13 @@ exports.checkCheckinInAria = function(requestObject)
     console.log('Appointment aria ser', ariaSerNum);
     //Check using Ackeem's script whether the patient has checked in at the kiosk
     checkIfCheckedIntoAriaHelper(ariaSerNum).then(function(success){
-      console.log('the user has checkhed in ', success);
+      console.log('the user has checked in ', success);
       //Check in the user into mysql if they have indeed checkedin at kiosk
       exports.runSqlQuery(queries.checkin(),['Kiosk', serNum, username]);
-      r.resolve(success);
+      r.resolve({CheckCheckin:{response:success, AppointmentSerNum:serNum}});
     }).catch(function(error){
       //Returns false to whether the patient has checked in.
-      r.reject(error);
+      r.reject({CheckCheckin:{response:error, AppointmentSerNum:serNum}});
     });
   });
   return r.promise;
@@ -457,8 +459,8 @@ exports.getMapLocation=function(requestObject)
   connection.query(queries.getMapLocation(qrCode),function(error,rows,fields)
   {
     console.log(error);
-    if(error) r.reject(error);
-    r.resolve(rows[0]);
+    if(error) r.reject('Invalid');
+    r.resolve({'MapLocation':rows[0]});
   });
   return r.promise;
 };
@@ -534,7 +536,7 @@ function LoadDocuments(rows)
       var n = rows[key].FinalFileName.lastIndexOf(".");
       var substring=rows[key].FinalFileName.substring(n+1,rows[key].FinalFileName.length);
       rows[key].DocumentType=substring;
-      rows[key].Content=filesystem.readFileSync(__dirname+'/Documents/' + rows[key].FinalFileName,'base64',errorReport, function(error,data){
+      rows[key].Content=filesystem.readFileSync(__dirname+'/Documents/' + rows[key].FinalFileName,'base64',function(error,data){
         if(error) r.reject(error);
       });
 
@@ -682,14 +684,7 @@ var LoadAttachments = function (rows )
   };
 function getAppointmentAriaSer(username, appSerNum)
 {
-  var r = Q.defer();
-  exports.runSqlQuery(queries.getAppointmentAriaSer(),[username, appSerNum]).then(function(response)
-  {
-    console.log(response);
-    r.resolve(response);
-  }).catch(function(error){r.reject(error);});
-  return r.promise;
-
+  return exports.runSqlQuery(queries.getAppointmentAriaSer(),[username, appSerNum]);
 }
 function checkIntoAria(patientActivitySerNum)
 {
@@ -736,4 +731,18 @@ function checkIfCheckedIntoAriaHelper(patientActivitySerNum)
       }).end();
     return r.promise;
 }
+//Get time estimate from Ackeem's scripts
 
+exports.getTimeEstimate = function(result)
+{
+  var r = Q.defer();
+  result = result[0];
+  timeEstimate.getEstimate(result.AppointmentAriaSer).then(
+      function(estimate){
+          r.resolve({CheckinUpdate: estimate});
+      },function(error)
+      {
+        r.resolve({CheckinUpdate: error});
+    });
+    return r.promise;
+};

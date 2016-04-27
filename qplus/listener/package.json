@@ -41,7 +41,12 @@
   "directories": {
     "test": "test"
   },
-  "keywords": ["muhc","opal","health","oncology"],
+  "keywords": [
+    "muhc",
+    "opal",
+    "health",
+    "oncology"
+  ],
   "author": "David Herrera",
   "license": "ISC",
   "repository": {

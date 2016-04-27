@@ -4,7 +4,7 @@ var sqlInterface = require('./sqlInterface.js');
 var utility = require('./utility.js');
 var validate = require('./validate.js');
 var queries = require('./queries.js');
-var timeEstimate = require('./timeEstimate.js');
+
 /*
  *@name login
  *@requires slqInterface
@@ -13,15 +13,8 @@ var timeEstimate = require('./timeEstimate.js');
  */
 
 exports.login = function (requestObject) {
-    var r = Q.defer();
-    var UserID=requestObject.UserID;
-    var device=requestObject.DeviceId;
-    var objectToFirebase = {};
-    sqlInterface.getPatientDeviceLastActivity(UserID,device).then(function(result){
-      console.log(result);
+    sqlInterface.getPatientDeviceLastActivity(requestObject.UserID,requestObject.DeviceId).then(function(result){
       var date=new Date(result.DateTime);
-      console.log('date of login', date);
-      console.log(result);
       date.setDate(date.getDate()+1);
       var today=new Date();
       if(typeof result !=='undefined'&&result.Request=='Login')
@@ -34,14 +27,8 @@ exports.login = function (requestObject) {
          });
       }
     });
-    sqlInterface.getPatientTableFields(UserID).then(function(objectToFirebase)
-    {
-      sqlInterface.addToActivityLog(requestObject);
-      r.resolve(objectToFirebase);
-    },function(reason){
-      r.resolve(reason);
-    });
-    return r.promise;
+    sqlInterface.addToActivityLog(requestObject);
+    return sqlInterface.getPatientTableFields(UserID);
 };
 /*
 *@name refresh
@@ -52,21 +39,13 @@ or a single table field.
 */
 exports.resume=function(requestObject)
 {
-  var r = Q.defer();
-  var UserId=requestObject.UserID;
-  sqlInterface.getPatientTableFields(UserId).then(function(objectToFirebase){
-    r.resolve(objectToFirebase);
-  }).catch(function(error){
-    r.reject(error);
-  });
-  return r.promise;
+  return sqlInterface.getPatientTableFields(requestObject.UserID);
 };
 exports.refresh = function (requestObject) {
     var r = Q.defer();
     var UserId=requestObject.UserID;
     var parameters=requestObject.Parameters;
     var timestamp=requestObject.Timestamp;
-    console.log(requestObject);
     var objectToFirebase = {};
     if(!validate("Defined",parameters))
     {
@@ -75,26 +54,18 @@ exports.refresh = function (requestObject) {
     }
     if(parameters=='All'){
       sqlInterface.getPatientTableFields(UserId,timestamp).then(function(objectToFirebase){
-        objectToFirebase=utility.resolveEmptyResponse(objectToFirebase);
-        console.log(objectToFirebase);
-
+        objectToFirebase = utility.resolveEmptyResponse(objectToFirebase);
         r.resolve(objectToFirebase);
       }).catch(function(error){
         r.reject(error);
       });
     }else {
-      console.log(parameters);
       if(!(typeof parameters.constructor !=='undefined'&&parameters.constructor=== Array)) parameters=[parameters];
-      console.log(parameters);
-      console.log(timestamp);
         if (!validate('RefreshArray', parameters)) {
             r.reject('Invalid');
         }
         sqlInterface.getPatientTableFields(UserId, timestamp, parameters).then(function (rows) {
-            objectToFirebase = rows;
-
-            objectToFirebase=utility.resolveEmptyResponse(objectToFirebase);
-              console.log(objectToFirebase);
+            objectToFirebase=utility.resolveEmptyResponse(rows);
             r.resolve(objectToFirebase);
         },function(reason)
         {
@@ -103,51 +74,22 @@ exports.refresh = function (requestObject) {
     }
     return r.promise;
 };
+
+//Check checkin API call
 exports.checkCheckin = function(requestObject)
 {
-  var r = Q.defer();
-  sqlInterface.checkCheckinInAria(requestObject).then(function(result){
-    r.resolve({CheckCheckin:{response:result, AppointmentSerNum:requestObject.Parameters.AppointmentSerNum}});
-  }).catch(function(error){
-    r.reject({CheckCheckin:{response:result, AppointmentSerNum:requestObject.Parameters.AppointmentSerNum}});
-  });
-  return r.promise;
+  return sqlInterface.checkCheckinInAria(requestObject);
 };
+
+//Get checkin update API call
 exports.checkinUpdate = function(requestObject)
 {
-  var r = Q.defer();
-  var serNum = requestObject.Parameters.AppointmentSerNum;
-  console.log(serNum);
-
-  sqlInterface.runSqlQuery(queries.getAppointmentAriaSer(),[requestObject.UserID,serNum]).then(function(result)
-  {
-    result = result[0];
-    console.log('results query', result);
-    console.log(result.AppointmentAriaSer);
-    timeEstimate.getEstimate(result.AppointmentAriaSer).then(
-      function(estimate){
-          console.log('Estimate:', estimate);
-          r.resolve({CheckinUpdate: estimate});
-      },function(error)
-      {
-        console.log('Estimate:', error);
-        r.resolve({CheckinUpdate: error});
-    });
-  });
-  return r.promise;
+  console.log('I am in the checkinUpdate function', requestObject);
+  return sqlInterface.runSqlQuery(queries.getAppointmentAriaSer(),[requestObject.UserID,requestObject.Parameters.AppointmentSerNum], sqlInterface.getTimeEstimate);
 };
+
+//Get Map Location API call 
 exports.getMapLocation=function(requestObject)
 {
-  var r=Q.defer();
-  console.log(requestObject);
-  sqlInterface.getMapLocation(requestObject).then(function(response)
-  {
-    var objectToSend={};
-    objectToSend.MapLocation=response;
-    console.log(response);
-    r.resolve(objectToSend);
-  }).catch(function(error){
-    r.reject('Invalid');
-  });
-  return r.promise;
+   return sqlInterface.getMapLocation(requestObject);
 };
