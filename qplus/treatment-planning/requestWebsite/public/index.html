@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>MUHC Listener</title>
@@ -45,7 +46,7 @@
                 </md-select>
               </md-input-container>
             </div>
-            <div flex >
+            <div flex = "30" >
               <fieldset class="demo-fieldset" >
               <div layout="column" layout-wrap flex>
                 <md-checkbox aria-label="Select All"
@@ -66,6 +67,17 @@
               </div>
             </fieldset>
           </div>
+          <div flex="40">
+             <fieldset class="demo-fieldset" >
+
+             <md-checkbox ng-checked="swapPairs" ng-click="toggleSwapPairs()" >
+                    <md-tooltip md-direction="right">
+                      Swaps pairs into the right order
+                    </md-tooltip>
+                   Swap Pairs
+                  </md-checkbox>
+               </fieldset>    
+            </div>
           </div>
        </div>
      </div>
@@ -165,6 +177,32 @@ Step Order Frequency <span style="font-size:13px;color:#fff">(Order frequency of
     <td class="active">{{alias.AliasName}}</td>
     <td class="success">{{alias.BestIndex}} ({{(alias.Array[alias.BestIndex]*100)/alias.TotalPatients|limitTo:4}}%)</td>
     <td class="success">{{alias.Array}}</td>
+  </tr>
+</table>
+</div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-heading" role="tab" id="headingFour">
+<h4 class="panel-title">
+<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+Fixed Step Order and Frequency 
+</a>
+</h4>
+</div>
+<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+<div class="panel-body">
+<table class="table table-bordered" style="margin-right:20px" cellpadding="10">
+  <tr>
+    <th>Order in Sequence</th>
+    <th>Name of Step</th>
+    <th>Percentage to be in that spot%</th>
+
+  </tr>
+  <tr ng-repeat= "step in stepFrequencyFixed" ng-click="null">
+    <td class="active">{{$index + 1}}</td>
+    <td class="success">{{step.Alias}}</td>
+    <td>{{step.Number|limitTo:4}}</td>
   </tr>
 </table>
 </div>

@@ -13,6 +13,8 @@ var queries = require('./queries.js');
  */
 
 exports.login = function (requestObject) {
+  console.log('Inside Login function', requestObject);
+  
     sqlInterface.getPatientDeviceLastActivity(requestObject.UserID,requestObject.DeviceId).then(function(result){
       var date=new Date(result.DateTime);
       date.setDate(date.getDate()+1);
@@ -28,7 +30,7 @@ exports.login = function (requestObject) {
       }
     });
     sqlInterface.addToActivityLog(requestObject);
-    return sqlInterface.getPatientTableFields(UserID);
+    return sqlInterface.getPatientTableFields(requestObject.UserID);
 };
 /*
 *@name refresh

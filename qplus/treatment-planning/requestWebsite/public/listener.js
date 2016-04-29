@@ -2,7 +2,7 @@ var app=angular.module('MUHCPushNotifications',['ngMaterial']);
 app.config(function($mdThemingProvider) {
    // Configure a dark theme with primary foreground yellow
    $mdThemingProvider.theme('docs-dark', 'default')
-     .primaryPalette('pink')
+     .primaryPalette('teal')
      .dark();
  });
 
@@ -22,13 +22,18 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
   };
   var ref = new Firebase('https://brilliant-inferno-7679.firebaseio.com/sequences');
   ref.auth('9HeH3WPYe4gdTuqa88dtE3KmKy7rqfb4gItDRkPF');
+  $scope.toggleSwapPairs = function()
+  {
+    $scope.swapPairs = $scope.swapPairs?false:true;
+    $scope.fetchCancerTypeData($scope.cancerType);
+  };
   $scope.fetchCancerTypeData = function(cancer)
   {
     var objectToSend = {};
     $rootScope.canceType = cancer;
     console.log(cancer);
     objectToSend[$rootScope.canceType] = {};
-    $.post("http://localhost:3000/login",{CancerType: cancer, Analysis:'SeqFreq'}, function(data){
+    $.post("http://localhost:3000/login",{CancerType: cancer, Analysis:'SeqFreq', swapPairs:$scope.swapPairs}, function(data){
       console.log(data);
       /*data = JSON.stringify(data);
       data = encryptObject(data, '12345');
@@ -47,12 +52,12 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
       });
     });
 
-    $.post("http://localhost:3000/login",{CancerType: cancer, Analysis:'StepFreq'}, function(data){
+    $.post("http://localhost:3000/login",{CancerType: cancer, Analysis:'StepFreq', swapPairs:false}, function(data){
       console.log(data);
-      /*data = JSON.stringify(data);
+     /* data = JSON.stringify(data);
       data = encryptObject(data, '12345');
       objectToSend[$rootScope.canceType].StepFreq=data;*/
-
+      
       $timeout(function()
       {
           var steps = organizeSteps(data);
@@ -63,8 +68,21 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
       });
 
     });
+     $.post("http://localhost:3000/login",{CancerType: cancer, Analysis:'FixedStepFreq', swapPairs:false}, function(data){
+      /*data = JSON.stringify(data);
+      data = encryptObject(data, '12345');
+      objectToSend[$rootScope.canceType].MissingFreq = data;
+      console.log(objectToSend);
+      ref.update(objectToSend);*/
+      $timeout(function()
+      {
+        console.log(data);
+        
+        $scope.stepFrequencyFixed = data;
+      });
+    });
 
-    $.post("http://localhost:3000/login",{CancerType: cancer, Analysis:'MissingFreq'}, function(data){
+    $.post("http://localhost:3000/login",{CancerType: cancer, Analysis:'MissingFreq', swapPairs:false}, function(data){
       /*data = JSON.stringify(data);
       data = encryptObject(data, '12345');
       objectToSend[$rootScope.canceType].MissingFreq = data;
@@ -75,6 +93,7 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
         $scope.missingSteps = data;
       });
     });
+   
   };
   $scope.items = [1,2,3,4,5];
   $scope.items = ['Consult Appointment','Ct-Sim'];

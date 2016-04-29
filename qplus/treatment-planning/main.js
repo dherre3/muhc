@@ -44,17 +44,41 @@ var cancerMappings =
   'Rectal':'%C20%',
   'Leukimia':'%C95%'
 };
+
 var apiCalls =
 {
   'SeqFreq':sequenceFrequencyAnalysis,
   'StepFreq':stepFrequencyAnalysis,
+  'FixedStepFreq':bestIndexPerPositionAnalysis,
   'MissingFreq':missingFrequencyAnalysis
 };
 
+var swapPairsMappings = 
+{
+   'Ct-Sim':'Consult Appointment',
+   'READY FOR CONTOUR':'Ct-Sim',
+   'READY FOR MD CONTOUR':'READY FOR CONTOUR',
+   'READY FOR DOSE CALCULATION':'READY FOR MD CONTOUR',
+   'READY FOR PHYSICS QA':'READY FOR DOSE CALCULATION',
+   'READY FOR TREATMENT':'READY FOR PHYSICS QA',
+   'End of Treament Note Task':'READY FOR TREATMENT'
+};
+function swapPairs(rows)
+{
+  for (var index = 0; index < rows.length-1; index++) {
+    if(rows[index+1].AliasName == swapPairsMappings[rows[index].AliasName]&&rows[index+1].PatientSerNum == rows[index].PatientSerNum)
+    {
+      var temp = rows[index+1];
+      rows[index+1] = rows[index];
+      rows[index] = temp;
+    }
+  }
+  return rows;
+}
 function obtainCancerQuery (cancerType)
 {
   var regex = cancerMappings[cancerType];
-  return "SELECT Appointment.AppointmentSerNum as StageSerNum, Appointment.PatientSerNum, Appointment.DiagnosisSerNum, Appointment.PrioritySerNum, Appointment.ScheduledStartTime as DateTime, Alias.AliasSerNum, Alias.AliasName, Alias.AliasType from Appointment, Alias where DiagnosisSerNum IN (select DiagnosisSerNum from Diagnosis where DiagnosisCode LIKE '"+regex+"') AND Alias.AliasSerNum = Appointment.AliasSerNum union all SELECT Task.TaskSerNum, Task.PatientSerNum, Task.DiagnosisSerNum, Task.PrioritySerNum, Task.DueDateTime, Alias.AliasSerNum, Alias.AliasName, Alias.AliasType from Task, Alias where DiagnosisSerNum IN (select DiagnosisSerNum from Diagnosis where DiagnosisCode LIKE '"+regex+"') AND Alias.AliasSerNum = Task.AliasSerNum Order by PatientSerNum, DateTime, DiagnosisSerNum";
+  return "SELECT Appointment.AppointmentSerNum as StageSerNum, Appointment.PatientSerNum, Appointment.DiagnosisSerNum, Appointment.PrioritySerNum, Appointment.ScheduledStartTime as DateTime, Alias.AliasSerNum, Alias.AliasName, Alias.AliasType from Appointment, Alias, Diagnosis where Appointment.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE  '"+regex+"' AND Alias.AliasSerNum = Appointment.AliasSerNum union all SELECT Task.TaskSerNum, Task.PatientSerNum, Task.DiagnosisSerNum, Task.PrioritySerNum, Task.CreationDate, Alias.AliasSerNum, Alias.AliasName, Alias.AliasType from Task, Alias, Diagnosis  where Task.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE '"+regex+"' AND Alias.AliasSerNum = Task.AliasSerNum Order by PatientSerNum, DateTime, DiagnosisSerNum";
 }
 var exports=module.exports={};
 //Query processing function
@@ -63,8 +87,12 @@ exports.proccessQuerySequence = function(argument, callback)
   console.log('main.js line59', argument);
   runSqlQuery(obtainCancerQuery(argument.CancerType), []).then(function(rows)
   {
-    var result = apiCalls[argument.Analysis](rows);
+    var result = apiCalls[argument.Analysis](rows, argument.swapPairs);
     callback(result);
+  }).catch(function(error)
+  {
+    console.log(error);
+    
   });
 };
 
@@ -72,15 +100,20 @@ exports.proccessQuerySequence = function(argument, callback)
 /*
 * API function that obtains the sequence frequency in all patients
 */
-function sequenceFrequencyAnalysis(rows)
-{
-
+function sequenceFrequencyAnalysis(rows, pairs)
+{ 
   //Eliminate CRR appointments
   rows = eliminateCRRAppointments(rows);
 
 
   //Eliminate duplicate aliases
   rows = clearDupSequencialAliases(rows);
+  console.log(typeof pairs);
+  if(pairs=='true')
+  {
+   console.log('main.js 109', pairs);   
+   rows =  swapPairs(rows);
+  }
 
   //Get the string sequence per patient
   var objectSequence = getSequencePerPatient(rows, 'AliasName', true);
@@ -100,9 +133,9 @@ function sequenceFrequencyAnalysis(rows)
 
   //Find total number of  sequences for percentage purposes.
   var totalNumberSequences = Object.keys(frequencyObject).length;
-  console.log(missingFrequencyAnalysis(rows));
   //Find the top 20 sequences
   var topSequences = buildTopSequences(frequencyObject,40);
+  console.log('I am done processing');
   var top = {
     NumberOfPatients:numberOfPatients,
     Top :topSequences,
@@ -113,10 +146,11 @@ function sequenceFrequencyAnalysis(rows)
 
 
 
+
 /*
 * Sequence frequency analysis per step
 */
-function stepFrequencyAnalysis(rows)
+function stepFrequencyAnalysis(rows, pairs)
 {
   //Eliminate CRR appointments
   rows = eliminateCRRAppointments(rows);
@@ -124,26 +158,125 @@ function stepFrequencyAnalysis(rows)
   //Eliminate duplicate aliases
   rows = clearDupSequencialAliases(rows);
   //Get sequence per patient
-
+if(pairs=='true')
+  {
+   console.log('main.js 109', pairs);   
+   rows =  swapPairs(rows);
+  }
   var objectSequence = getSequencePerPatient(rows, 'AliasName', true);
   //Set the frequency per AliasSerNum and position, find the best index for that AliasSerNum
   var orderStepFrequency = getStepFrequencyObject(objectSequence);
 
   return orderStepFrequency;
 }
+/*
+* Finding the step frequency a second way
+*/
+function bestIndexPerPositionAnalysis(rows, pairs)
+{
+     //Eliminate CRR appointments
+  rows = eliminateCRRAppointments(rows);
+
+  //Eliminate duplicate aliases
+  rows = clearDupSequencialAliases(rows);
+  //Get sequence per patient
+   if(pairs=='true')
+  {
+   console.log('main.js 109', pairs);   
+   rows =  swapPairs(rows);
+  }
+  var patientNumber = Object.keys(getSequencePerPatient(rows,'AliasName', false)).length;
+ 
+  //Find step frequency deleting
+  return getBestIndexSpot(rows);
+}
+
+//Helper
+function getBestIndexSpot(rows)
+{
+  //Get the steps
+    var steps = Object.keys(getSteps(rows, 'AliasName'));
+    //Initialize array of positions
+    var array = [];
+    for (var i = 0; i < steps.length;i++) {
+      //Initialize array for scoring of steps
+      var stepsObject = getSteps(rows, 'AliasName');
+      //Get patient sequence of remaining rows
+      var objectSequence = getSequencePerPatient(rows,'AliasName', false);      
+      for (var key in objectSequence) {   
+        //Add a counter to the first spot found
+        stepsObject[objectSequence[key][0]]++;
+      }
+      //Find the max object and its score
+      var maxObject = findMaxAlias(stepsObject);
+      maxObject.Number = (maxObject.Number*100)/Object.keys(objectSequence).length;
+      //push max object
+      array.push(maxObject);
+      //Delete the rows with that alias and repeat
+      rows = deleteAliasFromData(rows, maxObject.Alias); 
+    }        
+    return array;    
+}
+function deleteAliasFromData(rows, alias)
+{
+  var length = rows.length-1;
+  for (var index = length; index >=0 ; index--) {
+    if(rows[index].AliasName == alias)
+    {
+      rows.splice(index,1);
+    }
+  }
+  return rows;
+}
+
+
+function findInstanceOfAlias(rows, alias)
+{
+  for (var index = 0; index < rows.length; index++) {
+    if(rows[index].AliasName == alias)
+    {
+      return true;
+    }  
+  }
+  return false;
+  
+}
+function findMaxAlias(stepsObject)
+{
+  var max = 0;
+  var maxAlias = '';
+  for (var key in stepsObject) {
+    if(stepsObject[key]>max)
+    {
+      maxAlias = key;
+      max = stepsObject[key];
+    }
+  }
+  return {Alias: maxAlias, Number:max};
+}
+function initObject(steps)
+{
+  var object = {};
+  for (var index = 0; index < steps.length; index++) {
+    object[(index+1)] = emptyArray(steps.length);
+    
+  }
+}
 
 /*
 * Missing Steps Analysis
 */
-function missingFrequencyAnalysis(rows)
+function missingFrequencyAnalysis(rows,pairs)
 {
   //Eliminate CRR appointments
   rows = eliminateCRRAppointments(rows);
 
   //Eliminate duplicate aliases
   rows = clearDupSequencialAliases(rows);
-  console.log(rows.length);
-
+  if(pairs=='true')
+  {
+   rows =  swapPairs(rows);
+  }
   //Get sequence per patient
   var patientSequences = getSequencePerPatient(rows, 'AliasName', false);
 
@@ -240,7 +373,7 @@ function eliminateCRRAppointments(rows)
 {
   for (var i = rows.length-1;i >=0; i--) {
 
-    if(rows[i].AliasSerNum == 1)
+    if(rows[i].AliasName == 'CRR')
     {
       rows.splice(i,1);
     }
@@ -254,11 +387,11 @@ function clearDupSequencialAliases(rows)
   var current = -1;
   var patientSerNum = -1;
   for (var i = rows.length-1; i >= 0; i--) {
-    if(patientSerNum == rows[i].PatientSerNum && rows[i].AliasSerNum == current)
+    if(patientSerNum == rows[i].PatientSerNum && rows[i].AliasName == current)
     {
       rows.splice(i,1);
     }else{
-      current = rows[i].AliasSerNum;
+      current = rows[i].AliasName;
       patientSerNum = rows[i].PatientSerNum;
     }
   }
@@ -370,6 +503,7 @@ function numberOfPatients(rows)
   }
   return count;
 }
+
 function FrequencyAnalysis(rows)
 {
   this.rawData = rows;
@@ -436,7 +570,11 @@ function runSqlQuery(query, parameters, processRawFunction)
 {
   var r=Q.defer();
   connection.query(query, function(err,rows,fields){
-    if (err) r.reject(err);
+    if (err) {
+      console.log(err);
+      
+      r.reject(err);
+    }
     if(typeof rows !=='undefined')
     {
 

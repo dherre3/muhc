@@ -20,6 +20,8 @@ var API = {
 
 exports.processRequest=function(requestObject)
 {
+  console.log(requestObject);
+  
   var r=Q.defer();
   if(!validate('DefinedObjectRequest',requestObject))
   {

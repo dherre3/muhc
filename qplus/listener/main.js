@@ -5,7 +5,6 @@ var Firebase    =require('firebase'),
     resetPasswordApi=require('./resetPassword.js'),
     CryptoJS=require('crypto-js'),
     q=require('q'),
-    timeEstimate = require('./timeEstimate.js'),
     processApiRequest=require('./processApiRequest.js');
 
 

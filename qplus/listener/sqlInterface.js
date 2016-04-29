@@ -387,6 +387,7 @@ exports.inputFeedback=function(requestObject)
 //Adding action to activity log
 exports.addToActivityLog=function(requestObject)
 {
+  var r = Q.defer();
   connection.query(queries.logActivity(requestObject),
   function(error, rows, fields)
   {
@@ -395,6 +396,7 @@ exports.addToActivityLog=function(requestObject)
     r.resolve('Hospital Request Proccessed');
     
   });
+  return r.promise;
 };
 //Gets user password for encrypting/decrypting
 exports.getUsersPassword=function(username)
