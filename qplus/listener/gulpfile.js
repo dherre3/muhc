@@ -25,4 +25,5 @@ gulp.task('watch-lint', function() {
 gulp.task('default', ['mocha'], function(done) {
     // place code for your default task here
     console.log(done);
+    gulp.watch(['*.js', 'test/*.js'], ['mocha','lint']);
 });

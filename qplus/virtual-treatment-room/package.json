@@ -1,0 +1,34 @@
+{
+  "name": "virtual-treatment-room",
+  "version": "1.0.0",
+  "description": "Virtual Waiting Room App Backend",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "bluebird": "^3.3.5",
+    "firebase": "^2.4.2",
+    "mysql": "^2.10.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.3.2",
+    "gulp-jsdoc3": "^0.2.1",
+    "gulp-jshint": "^2.0.0",
+    "gulp-mocha": "^2.2.0",
+    "jshint": "^2.9.2",
+    "jshint-stylish": "^2.1.0",
+    "mocha": "^2.4.5",
+    "sinon": "^1.17.3",
+    "sinon-chai": "^2.8.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "VWR",
+    "muhc",
+    "Glen"
+  ],
+  "author": "David Herrera",
+  "license": "ISC"
+}

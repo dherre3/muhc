@@ -641,10 +641,7 @@ function checkIntoAria(patientActivitySerNum)
   var urlCheckin = {
       path: 'http://medphys/devDocuments/screens/php/checkInPatient.php?CheckinVenue=8225&ScheduledActivitySer='+patientActivitySerNum
     };
-  //Url to check the successful or unsuccessful checkin
-  var urlCheckCheckin = {
-      path: 'http://medphys/devDocuments/ackeem/getCheckins.php?AppointmentAriaSer='+patientActivitySerNum
-  };
+
   //making request to checkin
       var x = http.request(urlCheckin,function(res){
           res.on('data',function(data){

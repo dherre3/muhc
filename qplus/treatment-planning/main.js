@@ -6,7 +6,7 @@ var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
   password:'root',
-  database:'OncoTimeDB',
+  database:'TreatmentPlan',
   dateStrings:true
 };
 
@@ -78,7 +78,7 @@ function swapPairs(rows)
 function obtainCancerQuery (cancerType)
 {
   var regex = cancerMappings[cancerType];
-  return "SELECT Appointment.AppointmentSerNum as StageSerNum, Appointment.PatientSerNum, Appointment.DiagnosisSerNum, Appointment.PrioritySerNum, Appointment.ScheduledStartTime as DateTime, Alias.AliasSerNum, Alias.AliasName, Alias.AliasType from Appointment, Alias, Diagnosis where Appointment.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE  '"+regex+"' AND Alias.AliasSerNum = Appointment.AliasSerNum union all SELECT Task.TaskSerNum, Task.PatientSerNum, Task.DiagnosisSerNum, Task.PrioritySerNum, Task.CreationDate, Alias.AliasSerNum, Alias.AliasName, Alias.AliasType from Task, Alias, Diagnosis  where Task.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE '"+regex+"' AND Alias.AliasSerNum = Task.AliasSerNum Order by PatientSerNum, DateTime, DiagnosisSerNum";
+  return "SELECT Appointment.AppointmentSerNum as StageSerNum, Appointment.PatientSerNum, Appointment.DiagnosisSerNum, Appointment.PrioritySerNum, Appointment.ScheduledStartTime as DateTime, Appointment.AliasExpressionSerNum, AliasExpression.ExpressionName as AliasName from AliasExpression, Appointment, Diagnosis where Appointment.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE  '"+regex+"' AND AliasExpression.AliasExpressionSerNum = Appointment.AliasExpressionSerNum  union all SELECT Task.TaskSerNum, Task.PatientSerNum, Task.DiagnosisSerNum, Task.PrioritySerNum, Task.CreationDate, Task.AliasExpressionSerNum, AliasExpression.ExpressionName as AliasName from Task, Diagnosis, AliasExpression  where Task.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE '"+regex+"' AND AliasExpression.AliasExpressionSerNum = Task.AliasExpressionSerNum Order by PatientSerNum, DateTime";
 }
 var exports=module.exports={};
 //Query processing function
