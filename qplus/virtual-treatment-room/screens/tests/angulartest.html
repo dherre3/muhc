@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+<script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script>
+<script src="johnController.js"></script>
+
+<script>
+# Firebase stuff
+
+
+function sendToFB() {
+//  var screenList = new Firebase('https://boiling-fire-1762.firebaseio.com');
+//  var name = "JK test from angulartest";
+//  var newScore = 13;
+//  var patientRef = screenList.child(name);
+
+  alert("sent to firebase");
+//  patientRef.setWithPriority({ name:name, score:newScore }, newScore);
+}
+</script>
+
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+</head>
+
+<body>
+
+<p>Try to change the names.</p>
+
+
+<div ng-app="" ng-controller="johnController" ng-init="quantity=1;cost=5;person={firstName:'Peter',lastName:'Pan'};points=[122222,1,15,19,2,40]">
+
+First Name: <input type="text" ng-model="firstName"><br>
+Last Name: <input type="text" ng-model="lastName"><br>
+<br>
+Full Name: {{firstName + " " + lastName + " " + quantity*cost}}<br>
+Full Name: {{person.firstName + " " + person.lastName + " " + 2*quantity*cost}}
+<p>The first name is {{ person.firstName }}</p>
+
+The last name is: <span ng-bind="lastName"></span>
+
+<p>The points are {{ points[0] + " " + points[4] + " " + test}}</p>
+
+<b>The full name is: </b> {{fullName() | uppercase}}
+
+  <ul>
+    <li ng-repeat="x in points | orderBy: points">
+      {{ x }}
+    </li>
+  </ul>
+
+
+
+
+First number: <input type="text" ng-model="num1"><br>
+Second number: <input type="text" ng-model="num2"><br>
+
+<b>Product is: </b> {{product() | currency}}
+
+  <table class="table table-striped" border="1">
+    <tr ng-repeat="x in names | orderBy:'Country'">
+      <td>{{ x.Name }}</td><td>{{ x.Country | uppercase }}</td>
+    </tr>
+  </table>
+
+Next table
+  <table class="table table-striped" border="1">
+    <tr ng-repeat="patient in checkins">
+      <td>{{ patient.LastName }}</td>
+      <td>{{ patient.Expression1 }}</td>
+      <td>{{ patient.ResourceName}}</td>
+      <td><button class="btn btn-primary" ng-disabled="moveSwitch"><span class="glyphicon glyphicon-plus"></span> Click Me!</button></td>
+
+      <td><button ng-class="{'btn btn-primary': patient.called}"><span class="glyphicon glyphicon-plus"></span> Click Me!</button></td>
+
+      <td><button ng-show=showMoveButton>Move me</button><input type="checkbox" ng-model="showMoveButton" ></td>
+      <td><button ng-click="callPatient(patient)">Call {{ lastName }} {{patient.called}}</button>
+
+      <td><button ng-click="changeName()">Change name {{ primary }}</button>
+    </tr>
+  </table>
+
+<div class="gridStyle" ng-grid="gridOptions"></div>
+
+<button onclick="myFunction()">Copy Text</button>
+
+<script>
+function myFunction(name, newScore) {
+  var screenList = new Firebase('https://boiling-fire-1762.firebaseio.com');
+
+  //var name = "JK test2 from angulartest";
+  //var newScore = 17;
+  var patientRef = screenList.child(name);
+
+  patientRef.setWithPriority({ name:name, score:newScore }, newScore);
+  
+  var data = "name: " + name + " score: " + newScore;
+
+
+  alert(data);
+}
+</script>
+</div>
+
+</body>
+</html>
+

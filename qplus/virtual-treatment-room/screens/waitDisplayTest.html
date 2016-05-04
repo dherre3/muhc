@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html ng-app="waitApp">
+<META HTTP-EQUIV="refresh" CONTENT="6000" URL="http://172.26.66.41/devDocuments/screens/waitDisplayDS1-1.html">
+<head>
+
+<!--Angular libraries -->
+<!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script> -->
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-poller/0.3.2/angular-poller.js"></script> -->
+<script src="http://172.26.66.41/Documents/config/angularjs/angular.min.js"></script>
+<script src="http://172.26.66.41/Documents/config/angularjs/angular-poller.js"></script>
+<script src="http://172.26.66.41/Documents/config/angularjs/checklist-model.js"></script>
+
+<!--Firebase libraries -->
+<!--<script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script> -->
+<!--<script src="https://cdn.firebase.com/libs/angularfire/1.0.0/angularfire.min.js"></script> -->
+<script src="http://172.26.66.41/Documents/config/firebase/firebase.js"></script>
+<script src="http://172.26.66.41/Documents/config/firebase/angularfire.min.js"></script>
+
+<!--Custom controllers -->
+<script src="controllers/waitControllerTest.js"></script>
+
+<!--CSS -->
+<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"> -->
+<link rel="stylesheet" href="http://172.26.66.41/Documents/config/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="http://172.26.66.41/devDocuments/screens/css/overridestyles.css">
+<script src="http://172.26.66.41/Documents/config/bootstrap/ui-bootstrap-tpls-0.12.1.min.js"></script>
+
+<script src="http://172.26.66.41/node_modules/ngAudio-1.6.2/app/angular.audio.js"></script>
+
+</head>
+
+<body>
+<div ng-controller="waitControllerTest">
+<center>
+
+<table border=0 style="width: 100%">
+<tr>
+  <td align="right" valign="center">
+    <!--<h2><b>Gestion de la salle d'attente</b></h2> -->
+  </td>
+  <td rowspan="1" align="center" valign="bottom">
+    <center>
+    <img src="http://172.26.66.41/Documents/config/images/CedarsLogo.jpg" width=400px></img>
+    </center>
+  </td>
+  <td align="left" valign="center">
+    <!--<h2><b>Waiting Room Management</b></h2> -->
+  </td>
+</tr>
+</table>
+
+<p/>
+  <table class="table table-striped" border="0" style="width: 1700px; text-align: center;">
+    </tr>
+    <tr ng-repeat="item in screenRows | orderBy: '-Timestamp' | filter:{'PatientStatus': 'Called'}" ng-class=" (item.diff > 0) && (item.diff < 18000) ? 'bg-danger': '' ">
+      <td ng-class=" (item.diff > 0) && (item.diff < 18000) ? 'bg-danger': ''"><span style="font-weight: bold; font-size: 75px;" >{{ item.FirstName}} {{ item.LastName}}</span><br><span style="font-size: 55px;">{{item.Destination}}</span><span class="invisible" style="font-size: 1px;">{{ item.diff = timeNow - item.Timestamp}}</span></td>  
+    </tr>
+  </table>
+<p/>
+
+
+  <table class="table table-hover" border="0">
+    <tr class="bg-info">
+      <th><center>Patients</center></th>
+    </tr>
+    <tr ng-repeat="pat in checkins" ng-class="bg-danger">
+      <td>test {{pat.FirstName}} </td>
+    </tr>
+  </table>
+
+<h3>Debug Messages</h3>
+<span ng-bind="debug_messages"></span>
+
+</div>
+</center>
+</body>
+</html>
+
+

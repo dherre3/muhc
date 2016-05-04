@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html ng-app="screenApp">
+
+<head>
+
+<!--Angular libraries -->
+<script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-poller/0.3.2/angular-poller.js"></script>
+
+<!--Firebase libraries -->
+<script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script>
+<script src="https://cdn.firebase.com/libs/angularfire/1.0.0/angularfire.min.js"></script>
+
+<!--Custom controllers -->
+<script src="controllers/screenController.js"></script>
+
+<!--CSS -->
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+<!--Angular Audio -->
+<!--<link rel="stylesheet" type="text/css" href="http://172.26.66.41/node_modules/ng-audio_min/dist/css/ng-audio.min.css">-->
+<!--<script type="text/javascript" src="http://172.26.66.41/node_modules/ng-audio_min/dist/ng-audio.min.js"></script>-->
+<script src="http://172.26.66.41/node_modules/ngAudio-1.6.2/app/angular.audio.js"></script>
+
+</head>
+
+<body>
+
+<div ng-controller="controllers/screenController">
+<!--<center><img src="http://172.26.66.41/Documents/config/images/logo.png" alt="MUHC logo" border="0"></center> -->
+<center>
+
+There are {{ messages.length }} patients in the screen list.
+<p/>
+  <table class="table" style="text-align: left; width: 1500px; background-color: rgb(255, 255, 255); font-size:60px;" border="0">
+    <tr class="danger">
+      <th>Patient</th>
+      <th>Destination</th>
+    </tr>
+    <tr ng-repeat="item in messages | filter: {PatientStatus:'Called'}:true" ng-class=" (item.diff > 0) && (item.diff < 100000) ? 'bg-primary': '' ">
+      <td><strong class="example-chat-username">{{ item.FirstName}} {{ item.LastName}}</strong><span class="invisible">{{ item.diff = timeNow - item.timestamp}}</span></td>  
+      <td>{{item.destination}}</td>  
+    </tr>
+  </table>
+<p/>
+</div>
+
+
+<h3>Debug Messages</h3>
+<span ng-bind="debug_messages"></span>
+
+</body>
+</html>
+
+

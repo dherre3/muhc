@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html ng-app="screenApp">
+
+<head>
+
+<!--Angular libraries -->
+<!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script> -->
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-poller/0.3.2/angular-poller.js"></script> -->
+<script src="http://172.26.66.41/Documents/config/angularjs/angular.min.js"></script>
+<script src="http://172.26.66.41/Documents/config/angularjs/angular-poller.js"></script>
+<script src="http://172.26.66.41/Documents/config/angularjs/checklist-model.js"></script>
+
+<!--Firebase libraries -->
+<!--<script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script> -->
+<!--<script src="https://cdn.firebase.com/libs/angularfire/1.0.0/angularfire.min.js"></script> -->
+<script src="http://172.26.66.41/Documents/config/firebase/firebase.js"></script>
+<script src="http://172.26.66.41/Documents/config/firebase/angularfire.min.js"></script>
+
+<!--Custom controllers -->
+<script src="controllers/patientControllerAll.js"></script>
+
+<!--CSS -->
+<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"> -->
+<link rel="stylesheet" href="http://172.26.66.41/Documents/config/bootstrap/css/bootstrap.min.css">
+<script src="http://172.26.66.41/Documents/config/bootstrap/ui-bootstrap-tpls-0.12.1.min.js"></script>
+
+<script src="http://172.26.66.41/node_modules/ngAudio-1.6.2/app/angular.audio.js"></script>
+
+</head>
+
+<body>
+<div ng-controller="screenController">
+<center>
+<table border=0 class="table" style="width: 100%">
+<tr>
+<td align="center" valign="center">
+</td>
+<td align="center" valign="center">
+  <center>
+    <h2><b>Team Room Display</b><br> {{PatientDestination}}</h2>
+  </center>
+</td>
+<td align="center" valign="bottom">
+</td>
+</tr>
+</table>
+</center>
+
+  <table border="0">
+    <tr>
+      <td>
+        <b>Resource(s):</b> 
+        <span ng-repeat="item in userResources"> <mark>{{item}}</mark> </span>
+      <td>
+    </tr>
+    <tr>
+      <td>
+        <!--<b>Location:</b> {{AriaVenueId}}-->
+      </td>
+    </tr>
+  </table>
+<p />
+  <table class="table table-hover" border="0">
+    <tr class="bg-info">
+    <th><center>Patient</center></th>
+    <th><center>Scheduled<br /><span class="glyphicon glyphicon-time"></span></center></th>
+    <th><center>CheckIn<br /><span class="glyphicon glyphicon-ok"></span></center></th>
+    <th><center>CheckIn Location<br /><span class="glyphicon glyphicon-barcode"></span></center></th>
+    <th><center>Wait <br />(min)</center></th>
+    <th><center>Remaining <br />(min)</center></th>
+    <th><center>Appointment</center></th>
+    <th><center>Resource</center></th>
+    <th><center>Primary <br /> Oncologist</center></th>
+    </tr>
+    <tr ng-repeat="patient in checkins | multiResourceFilter:userResources" ng-class=" (patient.TimeRemaining < 5) ? 'bg-danger': '' ">
+      <td>{{ patient.LastName }}, {{ currentPatient = patient.FirstName}} ({{ patient.PatientId}})</td>
+      <td><center>{{ patient.ScheduledStartTime_hh}}:{{"0"+patient.ScheduledStartTime_mm | limitTo:-2}}</center></td>
+      <td><center>{{ patient.ArrivalDateTime_hh}}:{{'0'+patient.ArrivalDateTime_mm | limitTo:-2}}</center></td>
+      <td><center>{{ patient.VenueId}}</center></td>
+      <td><center>{{ patient.WaitTime}}</center></td>
+      <td><center>{{ patient.TimeRemaining }}</center></td> 
+      </center></td>
+      <td><center>{{ patient.Expression1 }}</center></td>
+      <td><center>{{ patient.ResourceName}}</center></td>
+      <td><center>{{ patient.DoctorName}}</center></td>
+      </center></td>
+    </tr>
+  </table>
+
+<center>
+<!--<h3>Debug Messages</h3>
+<span ng-bind="debug_messages"></span>
+-->
+</center>
+
+
+<font color="white">
+
+<nav class="navbar-xs navbar-inverse navbar-fixed-bottom">
+    <span class="nav navbar-nav navbar-left">
+        &nbsp;&nbsp;&nbsp;<i class="glyphicon glyphicon-time"></i>
+        &nbsp;Current Time:</b> {{timeNow | date:'yyyy-MM-dd hh:mm'}}
+    </span>
+    <span class="nav navbar-nav navbar-center">
+      <center>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Questions or Comments? Please contact John Kildea at ex 44154 
+      </center>
+    </span>
+
+    <span class="nav navbar-nav navbar-right">
+      <b>Location:</b> {{PatientDestination}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    </span>
+</nav>
+
+</font>
+</div>
+
+<script type="text/ng-template" id="ExamRoomModal.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Select Exam Room</h3>
+        </div>
+        <div class="modal-body">
+   	    <ul style="list-style: none;
+			padding-left:0;">
+                <li class="btn btn-info btn-block" ng-repeat="item in items">
+                    <a  style="color: #FFFFFF;" ng-click="selected.item = item.AriaVenueId">{{ item.AriaVenueId }}</a>
+                </li>
+            </ul>
+            Selected: <b>{{ selected.item }}</b>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+</script>
+
+
+</body>
+</html>
+
+

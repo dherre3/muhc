@@ -1,0 +1,58 @@
+<!doctype html>
+<html ng-app="ui.bootstrap.demo">
+  <head>
+<!--Angular libraries -->
+<!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script> -->
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-poller/0.3.2/angular-poller.js"></script> -->
+<script src="http://172.26.66.41/Documents/config/angularjs/angular.min.js"></script>
+<script src="http://172.26.66.41/Documents/config/angularjs/angular-poller.js"></script>
+<script src="http://172.26.66.41/Documents/config/angularjs/checklist-model.js"></script>
+
+<!--Firebase libraries -->
+<!--<script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script> -->
+<!--<script src="https://cdn.firebase.com/libs/angularfire/1.0.0/angularfire.min.js"></script> -->
+<script src="http://172.26.66.41/Documents/config/firebase/firebase.js"></script>
+<script src="http://172.26.66.41/Documents/config/firebase/angularfire.min.js"></script>
+
+<!--Custom controllers -->
+<script src="modal_checkboxController.js"></script>
+
+<!--CSS -->
+<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"> -->
+<link rel="stylesheet" href="http://172.26.66.41/Documents/config/bootstrap/bootstrap.min.css">
+<script src="http://172.26.66.41/Documents/config/bootstrap/ui-bootstrap-tpls-0.12.1.min.js"></script>
+
+<script src="http://172.26.66.41/node_modules/ngAudio-1.6.2/app/angular.audio.js"></script>
+
+  </head>
+  <body>
+
+
+<div ng-controller="ExamRoomModalCrtl">
+    <script type="text/ng-template" id="ExamRoomModal.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Select Exam Room</h3>
+        </div>
+        <div class="modal-body">
+   	    <ul style="list-style: none;
+			padding-left:0;">
+                <li class="btn btn-info btn-block" ng-repeat="item in items">
+                    <a  style="color: #FFFFFF;" ng-click="selected.item = item.AriaVenueId">{{ item.AriaVenueId }}</a>
+                </li>
+            </ul>
+            Selected: <b>{{ selected.item }}</b>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
+
+    <button class="btn btn-default" ng-click="open('sm')">Small modal</button>
+
+
+    <div ng-show="selected">Selection from a modal: {{ selected }}</div>
+</div>
+
+  </body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html ng-app="screenApp">
+
+<head>
+
+<!--Angular libraries -->
+<!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script> -->
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-poller/0.3.2/angular-poller.js"></script> -->
+<script src="http://172.26.66.41/Documents/config/angularjs/angular.min.js"></script>
+<script src="http://172.26.66.41/Documents/config/angularjs/angular-poller.js"></script>
+<script src="http://172.26.66.41/Documents/config/angularjs/checklist-model.js"></script>
+
+<!--Firebase libraries -->
+<!--<script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script> -->
+<!--<script src="https://cdn.firebase.com/libs/angularfire/1.0.0/angularfire.min.js"></script> -->
+<script src="http://172.26.66.41/Documents/config/firebase/firebase.js"></script>
+<script src="http://172.26.66.41/Documents/config/firebase/angularfire.min.js"></script>
+
+<!--Custom controllers -->
+<script src="controllers/patientController.js"></script>
+
+<!--CSS -->
+<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"> -->
+<link rel="stylesheet" href="http://172.26.66.41/Documents/config/bootstrap/bootstrap.min.css">
+<script src="http://172.26.66.41/Documents/config/bootstrap/ui-bootstrap-tpls-0.12.1.min.js"></script>
+
+<script src="http://172.26.66.41/node_modules/ngAudio-1.6.2/app/angular.audio.js"></script>
+
+</head>
+
+<body>
+<div ng-controller="screenController">
+<center>
+<table border=0 class="table" style="width: 100%">
+<tr>
+<td align="center" valign="center">
+</td>
+<td align="center" valign="center">
+  <center>
+  <img src="http://172.26.66.41/Documents/config/images/CedarsLogo.jpg" width=300px></img>
+    <h2><b>Waiting Room Management</b></h2>
+  </center>
+</td>
+<td align="center" valign="bottom">
+</td>
+</tr>
+</table>
+</center>
+
+
+<div ng-controller="ModalDemoCtrl">
+  <script type="text/ng-template" id="myModalContent.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Resource Filter</h3>
+  </div>
+  <div class="modal-body">
+    <div class="input-group">
+      <span class="input-group-addon" id="basic-addon1">Search</span>
+      <input type="text" ng-model="ResourceFilter" class="form-control" placeholder="Enter text" aria-describedby="basic-addon1">
+    </div>
+    <div style="padding: 10px;">
+      <input type="checkbox" ng-click="checkAll()" ngChecked="allChecked">Select all 
+    </div>
+
+    <ul style="list-style: none; 
+		max-height: 400px;
+  		overflow-y: auto;
+  		list-style: none;
+  		border: 1px #ccc solid;
+  		margin-top: 10px;
+  		border-radius: 5px;">
+      <li ng-repeat="Resource in Resources | filter: ResourceFilter" style="float: left; width: 50%;">
+        <label>
+          <input type="checkbox" checklist-model="user.Resources" checklist-value="Resource"> {{Resource}} 
+        </label>
+      </li>
+    </ul>
+    <b>Selected Resources: </b> {{user.Resources}} 
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">OK</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+  </div>
+  </script>
+  <table border="0">
+    <tr>
+      <td>
+        <button class="btn btn-link" ng-click="open()"><b>Reource(s):</b></button>
+        <span ng-repeat="item in user.Resources"> <mark>{{item}}</mark> </span>
+      <td>
+    <tr>
+  </table>
+</div>
+
+
+  <table border="0">
+    <tr>
+      <td>
+        <button class="btn btn-link"><b>Location: </b></button>
+        <select class="btn btn-link dropdown-toggle" data-ng-options="destination.VenueId2 for destination in venues" data-ng-model="PatientDestination">
+          <option value="" selected="selected"><b>Set This Location </b></option>
+        </select>
+      <td>
+    <tr>
+  </table>
+
+
+  <table class="table table-hover" border="0">
+    <tr class="bg-info">
+    <th>Patient</th>
+    <th>Scheduled</th>
+    <th>CheckIn</th>
+    <th>CheckIn Location</th>
+    <th>Wait <br />(min)</th>
+    <th>Remaining <br />(min)</th>
+    <th>Appointment</th>
+    <th>Resource</th>
+    <th>Primary <br /> Oncologist</th>
+    <th><span class="glyphicon glyphicon-bullhorn"></span> Call Patient</th>
+    <th><span class="glyphicon glyphicon-map-marker"></span> Patient Arrived</th>
+    <th><span class="glyphicon glyphicon-check"></span> Assign Room</th>
+    </tr>
+    <tr ng-repeat="patient in checkins | multiResourceFilter:user.Resources" ng-class=" (patient.TimeRemaining < 5) ? 'bg-danger': '' ">
+      <td>{{ currentPatient = patient.FirstName}} {{ patient.LastName }} ({{ patient.PatientId}})</td>
+      <td>{{ patient.ScheduledStartTime_hh}}:{{"0"+patient.ScheduledStartTime_mm | limitTo:-2}}</td>
+      <td>{{ patient.ArrivalDateTime_hh}}:{{'0'+patient.ArrivalDateTime_mm | limitTo:-2}}</td>
+      <td>{{ patient.VenueId}}</td>
+      <td>{{ patient.WaitTime}}</td>
+      <td>{{ patient.TimeRemaining }}</td> 
+      </td>
+      <td>{{ patient.Expression1 }}</td>
+      <td>{{ patient.ResourceName}}</td>
+      <td>{{ patient.DoctorName}}</td>
+      <td><span ng-hide="(screenRows|filter:{PatientId: patient.PatientId, ScheduledActivitySer: patient.ScheduledActivitySer}:true).length > 0"><button ng-click="callPatient(patient)" class="btn btn-primary">Call Patient </span></button></span>
+      <td><span ng-show="(screenRows|filter:{PatientId: patient.PatientId, ScheduledActivitySer: patient.ScheduledActivitySer, PatientStatus: 'Called'}:true).length > 0"><button ng-click="arrivedPatient(patient)" class="btn btn-warning"> Patient Arrived</button></span></td>
+
+
+      <td><span ng-show="(screenRows|filter:{PatientId: patient.PatientId, ScheduledActivitySer: patient.ScheduledActivitySer, PatientStatus: 'Arrived'}:true).length > 0"><button ng-click="openExamRoom('sm',patient)" class="btn btn-success"> Assign Room</button></span>
+          <span ng-show="(screenRows|filter:{PatientId: patient.PatientId, ScheduledActivitySer: patient.ScheduledActivitySer, PatientStatus: 'RoomAssigned'}:true).length > 0"><b>{{ patient.VenueId}}</b></span>
+      </td>
+    </tr>
+  </table>
+
+<h3>SMS Message</h3>
+<p>
+{{SMS_message}}
+</p>
+
+<hr/>
+<h3>Screen Display</h3>
+There are {{ screenRows.length }} patients in the screen list.
+<p/>
+  <table class="table" border="0">
+    <tr>
+    <th>Patient</th>
+    <th>Destination</th>
+    <th>Action</th>
+    </tr>
+    <tr ng-repeat="item in screenRows" ng-class=" (item.diff > 0) && (item.diff < 10000) ? 'bg-primary': '' ">
+      <td><strong class="example-chat-username">{{ item.FirstName}} {{ item.LastName}}</strong><span class="invisible">{{ item.diff = timeNow - item.Timestamp}}</span></td>  
+      <td>{{item.Destination}}</td>  
+      <td><a class="btn btn-danger" ng-click="removeItem($index)"> Remove from Firebase</a></td>
+    </tr>
+  </table>
+<p/>
+
+<h3>Debug Messages</h3>
+<span ng-bind="debug_messages"></span>
+
+
+<ul>
+  <li ng-repeat="message in screenRows">{{ message.TestData.FirstName}}: {{ message.LastName}}</li>
+</ul>
+
+<font color="white">
+  <nav class="navbar-xs navbar-inverse navbar-fixed-bottom">
+    <div class="container">
+       <table border="0">
+       <tr>
+         <td><b>Current Time:</b> {{timeNow | date:'yyyy-MM-dd hh:mm'}}</td>
+	 <td align="right"><b>Location:</b> {{PatientDestination.VenueId}}</td>
+      </tr>
+      </table>
+    </div>
+  </nav>
+</font>
+</div>
+
+<script type="text/ng-template" id="ExamRoomModal.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Select Exam Room</h3>
+        </div>
+        <div class="modal-body">
+   	    <ul style="list-style: none;
+			padding-left:0;">
+                <li class="btn btn-info btn-block" ng-repeat="item in items">
+                    <a  style="color: #FFFFFF;" ng-click="selected.item = item.AriaVenueId">{{ item.AriaVenueId }}</a>
+                </li>
+            </ul>
+            Selected: <b>{{ selected.item }}</b>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+</script>
+
+
+</body>
+</html>
+
+

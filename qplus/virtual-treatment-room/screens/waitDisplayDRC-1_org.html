@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<META HTTP-EQUIV="refresh" CONTENT="60" URL="http://172.26.66.41/devDocuments/screens/waitDisplayDRC-1.html">
+<head>
+
+<!--CSS -->
+<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"> -->
+<link rel="stylesheet" href="http://172.26.66.41/Documents/config/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="http://172.26.66.41/devDocuments/screens/css/box.css">
+
+</head>
+
+<body>
+<center>
+
+<div>
+    <img id="logo"></img>
+</div>
+
+
+</body>
+</html>
+
+<script type="text/javascript">
+  var current= new Date();
+  var hours =current.getHours();
+
+if (hours>=19 || hours <6){
+  
+  document.getElementById("logo").src = "http://172.26.66.41/Documents/config/images/black.jpg";
+
+}else{
+
+  document.getElementById("logo").src = "http://172.26.66.41/Documents/config/images/ScreenTempCedars.svg";
+
+}
+</script>
+
+

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html ng-app="patientAliasApp">
+
+<head>
+
+<!--Angular libraries -->
+<!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script> -->
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-poller/0.3.2/angular-poller.js"></script> -->
+<script src="http://172.26.66.41/Documents/config/angularjs/angular.min.js"></script>
+<script src="http://172.26.66.41/Documents/config/angularjs/angular-poller.js"></script>
+<script src="http://172.26.66.41/Documents/config/angularjs/checklist-model.js"></script>
+
+<!--Firebase libraries -->
+<!--<script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script> -->
+<!--<script src="https://cdn.firebase.com/libs/angularfire/1.0.0/angularfire.min.js"></script> -->
+<script src="http://172.26.66.41/Documents/config/firebase/firebase.js"></script>
+<script src="http://172.26.66.41/Documents/config/firebase/angularfire.min.js"></script>
+
+<!--Custom controllers -->
+<script src="controllers/patientAliasController.js"></script>
+
+<!--CSS -->
+<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"> -->
+<link rel="stylesheet" href="http://172.26.66.41/Documents/config/bootstrap/css/bootstrap.min.css">
+<script src="http://172.26.66.41/Documents/config/bootstrap/ui-bootstrap-tpls-0.12.1.min.js"></script>
+
+<script src="http://172.26.66.41/node_modules/ngAudio-1.6.2/app/angular.audio.js"></script>
+
+</head>
+
+<body>
+<div ng-controller="patientAliasController">
+<center>
+<table border=0 class="table" style="width: 100%">
+<tr>
+<td align="center" valign="center">
+</td>
+<td align="center" valign="center">
+  <center>
+  <img src="http://172.26.66.41/Documents/config/images/CedarsLogo.jpg" width=300px></img>
+    <h2><b>Virtual Waiting Room - Patient Alias Registration</b></h2>
+  </center>
+</td>
+<td align="center" valign="bottom">
+</td>
+</tr>
+</table>
+</center>
+	<h3>Please click inside box and scan Quebec Medicare Card</h3>
+	
+	Medicare SSN: <input type="text" ng-model="SSN">
+	<div class="btn btn-default btn-sm"><a ng-click="getAriaPatientInfo()">Search</a></div><br><br>
+
+<h3>Patient Data</h3>
+<ul>
+<li ng-repeat="patient in patientData" >
+{{patient.FirstName}},{{patient.LastName}} ({{patient.PatientId}})
+</ul>
+
+Is this the correct patient?
+
+
+
+
+
+<h3>Debug Messages</h3>
+{{debug_messages}}
+
+</body>
+</html>
+
+

@@ -1,0 +1,73 @@
+<!doctype html>
+<html ng-app="ui.bootstrap.demo">
+  <head>
+<!--Angular libraries -->
+<!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script> -->
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-poller/0.3.2/angular-poller.js"></script> -->
+<script src="http://172.26.66.41/Documents/config/angularjs/angular.min.js"></script>
+<script src="http://172.26.66.41/Documents/config/angularjs/angular-poller.js"></script>
+<script src="http://172.26.66.41/Documents/config/angularjs/checklist-model.js"></script>
+
+<!--Firebase libraries -->
+<!--<script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script> -->
+<!--<script src="https://cdn.firebase.com/libs/angularfire/1.0.0/angularfire.min.js"></script> -->
+<script src="http://172.26.66.41/Documents/config/firebase/firebase.js"></script>
+<script src="http://172.26.66.41/Documents/config/firebase/angularfire.min.js"></script>
+
+<!--Custom controllers -->
+<script src="modalController.js"></script>
+
+<!--CSS -->
+<!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"> -->
+<link rel="stylesheet" href="http://172.26.66.41/Documents/config/bootstrap/bootstrap.min.css">
+<script src="http://172.26.66.41/Documents/config/bootstrap/ui-bootstrap-tpls-0.12.1.min.js"></script>
+
+<script src="http://172.26.66.41/node_modules/ngAudio-1.6.2/app/angular.audio.js"></script>
+
+  </head>
+  <body>
+
+
+<div ng-controller="ModalDemoCtrl">
+  <script type="text/ng-template" id="myModalContent.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Resource Filter</h3>
+  </div>
+  <div class="modal-body">
+    <div class="input-group">
+      <span class="input-group-addon" id="basic-addon1">Filter</span>
+      <input type="text" ng-model="ResourceFilter" class="form-control" placeholder="Enter text" aria-describedby="basic-addon1">
+    </div>
+    <div style="padding: 10px;">
+      <input type="checkbox" ng-click="checkAll()" ngChecked="allChecked">Select all 
+    </div>
+
+    <ul style="list-style: none; 
+		max-height: 400px;
+  		overflow-y: auto;
+  		list-style: none;
+  		border: 1px #ccc solid;
+  		margin-top: 10px;
+  		border-radius: 5px;">
+      <li ng-repeat="Resource in Resources | filter: ResourceFilter" style="float: left; width: 50%;">
+        <label>
+          <input type="checkbox" checklist-model="user.Resources" checklist-value="Resource"> {{Resource}} 
+        </label>
+      </li>
+    </ul>
+    <b>Selected Resources: </b> {{user.Resources}} 
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">OK</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+  </div>
+  </script>
+    <b>Selected Resources: </b> 
+  <ul ng-repeat="item in user.Resources">
+    <li>{{item}} </li>
+  </ul>
+  <button class="btn btn-default" ng-click="open()">Open me!</button>
+</div>
+
+  </body>
+</html>
