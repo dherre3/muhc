@@ -4,6 +4,7 @@ exports.apiMappings = {
     'Patient-Arrived':{},
     'GetRooms':{}
 };
+//
 exports.processRequest = function()
 {
     
