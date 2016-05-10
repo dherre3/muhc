@@ -4,8 +4,9 @@
   "description": "A website to study the performance of data-clean up in the treatment planning sequence as the MUHC",
   "main": "main.js",
   "dependencies": {
-    "express": "^4.13.3",
     "body-parser": "^1.14.1",
+    "express": "^4.13.3",
+    "kmeans-js": "^0.1.2",
     "mysql": "^2.9.0",
     "q": "^1.4.1"
   },

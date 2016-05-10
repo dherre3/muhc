@@ -153,6 +153,84 @@ Sequence Frequency <span style="font-size:13px;color:#fff">(frequency of each al
 </div>
 </div>
 <div class="panel">
+<div class="panel-heading" role="tab" id="headingSwapPairsGrouping">
+<h4 class="panel-title">
+<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#swapPairsGrouping" aria-expanded="false" aria-controls="swapPairsGrouping">
+Swap Pairs groupings <span style="font-size:13px;color:#fff"></span>
+</a>
+</h4>
+</div>
+<div id="swapPairsGrouping" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSwapPairsGrouping">
+<div class="panel-body">
+  <!--<div  align="center" style="padding:10px" ><md-button class="md-primary" ng-click ="clearHistogram()" ng-show="histogramPlot"><span ng-hide="histogramPlot">Show</span><span ng-show="histogramPlot">Hide</span> Histogram</md-button></div>-->
+
+  <!--<div id = "chartStep"></div>-->
+
+  <table border="1" class="table table-bordered" style="margin-right:20px" cellpadding="10" id = "printTableSwapPairsGrouping">
+
+<tr>
+<th>Number #</th>
+<th>Sequence</th>
+<th>Sibling Sequences</th>
+</tr>
+<tr ng-repeat= "(key,value) in groupingSwapPairs">
+<td class="active">{{$index + 1}}</td>
+<td class="success">{{key}}</td>
+<td colspan="3">
+<table class="table table-striped" cellpadding="10">
+<th>&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;&nbsp;</th>
+<th>Sequence</th>
+<tr ng-repeat ="sequence in value " class="text-left" >
+  <td class = "text-center">{{$index + 1}}</td>
+  <td class = "text-left">{{sequence}}</td></tr>
+</table>
+</td>
+</tr>
+
+</table>
+</div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-heading" role="tab" id="collapseCosineSimilarityHeading">
+<h4 class="panel-title">
+<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseCosineSimilarity" aria-expanded="false" aria-controls="collapseCosineSimilarity">
+Grouping by Cosine Similarity <span style="font-size:13px;color:#fff"></span>
+</a>
+</h4>
+</div>
+<div id="collapseCosineSimilarity" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapseCosineSimilarityHeading">
+<div class="panel-body">
+  <!--<div  align="center" style="padding:10px" ><md-button class="md-primary" ng-click ="clearHistogram()" ng-show="histogramPlot"><span ng-hide="histogramPlot">Show</span><span ng-show="histogramPlot">Hide</span> Histogram</md-button></div>
+
+  <div id = "chartStep"></div>-->
+
+  <table border="1" class="table table-bordered" style="margin-right:20px" cellpadding="10" id = "printTableCosineSimilarityGrouping">
+
+<tr>
+<th>Number #</th>
+<th>Sequence</th>
+<th>Sibling Sequences</th>
+</tr>
+<tr ng-repeat= "(key,value) in groupingCosineSimilarity">
+<td class="active">{{$index + 1}}</td>
+<td class="success">{{key}}</td>
+<td colspan="3">
+<table class="table table-striped" cellpadding="10">
+<th>&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;&nbsp;</th>
+<th>Sequence</th>
+<tr ng-repeat ="sequence in value " class="text-left" >
+  <td class = "text-center">{{$index + 1}}</td>
+  <td class = "text-left">{{sequence}}</td></tr>
+</table>
+</td>
+</tr>
+
+</table>
+</div>
+</div>
+</div>
+<div class="panel">
 <div class="panel-heading" role="tab" id="headingTwo">
 <h4 class="panel-title">
 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">

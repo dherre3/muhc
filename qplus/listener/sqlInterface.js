@@ -87,6 +87,7 @@ var requestMappings=
   {
     sql:queries.patientAppointmentsTableFields(),
     numberOfLastUpdated:5,
+    processFunction:combineResources,
     table:'Appointment',
     serNum:'MessagesSerNum'
   },
@@ -690,3 +691,43 @@ exports.getTimeEstimate = function(result)
     });
     return r.promise;
 };
+/**
+ * @module sqlInterface
+ * @name combineResources
+ * @method combineResources
+ * @parameters {void}
+ * @description Modifies all the appointments for the user to only obtain  
+ */
+function combineResources(rows)
+{
+  var r = Q.defer();
+  var resource = {};
+  var index = 0;
+  if(rows.length>0)
+  {
+    resource[rows[rows.length-1].ResourceType] = rows[rows.length-1].ResourceName;
+  for (var i=rows.length-2;i>=0;i--) {
+    if(rows[i].AppointmentSerNum == rows[i+1].AppointmentSerNum)
+    {
+       resource[rows[i].ResourceType] = rows[i].ResourceName;
+       rows.splice(i+1,1);
+    }else{
+      var resourceObject={};
+      for (var key in resource) {
+        resourceObject[key] = resource[key];
+      }
+      rows[i+1].Resource = resourceObject;
+      resource = {};
+      resource[rows[i].ResourceType] = rows[i].ResourceName;
+      delete rows[i+1].ResourceName;
+      delete rows[i+1].ResourceType;
+    }
+  }
+  delete rows[0].ResourceName;
+  delete rows[0].ResourceType;
+  rows[0].Resource = resource; 
+  console.log(rows.length);
+  }
+   r.resolve(rows);
+  return r.promise;
+}

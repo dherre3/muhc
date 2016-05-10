@@ -2,7 +2,6 @@ var CryptoJS    =require('crypto-js');
 var credentials=require('./credentials.js');
 var exports=module.exports={};
 
-
 //Returns empty response, function used by refresh, resume, login
 exports.resolveEmptyResponse=function(data)
 {
@@ -181,6 +180,8 @@ function Queue()
     }
   };
 }
+
+
 /*
 * For test mocha
 var https = require('https');

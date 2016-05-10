@@ -68,6 +68,48 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
       });
 
     });
+    $.post("http://localhost:3000/login",{CancerType: cancer,NewAnalysis:true, Analysis:'GroupBySwappingPairsSimple', swapPairs:false}, function(data){
+      console.log(data);
+      console.log(Object.keys(data).length);
+       $timeout(function(){
+          $scope.groupingSwapPairs = data;
+
+      });
+     /* data = JSON.stringify(data);
+      data = encryptObject(data, '12345');
+      objectToSend[$rootScope.canceType].StepFreq=data;*/
+      
+      /*$timeout(function()
+      {
+          var steps = organizeSteps(data);
+          steps = getTotalCount(steps);
+          console.log(steps);
+          $scope.stepFrequency = organizeSteps(data);
+
+      });*/
+
+    });
+    $.post("http://localhost:3000/login",{CancerType: cancer,NewAnalysis:true, Analysis:'GroupByCosine', swapPairs:false}, function(data){
+      console.log(data);
+      console.log(Object.keys(data).length);
+      $timeout(function(){
+          $scope.groupingCosineSimilarity = data;
+
+      });
+     /* data = JSON.stringify(data);
+      data = encryptObject(data, '12345');
+      objectToSend[$rootScope.canceType].StepFreq=data;*/
+      
+      /*$timeout(function()
+      {
+          var steps = organizeSteps(data);
+          steps = getTotalCount(steps);
+          console.log(steps);
+          $scope.stepFrequency = organizeSteps(data);
+
+      });*/
+
+    });
      $.post("http://localhost:3000/login",{CancerType: cancer, Analysis:'FixedStepFreq', swapPairs:false}, function(data){
       /*data = JSON.stringify(data);
       data = encryptObject(data, '12345');

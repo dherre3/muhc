@@ -110,6 +110,39 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', '
 
       });
     });
+    ref.child(cancer+'/GroupingCosineSimilarity').once('value',function(snap)
+    {
+      var data = snap.val();
+      data = decryptObject(data, password);
+      data = JSON.parse(data);
+      console.log(data);
+      $timeout(function()
+      {
+          $scope.groupingCosineSimilarity = data;
+      });
+    });
+    ref.child(cancer+'/GroupingSwapPairs').once('value',function(snap)
+    {
+      var data = snap.val();
+      data = decryptObject(data, password);
+      data = JSON.parse(data);
+      console.log(data);
+      $timeout(function()
+      {
+          $scope.groupingSwapPairs = data;
+      });
+    });
+    ref.child(cancer+'/FixedStepData').once('value',function(snap)
+    {
+      var data = snap.val();
+      data = decryptObject(data, password);
+      data = JSON.parse(data);
+      console.log(data);
+      $timeout(function()
+      {
+          $scope.stepFrequencyFixed = data;
+      });
+    });
     ref.child(cancer+'/MissingFreq').once('value',function(snap)
     {
       var data = snap.val();

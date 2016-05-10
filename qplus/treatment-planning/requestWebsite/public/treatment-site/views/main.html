@@ -1,55 +1,66 @@
 <div layout="column" style="height:100%;">
-<section layout="row" flex>
-<md-content flex >
-  <md-content md-theme="docs-dark" layout-gt-sm="row" layout-padding style="position:fixed;width:100vw;z-index:2">
-<div>
- <div layout="row" style="width:100vw">
-   <div flex="40">
-      <h3>TPS Opal - {{cancerType}} - Patient Number: {{patientNumber}}</h3>
-   </div>
-   <div flex>
+  <section layout="row" flex>
+    <md-content flex ng-controller = "TablesController">
+      <md-content md-theme="docs-dark" layout-gt-sm="row" layout-padding style="position:fixed;width:100vw;z-index:2">
+   <div>
+     <div layout="row" style="width:100vw">
+       <div flex="40">
+          <h3>TPS Opal - {{cancerType}} - Patient Number: {{patientNumber}}</h3>
+       </div>
+       <div flex>
 
-       <div layout="row">
-         <div flex="30">
-            <md-input-container style="min-width:100px">
-            <label>Cancer Type</label>
-            <md-select ng-model="cancerType" ng-change="fetchCancerTypeData(cancerType)">
-              <md-option ng-repeat="cancer in cancerTypes" value="{{cancer}}">
-                {{cancer}}
-              </md-option>
-            </md-select>
-          </md-input-container>
-        </div>
-        <div flex >
-          <fieldset class="demo-fieldset" >
-          <div layout="column" layout-wrap flex>
-            <md-checkbox aria-label="Select All"
-                         ng-checked="isChecked()"
-                         md-indeterminate="isIndeterminate()"
-                         ng-click="toggleAll()" style="margin-right:20px">
-              <span ng-if="isChecked()">Un-</span>Include All
-            </md-checkbox>
+           <div layout="row">
+             <div flex="30">
+                <md-input-container style="min-width:100px">
+                <label>Cancer Type</label>
+                <md-select ng-model="cancerType" ng-change="fetchCancerTypeData(cancerType)">
+                  <md-option ng-repeat="cancer in cancerTypes" value="{{cancer}}">
+                    {{cancer}}
+                  </md-option>
+                </md-select>
+              </md-input-container>
+            </div>
+            <div flex = "30" >
+              <fieldset class="demo-fieldset" >
+              <div layout="column" layout-wrap flex>
+                <md-checkbox aria-label="Select All"
+                             ng-checked="isChecked()"
+                             md-indeterminate="isIndeterminate()"
+                             ng-click="toggleAll()" style="margin-right:20px">
+                  <span ng-if="isChecked()">Un-</span>Include All
+                </md-checkbox>
 
-            <div class="demo-select-all-checkboxes" flex="10" ng-repeat="item in items" style="margin-right:50px">
-              <md-checkbox ng-checked="exists(item, selected)" ng-click="toggle(item, selected)" >
-                <md-tooltip md-direction="right">
-                  Inserts step into all sequences
-                </md-tooltip>
-               {{ item }}
-              </md-checkbox>
+                <div class="demo-select-all-checkboxes" flex="10" ng-repeat="item in items" style="margin-right:50px">
+                  <md-checkbox ng-checked="exists(item, selected)" ng-click="toggle(item, selected)" >
+                    <md-tooltip md-direction="right">
+                      Inserts step into all sequences
+                    </md-tooltip>
+                   {{ item }}
+                  </md-checkbox>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div flex="40">
+             <fieldset class="demo-fieldset" >
+
+             <md-checkbox ng-checked="swapPairs" ng-click="toggleSwapPairs()" >
+                    <md-tooltip md-direction="right">
+                      Swaps pairs into the right order
+                    </md-tooltip>
+                   Swap Pairs
+                  </md-checkbox>
+               </fieldset>    
             </div>
           </div>
-        </fieldset>
-      </div>
-      </div>
+       </div>
+     </div>
+
+
    </div>
- </div>
-
-
-</div>
-</md-content>
-  <div layout="column" layout-fill style="margin-top:140px">
-    <div class="panel-group wrap" id="accordion" role="tablist" aria-multiselectable="true">
+ </md-content>
+      <div layout="column" layout-fill style="margin-top:140px">
+        <div class="panel-group wrap" id="accordion" role="tablist" aria-multiselectable="true">
 <div class="panel">
 <div class="panel-heading" role="tab" id="headingOne">
 <h4 class="panel-title">
@@ -60,25 +71,25 @@ Sequence Frequency <span style="font-size:13px;color:#fff">(frequency of each al
 </div>
 <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
 <div class="panel-body" style="overflow-y:scroll">
-<md-card style="width:100%">
-<md-card-title >
-<md-card-title-text>
-  <span class="md-headline">{{cancerType}} - Patient Count: {{patientNumber}} - Total # of Unique Sequences: {{sequenceTotal}}     <md-button class="md-primary" ng-click="scatterPlot=scatterPlot?false:true" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><span ng-hide="scatterPlot">Show</span><span ng-show="scatterPlot">Hide</span> Scatter Plot</md-button>
-</span>
+  <md-card style="width:100%">
+  <md-card-title >
+    <md-card-title-text>
+      <span class="md-headline">{{cancerType}} - Patient Count: {{patientNumber}} - Total # of Unique Sequences: {{sequenceTotal}}     <md-button class="md-primary" ng-click="scatterPlot=scatterPlot?false:true" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><span ng-hide="scatterPlot">Show</span><span ng-show="scatterPlot">Hide</span> Scatter Plot</md-button>
+    </span>
 
-</md-card-title>
-<md-card-content  style="margin-top:40px;">
-<div style="padding:10px" align="center"  >
-</div>
-<div class="collapse" id="collapseExample">
-  <div class="well">
-    <div align="center" id ='freqPlot'></div>
+  </md-card-title>
+  <md-card-content  style="margin-top:40px;">
+    <div style="padding:10px" align="center"  >
   </div>
-</div>
+    <div class="collapse" id="collapseExample">
+      <div class="well">
+        <div align="center" id ='freqPlot'></div>
+      </div>
+    </div>
 
-<!-- On rows -->
- <div align="center"><md-button class="md-primary md-raised" ng-click="printTable()">Print table</md-button></div>
-<table border="1" class="table table-bordered" style="margin-right:20px" cellpadding="10" id = "printTable">
+    <!-- On rows -->
+     <div align="center"><md-button class="md-primary md-raised" ng-click="printTable()">Print table</md-button></div>
+    <table border="1" class="table table-bordered" style="margin-right:20px" cellpadding="10" id = "printTable">
 
 <tr>
 <th>Number #</th>
@@ -100,18 +111,96 @@ Sequence Frequency <span style="font-size:13px;color:#fff">(frequency of each al
 <th>&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;&nbsp;</th>
 <th>Sequence</th>
 <tr ng-repeat ="sequence in top.maxArrayFrequencies " class="text-left" >
-<td class = "text-center">{{$index + 1}}</td>
-<td class = "text-left">{{sequence}}</td></tr>
+  <td class = "text-center">{{$index + 1}}</td>
+  <td class = "text-left">{{sequence}}</td></tr>
 </table>
 </td>
 </tr>
 
 </table>
-</md-card-content>
-<md-card-actions layout="row" layout-align="end center">
+  </md-card-content>
+  <md-card-actions layout="row" layout-align="end center">
 
-</md-card-actions>
+  </md-card-actions>
 </md-card>
+</div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-heading" role="tab" id="headingSwapPairsGrouping">
+<h4 class="panel-title">
+<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" data-target="#swapPairsGrouping" aria-expanded="false" aria-controls="swapPairsGrouping">
+Grouping by Swap Pairs  <span style="font-size:13px;color:#fff"></span>
+</a>
+</h4>
+</div>
+<div id="swapPairsGrouping" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSwapPairsGrouping">
+<div class="panel-body">
+  <!--<div  align="center" style="padding:10px" ><md-button class="md-primary" ng-click ="clearHistogram()" ng-show="histogramPlot"><span ng-hide="histogramPlot">Show</span><span ng-show="histogramPlot">Hide</span> Histogram</md-button></div>-->
+
+  <!--<div id = "chartStep"></div>-->
+
+  <table border="1" class="table table-bordered" style="margin-right:20px" cellpadding="10" id = "printTableSwapPairsGrouping">
+
+<tr>
+<th>Number #</th>
+<th>Sequence</th>
+<th>Sibling Sequences</th>
+</tr>
+<tr ng-repeat= "(key,value) in groupingSwapPairs">
+<td class="active">{{$index + 1}}</td>
+<td class="success">{{key}}</td>
+<td colspan="3">
+<table class="table table-striped" cellpadding="10">
+<th>&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;&nbsp;</th>
+<th>Sequence</th>
+<tr ng-repeat ="sequence in value " class="text-left" >
+  <td class = "text-center">{{$index + 1}}</td>
+  <td class = "text-left">{{sequence}}</td></tr>
+</table>
+</td>
+</tr>
+
+</table>
+</div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-heading" role="tab" id="collapseCosineSimilarityHeading">
+<h4 class="panel-title">
+<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"  aria-expanded="false" data-target="#collapseCosineSimilarity" aria-controls="collapseCosineSimilarity">
+Grouping by Cosine Similarity <span style="font-size:13px;color:#fff"></span>
+</a>
+</h4>
+</div>
+<div id="collapseCosineSimilarity" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapseCosineSimilarityHeading">
+<div class="panel-body">
+  <!--<div  align="center" style="padding:10px" ><md-button class="md-primary" ng-click ="clearHistogram()" ng-show="histogramPlot"><span ng-hide="histogramPlot">Show</span><span ng-show="histogramPlot">Hide</span> Histogram</md-button></div>
+
+  <div id = "chartStep"></div>-->
+
+  <table border="1" class="table table-bordered" style="margin-right:20px" cellpadding="10" id = "printTableCosineSimilarityGrouping">
+
+<tr>
+<th>Number #</th>
+<th>Sequence</th>
+<th>Sibling Sequences</th>
+</tr>
+<tr ng-repeat= "(key,value) in groupingCosineSimilarity">
+<td class="active">{{$index + 1}}</td>
+<td class="success">{{key}}</td>
+<td colspan="3">
+<table class="table table-striped" cellpadding="10">
+<th>&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;&nbsp;</th>
+<th>Sequence</th>
+<tr ng-repeat ="sequence in value " class="text-left" >
+  <td class = "text-center">{{$index + 1}}</td>
+  <td class = "text-left">{{sequence}}</td></tr>
+</table>
+</td>
+</tr>
+
+</table>
 </div>
 </div>
 </div>
@@ -125,22 +214,48 @@ Step Order Frequency <span style="font-size:13px;color:#fff">(Order frequency of
 </div>
 <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
 <div class="panel-body">
-<div  align="center" style="padding:10px" ><md-button class="md-primary" ng-click ="clearHistogram()" ng-show="histogramPlot"><span ng-hide="histogramPlot">Show</span><span ng-show="histogramPlot">Hide</span> Histogram</md-button></div>
+  <div  align="center" style="padding:10px" ><md-button class="md-primary" ng-click ="clearHistogram()" ng-show="histogramPlot"><span ng-hide="histogramPlot">Show</span><span ng-show="histogramPlot">Hide</span> Histogram</md-button></div>
 
-<div id = "chartStep"></div>
+  <div id = "chartStep"></div>
 
 <table class="table table-bordered" style="margin-right:20px" cellpadding="10">
-<tr>
-<th>Name of Step</th>
-<th>Best Index</th>
-<th>Frequency of Steps</th>
+  <tr>
+    <th>Name of Step</th>
+    <th>Best Index</th>
+    <th>Frequency of Steps</th>
 
-</tr>
-<tr ng-repeat= "alias in stepFrequency" ng-click="paintStepHistogram(alias)">
-<td class="active">{{alias.AliasName}}</td>
-<td class="success">{{alias.BestIndex}} ({{(alias.Array[alias.BestIndex]*100)/alias.TotalPatients|limitTo:4}}%)</td>
-<td class="success">{{alias.Array}}</td>
-</tr>
+  </tr>
+  <tr ng-repeat= "alias in stepFrequency" ng-click="paintStepHistogram(alias)">
+    <td class="active">{{alias.AliasName}}</td>
+    <td class="success">{{alias.BestIndex}} ({{(alias.Array[alias.BestIndex]*100)/alias.TotalPatients|limitTo:4}}%)</td>
+    <td class="success">{{alias.Array}}</td>
+  </tr>
+</table>
+</div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-heading" role="tab" id="headingFour">
+<h4 class="panel-title">
+<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+Fixed Step Order and Frequency 
+</a>
+</h4>
+</div>
+<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+<div class="panel-body">
+<table class="table table-bordered" style="margin-right:20px" cellpadding="10">
+  <tr>
+    <th>Order in Sequence</th>
+    <th>Name of Step</th>
+    <th>Percentage to be in that spot%</th>
+
+  </tr>
+  <tr ng-repeat= "step in stepFrequencyFixed" ng-click="null">
+    <td class="active">{{$index + 1}}</td>
+    <td class="success">{{step.Alias}}</td>
+    <td>{{step.Number|limitTo:4}}</td>
+  </tr>
 </table>
 </div>
 </div>
@@ -148,7 +263,7 @@ Step Order Frequency <span style="font-size:13px;color:#fff">(Order frequency of
 <div class="panel">
 <div class="panel-heading" role="tab" id="headingThree">
 <h4 class="panel-title">
-<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"  aria-expanded="false" data-target="#collapseThree"   aria-controls="collapseThree">
 Missing Steps
 </a>
 </h4>
@@ -156,17 +271,17 @@ Missing Steps
 <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
 <div class="panel-body">
 <table class="table table-bordered" style="margin-right:20px" cellpadding="10">
-<tr>
-<th>Name of Step</th>
-<th>Number of patients missing the step</th>
-<th>Missing Percentage %</th>
+  <tr>
+    <th>Name of Step</th>
+    <th>Number of patients missing the step</th>
+    <th>Missing Percentage %</th>
 
-</tr>
-<tr ng-repeat= "(step, numberMissing) in missingSteps" ng-click="null">
-<td class="active">{{step}}</td>
-<td class="success">{{numberMissing}}</td>
-<td>{{numberMissing*100/patientNumber|limitTo:4}}</td>
-</tr>
+  </tr>
+  <tr ng-repeat= "(step, numberMissing) in missingSteps" ng-click="null">
+    <td class="active">{{step}}</td>
+    <td class="success">{{numberMissing}}</td>
+    <td>{{numberMissing*100/patientNumber|limitTo:4}}</td>
+  </tr>
 </table>
 </div>
 </div>
@@ -175,25 +290,25 @@ Missing Steps
 
 
 
-  </div>
-  <div flex></div>
-</md-content>
-<md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
-  <md-toolbar class="md-theme-light">
-    <h1 class="md-toolbar-tools">Sidenav Right</h1>
-  </md-toolbar>
-  <md-content ng-controller="RightCtrl" layout-padding>
-    <form>
-      <md-input-container>
-        <label for="testInput">Test input</label>
-        <input type="text" id="testInput"
-               ng-model="data" md-autofocus>
-      </md-input-container>
-    </form>
-    <md-button ng-click="close()" class="md-primary">
-      Close Sidenav Right
-    </md-button>
-  </md-content>
-</md-sidenav>
-</section>
+      </div>
+      <div flex></div>
+    </md-content>
+    <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
+      <md-toolbar class="md-theme-light">
+        <h1 class="md-toolbar-tools">Sidenav Right</h1>
+      </md-toolbar>
+      <md-content ng-controller="RightCtrl" layout-padding>
+        <form>
+          <md-input-container>
+            <label for="testInput">Test input</label>
+            <input type="text" id="testInput"
+                   ng-model="data" md-autofocus>
+          </md-input-container>
+        </form>
+        <md-button ng-click="close()" class="md-primary">
+          Close Sidenav Right
+        </md-button>
+      </md-content>
+    </md-sidenav>
+  </section>
 </div>

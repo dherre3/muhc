@@ -15,7 +15,7 @@ var requestObject = {
   DeviceId:'browser', 
   Parameters:{'AppointmentSerNum':13, Latitude:'123.12312312', Longitude:'41.123123', Accuracy:'41'}
 };
-sqlInterface.runSqlQuery(queries.checkin(),['Kiosk', requestObject.UserID, requestObject.UserID]);
+//sqlInterface.runSqlQuery(queries.checkin(),['Kiosk', requestObject.UserID, requestObject.UserID]);
 /*sqlInterface.checkIn(requestObject).then(function(response){
   console.log(response);
 });*/
