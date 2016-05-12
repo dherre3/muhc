@@ -20,9 +20,7 @@ module.exports = {};
   database:'QPlusApp',
   dateStrings:true
 };*/
-/*
-*Connecting to mysql database
-*/
+
 var sqlConfig = {
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
@@ -30,6 +28,9 @@ var sqlConfig = {
   database:credentials.MYSQL_DATABASE,
   dateStrings:true
 };
+/*
+*Connecting to mysql database
+*/
 var connection = mysql.createConnection(sqlConfig);
 
 function handleDisconnect(myconnection) {

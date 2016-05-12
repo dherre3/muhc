@@ -3,8 +3,15 @@ var sqlInterface = require('./sqlInterface.js');
 
 var CheckinAppointments = function(data)
 {
-    //helperFunction.cleanDataCheckinAppointments(data);    
+    helperFunction.cleanDataCheckinAppointments(data);    
+    
+    for (var i = 0; i < data.length; i++) {
+        data[i].FirstName = data[i].FirstName.split(" ")[0];
+        data[i].FirstName = data[i].FirstName[0].toUpperCase() + data[i].FirstName.toLowerCase().substring(1);
+        data[i].LastName = data[i].LastName[0].toUpperCase() + data[i].LastName.toLowerCase().substring(1);
+    };
     this.CheckinAppointments = data;
+    console.log(data);
     this.Resources = []; 
     this.setResources = function(data)
     {

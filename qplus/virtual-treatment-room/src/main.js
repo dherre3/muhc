@@ -1,7 +1,7 @@
 var exports = module.exports = {};
 var firebaseInterface = require('./firebaseInterface.js');
 var sqlInterface = require('./sqlInterface.js');
-var helperFunction = require('./helperFunctions.js');
+var helperFunctions = require('./helperFunctions.js');
 var CheckinAppointments = require('./checkinAppointments.js');
 
 //Calling the main function
