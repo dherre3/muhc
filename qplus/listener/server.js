@@ -23,9 +23,7 @@ app.post('/login',function(req,res,next){
   var request=req.body.objectRequest;
   var requestObject={};
   requestObject=request;
-  console.log(requestObject);
-  console.log(requestKey);
-    console.log(requestObject);
+
 
     if(requestObject.Request=='VerifySSN'||requestObject.Request=='SetNewPassword'||requestObject.Request=='VerifySecurityAnswer')
     {
@@ -38,7 +36,7 @@ app.post('/login',function(req,res,next){
       });
 
     }else{
-      mainRequestApi.apiRequest(requestKey, requestObject).then(function(results){
+      mainRequestApi.apiRequestFormatter(requestKey, requestObject).then(function(results){
         console.log('Api call from server.js');
         res.send(results);
       });

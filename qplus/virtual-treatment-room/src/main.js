@@ -12,14 +12,12 @@ function main()
   ///setInterval(function()
   //{
     sqlInterface.getAllCheckinAppointments().then(function(data){
-      var appointments =new CheckinAppointments(data);      
-      console.log(appointments.CheckinAppointments);
-      
+      var appointments =new CheckinAppointments(data);            
       firebaseInterface.writeToFirebase('checkin-appointments', appointments.CheckinAppointments);
       firebaseInterface.writeToFirebase('Resources', appointments.Resources);
     }); 
  // },1000);
-  startRequestListener();
+  //startRequestListener();
  
 }
 

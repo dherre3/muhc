@@ -8,21 +8,10 @@ myApp.service('RequestToServer',function(UserAuthorizationInfo, EncryptionServic
     function getIdentifierWeb()
     {
       var r=$q.defer();
-    $http({
-        method: 'GET',
-        url: 'http://ip-api.com/json/?callback=?'
-        }).then(function(data){
-          data=data.data;
-          data=data.substring(2, data.length-2);
-          var uniqueIdentifier=JSON.parse(data);
-          var uuid=String(uniqueIdentifier.query);
-          uuid=uuid.replace(/\./g, "-");
-          console.log(uuid);
-          r.resolve(uuid);
-        });
+      r.resolve('DE83B0B8-546E-4FB3-9930-50F5111778CD');
       return r.promise;
     }
-    var identifier='';
+    var identifier='DE83B0B8-546E-4FB3-9930-50F5111778CD';
     return{
         sendRequest:function(typeOfRequest,content){
             var Ref=new Firebase('https://brilliant-inferno-7679.firebaseio.com/requests');
@@ -72,6 +61,7 @@ myApp.service('RequestToServer',function(UserAuthorizationInfo, EncryptionServic
               identifier=uuid;
               r.resolve(uuid);
             });
+            r.resolve('DE83B0B8-546E-4FB3-9930-50F5111778CD')
           }
           return r.promise;
         },

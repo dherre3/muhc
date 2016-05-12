@@ -3,7 +3,7 @@ var sqlInterface = require('./sqlInterface.js');
 
 var CheckinAppointments = function(data)
 {
-    helperFunction.cleanDataCheckinAppointments(data);    
+    //helperFunction.cleanDataCheckinAppointments(data);    
     this.CheckinAppointments = data;
     this.Resources = []; 
     this.setResources = function(data)

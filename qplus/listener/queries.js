@@ -130,7 +130,10 @@ exports.updateLogout=function(requestObject)
 {
   return "INSERT INTO PatientActivityLog (`ActivitySerNum`,`Request`,`Username`, `DeviceId`,`SessionId`,`DateTime`,`LastUpdated`) VALUES (NULL,?,?,?,?,?,CURRENT_TIMESTAMP )";
 };
-
+exports.updateDeviceIdentifiers = function(requestObject)
+{
+  return "INSERT INTO `PatientDeviceIdentifier`(`PatientDeviceIdentifierSerNum`, `PatientSerNum`, `DeviceId`, `RegistrationId`, `DeviceType`,`SessionId`, `LastUpdated`) VALUES (NULL, ?,?,?,?,?, NULL) ON DUPLICATE KEY UPDATE RegistrationId = ?, SessionId = ?;"
+};
 exports.getMapLocation=function(qrCode)
 {
   console.log("SELECT * FROM HospitalMap WHERE QRMapAlias = '"+qrCode+"';");

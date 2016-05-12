@@ -12,7 +12,7 @@ var timeEstimate = require('./timeEstimate.js');
 
 
 
-var sqlConfig={
+/*var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
   password:'root',
@@ -22,7 +22,7 @@ var sqlConfig={
 /*
 *Connecting to mysql database
 */
-/*var sqlConfig={
+var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,
@@ -137,7 +137,7 @@ exports.runSqlQuery = function(query, parameters, processRawFunction)
 {
   var r = Q.defer();
 
-  connection.query(query, parameters, function(err,rows,fields){
+  var query = connection.query(query, parameters, function(err,rows,fields){
     if (err) r.reject(err);
     if(typeof rows !=='undefined')
     {
@@ -153,6 +153,7 @@ exports.runSqlQuery = function(query, parameters, processRawFunction)
     }else{
       r.resolve([]);
     }
+    console.log(query.sql);
   });
   return r.promise;
 };
@@ -280,7 +281,7 @@ exports.checkCheckinInAria = function(requestObject)
       console.log('the user has checked in ', success);
       //Check in the user into mysql if they have indeed checkedin at kiosk
       exports.runSqlQuery(queries.checkin(),['Kiosk', serNum, username]);
-      r.resolve({CheckCheckin:{response:success, AppointmentSerNum:serNum}});
+      r.resolve({CheckCheckin:{response:'failure', AppointmentSerNum:serNum}});
     }).catch(function(error){
       //Returns false to whether the patient has checked in.
       r.reject({CheckCheckin:{response:error, AppointmentSerNum:serNum}});
@@ -385,6 +386,38 @@ exports.inputFeedback=function(requestObject)
   });
   return r.promise;
 };
+
+/**
+* @module sqlInterface
+* @name updateDeviceIdentifiers
+* @description Updates the device identifer for a particular user and a particular device.
+* @input {object} Object containing the device identifiers
+* @returns {promise} Promise with success or failure.
+*/
+exports.updateDeviceIdentifier = function(requestObject)
+{
+  var r = Q.defer();
+  var identifiers = requestObject.Parameters;
+  var deviceType = (identifiers.deviceType == 'iOS')?0:1;
+  console.log('line 400', identifiers.deviceType, identifiers);
+  console.log(getUserFromUserID(requestObject.UserID));
+  console.log(requestObject.UserID);
+
+
+  getUserFromUserID(requestObject.UserID).then(function(user){
+    console.log(user);
+    exports.runSqlQuery(queries.updateDeviceIdentifiers(),[user.UserTypeSerNum, requestObject.DeviceId, identifiers.registrationId, deviceType,requestObject.Token, identifiers.registrationId, requestObject.Token]).then(function(response){
+      console.log(response);
+      r.resolve('success');
+    }).catch(function(error){
+      r.reject(error);
+    });
+  }).catch(function(error){
+    r.reject(error);
+  });
+  return r.promise;
+
+};
 //Adding action to activity log
 exports.addToActivityLog=function(requestObject)
 {
@@ -479,7 +512,7 @@ exports.updateLogout=function(fields)
 function getUserFromUserID(UserID)
 {
   var r=Q.defer();
-  connection.query(queries.getUserFromUserID(UserID),function(error, rows, fields){
+  connection.query(queries.getUserFromUserId(UserID),function(error, rows, fields){
     if(error) r.reject(error);
     r.resolve(rows[0]);
   });

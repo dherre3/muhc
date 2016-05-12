@@ -35,3 +35,9 @@ exports.updateReadStatus=function(requestObject)
 exports.checkIn = function (requestObject) {
     return sqlInterface.checkIn(requestObject);
 };
+
+//Update device token for push notifications
+exports.updateDeviceIdentifier= function(requestObject)
+{
+  return sqlInterface.updateDeviceIdentifier(requestObject);
+};

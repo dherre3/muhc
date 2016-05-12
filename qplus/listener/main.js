@@ -37,7 +37,8 @@ function main()
       });
     }else{
       //Normal api request
-      exports.apiRequestFormatter(requestKey, requestObject).then(function(results){
+      console.log('asdas');
+      processApiRequest.processRequest(requestKey, requestObject).then(function(results){
         handleResponse(results);
       });
     }

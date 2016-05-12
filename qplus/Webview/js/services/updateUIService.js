@@ -143,7 +143,6 @@ myApp.service('UpdateUI', ['EncryptionService','$http','$filter', 'Patient','Doc
         var pathToSection=''
         var username=UserAuthorizationInfo.getUserName();
         var deviceId=RequestToServer.getIdentifier();
-        deviceId = 'demo';
         console.log(deviceId);
         if(section!=='UserPreferences'){
             pathToSection=username+'/'+deviceId+'/'+section;

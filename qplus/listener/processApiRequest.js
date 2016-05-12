@@ -15,7 +15,8 @@ var API = {
   'Read':apiHospitalUpdate.updateReadStatus,
   'AccountChange':apiHospitalUpdate.accountChange,
   'Feedback':apiHospitalUpdate.inputFeedback,
-  'Logout': apiHospitalUpdate.logout
+  'Logout': apiHospitalUpdate.logout,
+  'DeviceIdentifier':apiHospitalUpdate.updateDeviceIdentifier
 };
 
 exports.processRequest=function(requestObject)
