@@ -9,6 +9,9 @@ var CheckinAppointments = function(data)
         data[i].FirstName = data[i].FirstName.split(" ")[0];
         data[i].FirstName = data[i].FirstName[0].toUpperCase() + data[i].FirstName.toLowerCase().substring(1);
         data[i].LastName = data[i].LastName[0].toUpperCase() + data[i].LastName.toLowerCase().substring(1);
+        for (var key in data[i]) {
+            data[i][key] = String(data[i][key]);
+        };
     };
     this.CheckinAppointments = data;
     console.log(data);
