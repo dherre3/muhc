@@ -14,7 +14,24 @@ var firebaseRef = new Firebase('https://brilliant-inferno-7679.firebaseio.com/VW
 var exports = module.exports = {};
 function authenticate()
 {
-   firebaseRef.authWithCustomToken(credentials.FIREBASE_SECRET,function(){});
+   firebaseRef.authWithCustomToken(credentials.FIREBASE_SECRET,function(){
+       
+       
+   });
+}
+exports.FirebaseRequestMappings = {
+    'Call-Patient':exports.callPatient,
+    'Arrive-Patient':exports.arrivePatient
+};
+exports.main = function(requestkey, requestobject,data)
+{
+    var request = requestobject.request;
+    exports.FirebaseRequestMappings[request](requestkey, requestobject,data).then(function()
+    {
+        exports.firebaseRefRequest.child(requestKey).set(null);
+    }).catch(function(error){
+       exports.firebaseRefRequest.child(requestKey).set(null);
+    });
 }
 authenticate();
 exports.firebaseRef = firebaseRef;
@@ -71,4 +88,62 @@ exports.deleteSection = function(section)
    {
      firebaseRef.child(pathsFirebase[section]).set(null);  
    }
+};
+exports.arrivePatient = function(requestkey, requestobject,data)
+{
+    var child_id = patient.PatientSer + "-" + patient.ScheduledActivitySer + "-" + patient.ScheduledStartTime;    
+
+    var patient = data.Patient;
+    var destination = data.Destination;//Venue Id;
+    var patient_child = firebaseScreenRef.child(child_id);
+    return new Promise(function(resolve,reject){
+       patient_child.update(
+       { 
+            PatientStatus: "Arrived" 
+       },function(error){
+           if(error) reject(error);
+           else resolve();
+       }); 
+        
+        
+    });
+    
+};
+exports.callPatient = function(requestkey, requestobject,data)
+{
+    var patient = data.Patient;
+    var destination = data.Destination;//Venue Id;
+    var child_id = patient.PatientSer + "-" + patient.ScheduledActivitySer + "-" + patient.ScheduledStartTime;  
+    var patient_child = firebaseRef.child(getScreenPathFirebase()).child(child_id); 
+    return new Promise(function(resolve,reject){
+        patient_child.set(
+		{ 
+			FirstName: patient.FirstName, 
+			LastName: patient.LastName, 
+			PatientSer: patient.PatientSer, 
+			Destination: destination, 
+			PatientStatus: "Called", 
+			Appointment: patient.Expression1, 
+			Resource: patient.ResourceName, 
+			ScheduledActivitySer: patient.ScheduledActivitySer,
+			Timestamp: Firebase.ServerValue.TIMESTAMP
+		},function(error){
+           if(error) reject(error);
+           else resolve(); 
+        });
+        
+    });
+   
+};
+
+
+function getScreenPathFirebase()
+{
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1;
+    if(dd<10) dd='0'+dd;
+    if(mm<10) mm='0'+mm;
+    today = mm+'-'+dd+'-'+today.getFullYear();
+    return today;
 };

@@ -12,13 +12,16 @@ function main()
   ///setInterval(function()
   //{
     sqlInterface.getAllCheckinAppointments().then(function(data){
-      var appointments =new CheckinAppointments(data); 
-      console.log(appointments);           
-      firebaseInterface.writeToFirebase('checkin-appointments', appointments.CheckinAppointments);
-      firebaseInterface.writeToFirebase('Resources', appointments.Resources);
+    sqlInterface.sqlInterface.getResourcesForDay().then(function(data){
+        var appointments =new CheckinAppointments(resources); 
+        console.log(appointments);           
+        firebaseInterface.writeToFirebase('checkin-appointments', appointments.CheckinAppointments);
+        firebaseInterface.writeToFirebase('Resources', resources); 
+    });
+
     }); 
- // },1000);
-  //startRequestListener();
+ // },10000);
+  startRequestListener();
  
 }
 
@@ -28,10 +31,13 @@ function startRequestListener()
   {
     //key: user, Value:request
     console.log(snap.key(), snap.val());
-     /*api.processRequest(snap.key(), snap.val()).then(function(data)
+    var snapshot = snap.val();
+    
+     api.processRequest(snapshot.request, snapshot.parameters).then(function(data)
      {
-       firebaseInterface.writeResponseToRequest(data.user, data.response);
-     });*/
+       console.log(data);
+       firebaseInterface.replyRequest(snap.key(), snap.val(),data);
+     });
   });
 }
 
