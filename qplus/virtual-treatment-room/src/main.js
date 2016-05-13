@@ -12,7 +12,8 @@ function main()
   ///setInterval(function()
   //{
     sqlInterface.getAllCheckinAppointments().then(function(data){
-      var appointments =new CheckinAppointments(data);            
+      var appointments =new CheckinAppointments(data); 
+      console.log(appointments);           
       firebaseInterface.writeToFirebase('checkin-appointments', appointments.CheckinAppointments);
       firebaseInterface.writeToFirebase('Resources', appointments.Resources);
     }); 

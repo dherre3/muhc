@@ -276,9 +276,9 @@ myApp.controller('screenController', ['$scope','$modal','$http','$firebaseArray'
 
         // Check the patient into the current location
         $http({
-	  url: "http://172.26.66.41/devDocuments/screens/php/checkInPatient.php",
-	  method: "GET",
-	  params: {CheckinVenue: $scope.selected, 
+          url: "http://172.26.66.41/devDocuments/screens/php/checkInPatient.php",
+          method: "GET",
+          params: {CheckinVenue: $scope.selected, 
 	  	   ScheduledActivitySer: patient.ScheduledActivitySer, 
 		   location: $scope.selected 
 		  } 
