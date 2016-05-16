@@ -3,9 +3,42 @@ var firebaseInterface = require('./firebaseInterface.js');
 var sqlInterface = require('./sqlInterface.js');
 var helperFunctions = require('./helperFunctions.js');
 var CheckinAppointments = require('./checkinAppointments.js');
+var bluebird = require('bluebird');
 
-//Calling the main function
-main();
+
+exports.requests = {
+  'Appointments-Resources':appointmentsResources
+};
+exports.processRequest = function(request, parameters,callback)
+{
+  exports.requests[request](parameters).then(function(data){
+    callback(data);
+  });
+};
+
+
+function appointmentsResources()
+{
+  return new Promise(function(resolve, reject){
+    sqlInterface.getAllCheckinAppointments().then(function(data){
+    sqlInterface.sqlInterface.getResourcesForDay().then(function(data){
+        var appointments =new CheckinAppointments(data); 
+        resolve({appointments:appointments.CheckinAppointments, resources:appointments.Resources});
+      }).catch(function(error){
+        console.log(error);
+        reject(error);
+      });
+    }).catch(function(error){
+      console.log(error);
+      reject(error);
+    });
+
+  });
+   
+}
+
+
+
 function main()
 {
   //Initialize Firebase request!
