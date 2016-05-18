@@ -3,7 +3,10 @@ var filesystem  =require('fs');
 var Q           =require('q');
 var groupBy = require('./groupingByPairSwapping.js');
 var cosineGroup = require('./groupingByCosineVector.js');
+var sqlInterface = require('./sqlInterface.js');
 var utilities = require('./utilities.js');
+var patientAll = require('./getAllPatientTaskAppointment.js');
+var sequencesPerPatient = require('./sequencesPerPatient.js');
 var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
@@ -54,7 +57,9 @@ var apiCalls =
   'FixedStepFreq':bestIndexPerPositionAnalysis,
   'MissingFreq':missingFrequencyAnalysis,
   'GroupBySwappingPairsSimple':groupBy.groupingByPairSwappingSimple,
-  'GroupByCosine':cosineGroup.groupingByCosineSimilarity
+  'GroupByCosine':cosineGroup.groupingByCosineSimilarity,
+  'SequencesPerPatient':sequencesPerPatient.getSequences,
+  'GetPatient':patientAll.getPatientInformation,
 };
 
 var swapPairsMappings = 
@@ -82,8 +87,7 @@ function swapPairs(rows)
 function obtainCancerQuery (cancerType)
 {
   var regex = cancerMappings[cancerType];
-  console.log("SELECT Appointment.AppointmentSerNum as StageSerNum, Appointment.PatientSerNum, Appointment.DiagnosisSerNum, Priority.PriorityCode, Appointment.ScheduledStartTime as DateTime, Appointment.AliasSerNum, Alias.AliasName as AliasName from Priority, Alias, Appointment, Diagnosis where Appointment.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE  '"+regex+"' AND Alias.AliasSerNum = Appointment.AliasSerNum  AND Appointment.PatientSerNum = Priority.PatientSerNum AND (Priority.PriorityCode = 'SGAS_P3' OR Priority.PriorityCode = 'SGAS_P4') AND Appointment.ScheduledStartTime  > '2015-06-02' AND Appointment.PatientSerNum NOT IN (SELECT App.PatientSerNum from Appointment as App WHERE App.ScheduledStartTime < '2015-06-01') union all SELECT Task.TaskSerNum, Task.PatientSerNum, Task.DiagnosisSerNum, Priority.PriorityCode, Task.CreationDate, Task.AliasSerNum, Alias.AliasName as AliasName from Priority, Task, Diagnosis, Alias  where Task.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE '"+regex+"' AND Alias.AliasSerNum = Task.AliasSerNum AND Task.PatientSerNum = Priority.PatientSerNum AND (Priority.PriorityCode = 'SGAS_P3' OR Priority.PriorityCode = 'SGAS_P4') AND Task.CreationDate > '2015-06-02' Order by PatientSerNum, DateTime");
-  return "SELECT Appointment.AppointmentSerNum as StageSerNum, Appointment.PatientSerNum, Appointment.DiagnosisSerNum, Priority.PriorityCode, Appointment.ScheduledStartTime as DateTime, Appointment.AliasSerNum, Alias.AliasName as AliasName from Priority, Alias, Appointment, Diagnosis where Appointment.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE  '"+regex+"' AND Alias.AliasSerNum = Appointment.AliasSerNum  AND Appointment.PatientSerNum = Priority.PatientSerNum AND (Priority.PriorityCode = 'SGAS_P3' OR Priority.PriorityCode = 'SGAS_P4') AND Appointment.ScheduledStartTime  > '2015-06-02' union all SELECT Task.TaskSerNum, Task.PatientSerNum, Task.DiagnosisSerNum, Priority.PriorityCode, Task.CreationDate, Task.AliasSerNum, Alias.AliasName as AliasName from Priority, Task, Diagnosis, Alias  where Task.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE '"+regex+"' AND Alias.AliasSerNum = Task.AliasSerNum AND Task.PatientSerNum = Priority.PatientSerNum AND (Priority.PriorityCode = 'SGAS_P3' OR Priority.PriorityCode = 'SGAS_P4') AND Task.CreationDate > '2015-06-02' AND Task.CreationDate > '2015-06-02' AND Task.PatientSerNum NOT IN (SELECT App.PatientSerNum from Task as App WHERE App.CreationDate < '2015-06-01') Order by PatientSerNum, DateTime"
+  return "SELECT Appointment.AppointmentSerNum as StageSerNum, Appointment.PatientSerNum, Appointment.DiagnosisSerNum, Priority.PriorityCode, Appointment.ScheduledStartTime as DateTime, Appointment.AliasSerNum, Alias.AliasName as AliasName from Priority, Alias, Appointment, Diagnosis where Appointment.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE  '"+regex+"' AND Alias.AliasSerNum = Appointment.AliasSerNum  AND Appointment.PatientSerNum = Priority.PatientSerNum AND (Priority.PriorityCode = 'SGAS_P3' OR Priority.PriorityCode = 'SGAS_P4') AND Appointment.ScheduledStartTime  > '2015-06-02' union all SELECT Task.TaskSerNum, Task.PatientSerNum, Task.DiagnosisSerNum, Priority.PriorityCode, Task.CreationDate, Task.AliasSerNum, Alias.AliasName as AliasName from Priority, Task, Diagnosis, Alias  where Task.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE '"+regex+"' AND Alias.AliasSerNum = Task.AliasSerNum AND Task.PatientSerNum = Priority.PatientSerNum AND (Priority.PriorityCode = 'SGAS_P3' OR Priority.PriorityCode = 'SGAS_P4') AND Task.CreationDate > '2015-06-02' AND Task.PatientSerNum NOT IN (SELECT App.PatientSerNum from Task as App WHERE App.CreationDate < '2015-06-02') UNION ALL SELECT 0, PatientSerNum, 0,PriorityCode, CreationDate, '-', 'Medically Ready'  FROM Priority WHERE CreationDate > '2015-06-02' AND PriorityCode IN ('SGAS_P3', 'SGAS_P4')AND PatientSerNum IN (SELECT DISTINCT * FROM (SELECT DISTINCT Diagnosis.PatientSerNum FROM Appointment, Diagnosis WHERE Diagnosis.DiagnosisCode LIKE '"+regex+"' AND Appointment.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Appointment.ScheduledStartTime > '2015-06-02' UNION ALL SELECT DISTINCT Diagnosis.PatientSerNum FROM Task, Diagnosis WHERE Diagnosis.DiagnosisCode LIKE '"+regex+"' AND Task.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Task.CreationDate > '2015-06-02') as dummy ORDER BY PatientSerNum) Order by PatientSerNum, DateTime;";
   
   /*
   "SELECT Appointment.AppointmentSerNum as StageSerNum, Appointment.PatientSerNum, Appointment.DiagnosisSerNum, Appointment.PrioritySerNum, Appointment.ScheduledStartTime as DateTime, Appointment.AliasExpressionSerNum, AliasExpression.ExpressionName as AliasName from AliasExpression, Appointment, Diagnosis where Appointment.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE  '"+regex+"' AND AliasExpression.AliasExpressionSerNum = Appointment.AliasExpressionSerNum  union all SELECT Task.TaskSerNum, Task.PatientSerNum, Task.DiagnosisSerNum, Task.PrioritySerNum, Task.CreationDate, Task.AliasExpressionSerNum, AliasExpression.ExpressionName as AliasName from Task, Diagnosis, AliasExpression  where Task.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Diagnosis.DiagnosisCode LIKE '"+regex+"' AND AliasExpression.AliasExpressionSerNum = Task.AliasExpressionSerNum Order by PatientSerNum, DateTime";
@@ -100,20 +104,24 @@ var exports=module.exports={};
 exports.proccessQuerySequence = function(argument, callback)
 {
   console.log('main.js line59', argument);
-  if(argument.NewAnalysis)
+  if(argument.NewAnalysis&&argument.Analysis == "SequencesPerPatient")
   {
-   /* apiCalls[argument.Analysis](argument).then(function(result){
+   apiCalls[argument.Analysis](argument).then(function(result){
       callback(result);
-    });*/
+    });
+  }else if(argument.NewAnalysis&&argument.Analysis == "GetPatient"){
+    apiCalls[argument.Analysis](argument.PatientSerNum).then(function(result){
+      callback(result);
+    });
+
   }else{
-    runSqlQuery(obtainCancerQuery(argument.CancerType), []).then(function(rows)
+      sqlInterface.runSqlQuery(argument.CancerType, []).then(
+    function(rows)
     {
       var result = apiCalls[argument.Analysis](rows, argument.swapPairs);
-      callback(result);
-    }).catch(function(error)
-    {
+        callback(result);
+    }).catch(function(error){
       console.log(error);
-      
     });
   }
   

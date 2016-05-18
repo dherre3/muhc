@@ -28,7 +28,7 @@ exports.groupingByCosineSimilarity = function(argument)
   });
   return r.promise;
 
-}
+};
 exports.groupingByCosineSimilarity({CancerType:'Breast'});
 function getSequenceGroupings(arrayOfDistinctSequences, scoreObject, score)
 {

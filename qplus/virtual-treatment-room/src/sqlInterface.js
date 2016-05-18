@@ -72,7 +72,7 @@ module.exports.getAllCheckinAppointments = function()
     });
 };
 
-var resourcesForDayQuery = "SELECT DISTINCT ClinicResources.ResourceName, ClinicResources.FROM ClinicResources, ClinicSchedule WHERE ClinicSchedule.Day =  ? AND ClinicSchedule.AMPM IN ( 'AM',  'PM') AND ClinicResources.ClinicScheduleSerNum = ClinicSchedule.ClinicScheduleSerNum"
+var resourcesForDayQuery = "SELECT DISTINCT ClinicResources.ResourceName, ClinicResources.FROM ClinicResources, ClinicSchedule WHERE ClinicSchedule.Day =  ? AND ClinicSchedule.AMPM IN ( 'AM',  'PM') AND ClinicResources.ClinicScheduleSerNum = ClinicSchedule.ClinicScheduleSerNum";
 /**
 * @method
 * @name getResourcesForDay()
@@ -90,7 +90,7 @@ module.exports.getResourcesForDay = function()
         resolve(rows);
       });
     });
-}
+};
 var resourceRoomQuery = "SELECT DISTINCT ClinicResources.ResourceName, ExamRoom.AriaVenueId FROM ClinicResources, ClinicSchedule, ExamRoom WHERE ClinicResources.ResourceName IN ? AND ClinicResources.ClinicScheduleSerNum =  ClinicSchedule.ClinicScheduleSerNum AND ClinicSchedule.DAY =  ? AND ClinicSchedule.AMPM =  ? AND ClinicSchedule.ExamRoomSerNum = ExamRoom.ExamRoomSerNum";
 /**
  * @method
@@ -134,7 +134,7 @@ module.exports.checkinPatientToLocation = function(system,parameters)
   {
      var params = '?CheckinVenue='+parameters.CheckinVenue+'&ScheduledActivitySer='+parameters.ScheduledActivitySer; 
     var url= (system == 'Aria')?urlsVirtualWaitingRoom["Checkin-Patient-Aria"]+params: urlsVirtualWaitingRoom["Checkin-Patient-Medivisit"]+params;
-    var urlCheckin = { path:url}
+    var urlCheckin = { path:url};
       //making request to checkin
           var x = http.request(urlCheckin,function(res){
               res.on('data',function(data){                
@@ -168,7 +168,7 @@ module.exports.screenName = function(request)
     return new Promise(function(resolve,reject)
     {
       var params = '?FirstName='+patient.FirstName+'&LastNameFirstThree='+patient.SSN; 
-      var urlScreenName = { path:urlsVirtualWaitingRoom["Similar-Checkins"]+params}
+      var urlScreenName = { path:urlsVirtualWaitingRoom["Similar-Checkins"]+params};
         //making request to checkin
             var x = http.request(urlScreenName,function(res){
                 res.on('data',function(data){                

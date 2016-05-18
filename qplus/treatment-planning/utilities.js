@@ -78,8 +78,7 @@ exports.getArrayOfDistinctSequences = function(objectPatientSequence,asString)
      }
      return array;
 };
-exports.uselessAliases = {'2':'Consult Appointment','5':'End of Treatment Note Task',  '23':'Treatment Appointment', '24':'CRR', '25':'Consult Redirected','26':'Plus TX Code', '27':'Initial TX Code', 
-'6':'End of Treatment Note Task', '40':'Follow-up Appointments','41':'Intra-Treatment Appointment','42':'','43':'','45':'', '48':'Machine Warmup Morning Appt', '49':'All Tasks'};
+exports.uselessAliases = {'2':'Consult Appointment',  '23':'Treatment Appointment', '24':'CRR', '25':'Consult Redirected','26':'Plus TX Code', '27':'Initial TX Code', '40':'Follow-up Appointments','41':'Intra-Treatment Appointment','42':'','43':'','45':'', '48':'Machine Warmup Morning Appt', '49':'All Tasks'};
 exports.eliminateAllUselessTasks = function (rows)
 {
   for (var i =  rows.length-1; i >= 0; i--) {

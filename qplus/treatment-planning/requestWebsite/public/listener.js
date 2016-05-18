@@ -68,11 +68,11 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
       });
 
     });
-    $.post("http://localhost:3000/login",{CancerType: cancer,NewAnalysis:true, Analysis:'GroupBySwappingPairsSimple', swapPairs:false}, function(data){
+    $.post("http://localhost:3000/login",{CancerType: cancer,NewAnalysis:true, Analysis:'SequencesPerPatient', swapPairs:false}, function(data){
       console.log(data);
-      console.log(Object.keys(data).length);
        $timeout(function(){
-          $scope.groupingSwapPairs = data;
+         $scope.sequencesPerPatient = data;
+          //$scope.groupingSwapPairs = data;
 
       });
      /* data = JSON.stringify(data);
@@ -89,7 +89,7 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
       });*/
 
     });
-    $.post("http://localhost:3000/login",{CancerType: cancer,NewAnalysis:true, Analysis:'GroupByCosine', swapPairs:false}, function(data){
+    /*$.post("http://localhost:3000/login",{CancerType: cancer,NewAnalysis:true, Analysis:'GroupByCosine', swapPairs:false}, function(data){
       console.log(data);
       console.log(Object.keys(data).length);
       $timeout(function(){
@@ -109,7 +109,7 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
 
       });*/
 
-    });
+    //});
      $.post("http://localhost:3000/login",{CancerType: cancer, Analysis:'FixedStepFreq', swapPairs:false}, function(data){
       /*data = JSON.stringify(data);
       data = encryptObject(data, '12345');
@@ -137,6 +137,26 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
     });
    
   };
+  
+  
+  //Grabs the information for a particular patient from the database
+  $scope.getPatientInformation = function(patientSerNum)
+  {
+    
+    $.post("http://localhost:3000/login",{Analysis:'GetPatient', PatientSerNum:patientSerNum}, function(data){
+      /*data = JSON.stringify(data);
+      data = encryptObject(data, '12345');
+      objectToSend[$rootScope.canceType].MissingFreq = data;
+      console.log(objectToSend);
+      ref.update(objectToSend);*/
+      $timeout(function()
+      {
+        $scope.patientInformation = data;
+      });
+    });
+  };
+  
+  
   $scope.items = [1,2,3,4,5];
   $scope.items = ['Consult Appointment','Ct-Sim'];
 $scope.selected = [];
