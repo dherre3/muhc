@@ -1,4 +1,3 @@
-firebaseInterfaceService.js
 var app = angular.module('MUHCAppListener');
 
 app.service('firebaseInterface',function(){
@@ -20,10 +19,10 @@ app.service('firebaseInterface',function(){
  */
 
 var firebaseRef = new Firebase('https://brilliant-inferno-7679.firebaseio.com/VWR');
-var exports = module.exports = {};
+var exports = {};
 function authenticate()
 {
-   firebaseRef.authWithCustomToken(credentials.FIREBASE_SECRET,function(){
+   firebaseRef.authWithCustomToken('9HeH3WPYe4gdTuqa88dtE3KmKy7rqfb4gItDRkPF',function(){
        
        
    });
@@ -32,6 +31,8 @@ exports.FirebaseRequestMappings = {
     'Call-Patient':exports.callPatient,
     'Arrive-Patient':exports.arrivePatient
 };
+
+
 exports.main = function(requestkey, requestobject,data)
 {
     var request = requestobject.request;
@@ -91,12 +92,13 @@ exports.writeToFirebase = function(section, data)
  * @returns {Promise} Returns promise with success or failure status
  * 
  */
-exports.deleteSection = function(section)
+exports.respondToRequest = function(user, request, response)
 {
-   if(pathsFirebase.hasOwnProperty(section))
-   {
-     firebaseRef.child(pathsFirebase[section]).set(null);  
-   }
+  firebaseRef.child(user+'/'+request).set(response);
+}
+exports.deleteFromFirebase = function(user, requestKey)
+{
+	firebaseRef.child('requests/'+user+'/'+requestkey).set(null);
 };
 exports.arrivePatient = function(requestkey, requestobject,data)
 {

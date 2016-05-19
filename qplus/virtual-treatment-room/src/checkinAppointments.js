@@ -6,6 +6,7 @@ var CheckinAppointments = function(data)
     helperFunction.cleanDataCheckinAppointments(data);    
     
     for (var i = 0; i < data.length; i++) {
+        if(data[i].ScheduledStartTime_mm.length == 1) data[i].ScheduledStartTime_mm = "0"+ data[i].ScheduledStartTime_mm; 
         data[i].FirstName = data[i].FirstName.split(" ")[0];
         data[i].FirstName = data[i].FirstName[0].toUpperCase() + data[i].FirstName.toLowerCase().substring(1);
         data[i].LastName = data[i].LastName[0].toUpperCase() + data[i].LastName.toLowerCase().substring(1);
@@ -14,18 +15,19 @@ var CheckinAppointments = function(data)
         };
     };
     this.CheckinAppointments = data;
-    console.log(data);
     this.Resources = []; 
     this.setResources = function(data)
     {
         var array = [];
         for (var index = 0; index < data.length; index++) {
+            data[index].ResourceName = data[index].ResourceName.replace(/\r/g,"");
             array.push(data[index].ResourceName);
             // this.resources.push(data[index].ResourceName);
         } 
         this.Resources = array;
+        return array;
     };
-    this.setResources(data);
+    
 
 };
 

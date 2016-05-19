@@ -1,15 +1,22 @@
 var mysql       = require('mysql');
 var filesystem  =require('fs');
 var Q           =require('q');
+var credentials = require('./credentials.js');
 
-var sqlConfig={
+/*var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
   password:'root',
   database:'sequencesTreatment',
   dateStrings:true
+};*/
+var sqlConfig={
+  host:credentials.HOST,
+  user:credentials.MYSQL_USERNAME,
+  password:credentials.MYSQL_PASSWORD,
+  database:credentials.MYSQL_DATABASE,
+  dateStrings:true
 };
-
 /*
 *Re-connecting the sql database, NodeJS has problems and disconnects if inactive,
 The handleDisconnect deals with that
@@ -41,8 +48,9 @@ exports.cancerMappings =
 exports.runSqlQuery = function(cancerType, parameters, processRawFunction)
 {
   var r=Q.defer();
-  connection.query(obtainCancerQuery(cancerType), function(err,rows,fields){
+  var sql = connection.query(obtainCancerQuery(cancerType), function(err,rows,fields){
     if (err) {
+      console.log(rows);
       console.log(err);
       
       r.reject(err);
@@ -63,17 +71,19 @@ exports.runSqlQuery = function(cancerType, parameters, processRawFunction)
       r.resolve([]);
     }
   });
+  console.log(sql.sql);
   return r.promise;
 };
 exports.obtainSGASTask = function()
 {
   var r = Q.defer();
-  connection.query(obtainSGASTaskQuery(),function(err,rows,fields)
+ var query =  connection.query(obtainSGASTaskQuery(),function(err,rows,fields)
   {
     console.log(err);
     if(err) r.reject(err);
     r.resolve(rows);
   });
+ console.log(query);
   return r.promise;
 };
 
@@ -101,7 +111,7 @@ exports.getDiagnosisPatientInformation = function(patientSerNum)
 
 function obtainPatientAllQuery(patientSerNum)
 {
-  return "SELECT Appointment.AppointmentSerNum as StageSerNum, Appointment.PatientSerNum, Appointment.DiagnosisSerNum, Priority.PriorityCode, Appointment.ScheduledStartTime as DateTime, Appointment.AliasSerNum, Alias.AliasName as AliasName from Priority, Alias, Appointment, Diagnosis where Appointment.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Alias.AliasSerNum = Appointment.AliasSerNum  AND Appointment.PatientSerNum = Priority.PatientSerNum AND (Priority.PriorityCode = 'SGAS_P3' OR Priority.PriorityCode = 'SGAS_P4') AND Appointment.PatientSerNum = "+patientSerNum+" union all SELECT Task.TaskSerNum, Task.PatientSerNum, Task.DiagnosisSerNum, Priority.PriorityCode, Task.CreationDate, Task.AliasSerNum, Alias.AliasName as AliasName from Priority, Task, Diagnosis, Alias  where Task.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Alias.AliasSerNum = Task.AliasSerNum AND Task.PatientSerNum = Priority.PatientSerNum AND (Priority.PriorityCode = 'SGAS_P3' OR Priority.PriorityCode = 'SGAS_P4') AND Task.PatientSerNum = "+patientSerNum+" UNION ALL SELECT 0, PatientSerNum, 0,PriorityCode, CreationDate, '-', 'Medically Ready'  FROM Priority WHERE PriorityCode IN ('SGAS_P3', 'SGAS_P4') AND PatientSerNum = "+patientSerNum+"  Order by PatientSerNum, DateTime;";
+  return "SELECT Appointment.AppointmentSerNum as StageSerNum, Appointment.PatientSerNum, Appointment.DiagnosisSerNum, Priority.PriorityCode, Appointment.ScheduledStartTime as DateTime, Appointment.AliasSerNum, Alias.AliasName as AliasName from Priority, Alias, Appointment, Diagnosis where Appointment.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Alias.AliasSerNum = Appointment.AliasSerNum  AND Appointment.PatientSerNum = Priority.PatientSerNum AND (Priority.PriorityCode = 'SGAS_P3' OR Priority.PriorityCode = 'SGAS_P4') AND Appointment.PatientSerNum = "+patientSerNum+" union all SELECT Task.TaskSerNum, Task.PatientSerNum, Task.DiagnosisSerNum, Priority.PriorityCode, Priority.CreationDate, Task.AliasSerNum, Alias.AliasName as AliasName from Priority, Task, Diagnosis, Alias  where Task.DiagnosisSerNum = Diagnosis.DiagnosisSerNum AND Alias.AliasSerNum = Task.AliasSerNum AND Task.PatientSerNum = Priority.PatientSerNum AND (Priority.PriorityCode = 'SGAS_P3' OR Priority.PriorityCode = 'SGAS_P4') AND Task.PatientSerNum = "+patientSerNum+" UNION ALL SELECT 0, PatientSerNum, 0,PriorityCode, CreationDate, '-', 'Medically Ready'  FROM Priority WHERE PriorityCode IN ('SGAS_P3', 'SGAS_P4') AND PatientSerNum = "+patientSerNum+"  Order by PatientSerNum, DateTime;";
 }
 
 function obtainDiagnosisAllPatient(patientSerNum)

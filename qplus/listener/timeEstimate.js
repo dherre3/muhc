@@ -14,7 +14,7 @@ exports.getEstimate=function(AriaSerNum, Id)
       },
       preceding:{
         'EN':'2 patients ahead of you',
-        'FR':'2 patients ahead of you'
+        'FR':'2 patients avant vous'
       },
       estimate:{
         'EN':'20 - 30',
@@ -22,7 +22,7 @@ exports.getEstimate=function(AriaSerNum, Id)
       },
       schedule:{
         'EN':'Approximately 10 minutes ahead of schedule',
-        'FR':'Approximately 10 minutes ahead of schedule'
+        'FR':"Environ 2 minutes d'avance"
       }
     };
     r.resolve(objectToSend);

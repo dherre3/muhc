@@ -1,5 +1,5 @@
 var app=angular.module('MUHCAppListener',[]);
-app.controller('MainController',['$scope','$timeout','firebaseInterface',function($scope,$timeout,firebaseInterface){
+app.controller('MainController',['$scope','$timeout','firebaseInterface','$q',function($scope,$timeout,firebaseInterface,$q){
   $scope.requests=[];
   //console.log(CryptoJS.SHA256('12345').toString());
 
@@ -40,36 +40,52 @@ ref.child('Users').on('value',function(snapshot){
     });
 },60000);
 
-  ref.child('requests').on('child_added',function(request){
-    $.post("http://172.26.66.41:8010/login",{key: request.key(),objectRequest: request.val()}, function(data){
-      if(data.type=='UploadToFirebase')
-      {
-        uploadToFirebase(data.requestKey, data.encryptionKey,data.requestObject, data.object);
-      }else if(data.type=='CompleteRequest')
-      {
-        completeRequest(data.requestKey,data.requestObject,data.Invalid);
-      }else if(data.type=='ResetPasswordError')
-      {
-        resetPasswordError(data.requestKey,data.requestObject);
-      }
+  ref.child('requests').on('child_added',function(snapshot){
+    console.log(snapshot);
+    if(snapshot.val()||typeof snapshot.val() !== null)
+    {
+      var snap = snapshot.val();
+      var keys = Object.keys(snap);
+      var req = snap[keys[0]];
+      var user = snapshot.key();
 
-    });
+      var requestObject = {'user':user, 'request':req.request, 'parameters':req.parameters};
+      requestBackend(requestObject).then(function(result){
+        console.log(result);
+        if(result.response == 'success')
+        { 
+          console.log(result.data)
+          firebaseInterface.respondToRequest(user, req.request, result.data);
+        }else{
+          console.log(result);
+          //firebaseInterface.deleteFromFirebase(request.key(),keys[0]);
+        }   
+      }); 
+    }
+
   });
 
 
    var interval = setInterval(function()
    {
-      requestBackend({request:'Appointments-Resources'}).then(function(data){
-        console.log(data);
-        firebaseInterface.writeToFirebase('checkin-appointments', data.checkinAppointments);
-        firebaseInterface.writeToFirebase('Resources', data.resources); 
+
+      requestBackend({request:'Appointments-Resources'}).then(function(result){
+        if(result.response =='success')
+        {
+          console.log(result.data.appointments);
+          firebaseInterface.writeToFirebase('checkin-appointments', result.data.appointments);
+          firebaseInterface.writeToFirebase('Resources', result.data.resources); 
+        }else{
+          console.log(results.data);
+        }
+        
       });
    },10000);
   
   function requestBackend(parameters)
   {
     var r = $q.defer();
-    $.post("http://172.26.66.41:8010/login",parameters, function(data){
+    $.post("http://172.26.66.41:4000/login",parameters, function(data){
       r.resolve(data);
     });
     return r.promise;

@@ -85,48 +85,54 @@
 
           </div>
         </md-content>
-        <div layout="column" layout-fill style="margin-top:140px">
+        <div layout="column" layout-fill style="margin-top:210px">
+
           <div class="panel-group wrap" id="accordion" role="tablist" aria-multiselectable="true">
              <div class="panel">
               <div class="panel-heading" role="tab" id="headingPatientInformation">
                 <h4 class="panel-title">
 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#patientInformation" aria-expanded="false" aria-controls="patientInformation">
-Swap Pairs groupings <span style="font-size:13px;color:#fff"></span>
+Check Individual Patient <span style="font-size:13px;color:#fff"></span>
 </a>
 </h4>
               </div>
               <div id="patientInformation" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingPatientInformation">
                 <div class="panel-body">
+                  <div align="center" >
+                    <div style="width:40vw">
+<div class="input-group">
+  <span class="input-group-addon" id="basic-addon3">PatientSerNum</span>
+  <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3" style="z-index:1" ng-model="patientId">
+  <span class="input-group-btn" >
+
+  <md-button class="md-raised md-primary" style="margin:0 0 0 10px;padding:0;height:29px" ng-click="getPatientInformation(patientId)">Search</md-button></div>
+      </span>
+</div>
+</div>
+
                   <!--<div  align="center" style="padding:10px" ><md-button class="md-primary" ng-click ="clearHistogram()" ng-show="histogramPlot"><span ng-hide="histogramPlot">Show</span><span ng-show="histogramPlot">Hide</span> Histogram</md-button></div>-->
                     <div class="center">
-                        
+                        <div>Diagnoses:</div>{{patientInformation.Diagnosis}}
                      </div>
                   <!--<div id = "chartStep"></div>-->
-
+                  <div></div>
                   <table border="1" class="table table-bordered" style="margin-right:20px" cellpadding="10" id="printTablePatientInformation">
 
                     <tr>
                       <th>Number #</th>
                       <th>Sequence</th>
-                      <th>Sibling Sequences</th>
                     </tr>
-                    <tr ng-repeat="(key,value) in groupingSwapPairs">
+                    <tr ng-repeat="value in patientInformation.Fields">
                       <td class="active">{{$index + 1}}</td>
-                      <td class="success">{{key}}</td>
                       <td colspan="3">
-                        <table class="table table-striped" cellpadding="10">
-                          <th>&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;&nbsp;</th>
-                          <th>Sequence</th>
-                          <tr ng-repeat="sequence in value " class="text-left">
-                            <td class="text-center">{{$index + 1}}</td>
-                            <td class="text-left">{{sequence}}</td>
-                          </tr>
-                        </table>
+                        <strong>Date: {{value.DateTime}}</strong><br>
+                        <p>{{value.AliasName}}</p>
                       </td>
                     </tr>
 
                   </table>
                 </div>
+                <div align="center" ><md-progress-circular ng-if="!sequences" class="md-primary md-hue-2" md-mode="indeterminate" md-diameter="70"></md-progress-circular></div>
               </div>
             </div>
                           <div class="panel">
@@ -139,6 +145,7 @@ Sequences Per Patient <span style="font-size:13px;color:#fff"></span>
               </div>
               <div id="sequencesPerPatient" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSequencesPerPatient">
                 <div class="panel-body">
+
                   <!--<div  align="center" style="padding:10px" ><md-button class="md-primary" ng-click ="clearHistogram()" ng-show="histogramPlot"><span ng-hide="histogramPlot">Show</span><span ng-show="histogramPlot">Hide</span> Histogram</md-button></div>-->
 
                   <!--<div id = "chartStep"></div>-->
@@ -170,6 +177,7 @@ Sequences Per Patient <span style="font-size:13px;color:#fff"></span>
                     </tr>
 
                   </table>
+                  <div align="center" ><md-progress-circular ng-if="!sequencesPerPatient" class="md-primary md-hue-2" md-mode="indeterminate" md-diameter="70"></md-progress-circular></div>
                 </div>
               </div>
             </div>
@@ -235,6 +243,7 @@ Sequence Frequency <span style="font-size:13px;color:#fff">(frequency of each al
                         </tr>
 
                       </table>
+                      <div align="center" ><md-progress-circular ng-if="!sequences" class="md-primary md-hue-2" md-mode="indeterminate" md-diameter="70"></md-progress-circular></div>
                     </md-card-content>
                     <md-card-actions layout="row" layout-align="end center">
 
@@ -280,6 +289,7 @@ Swap Pairs groupings <span style="font-size:13px;color:#fff"></span>
                     </tr>
 
                   </table>
+                  <div align="center" ><md-progress-circular ng-if="!groupingSwapPairs" class="md-primary md-hue-2" md-mode="indeterminate" md-diameter="70"></md-progress-circular></div>
                 </div>
               </div>
             </div>
@@ -352,6 +362,7 @@ Step Order Frequency <span style="font-size:13px;color:#fff">(Order frequency of
                       <td class="success">{{alias.Array}}</td>
                     </tr>
                   </table>
+                  <div align="center" ><md-progress-circular ng-if="!stepFrequency" class="md-primary md-hue-2" md-mode="indeterminate" md-diameter="70"></md-progress-circular></div>
                 </div>
               </div>
             </div>
@@ -378,6 +389,7 @@ Fixed Step Order and Frequency
                       <td>{{step.Number|limitTo:4}}</td>
                     </tr>
                   </table>
+                  <div align="center" ><md-progress-circular ng-if="!stepFrequencyFixed" class="md-primary md-hue-2" md-mode="indeterminate" md-diameter="70"></md-progress-circular></div>
                 </div>
               </div>
             </div>
@@ -404,6 +416,7 @@ Missing Steps
                       <td>{{numberMissing*100/patientNumber|limitTo:4}}</td>
                     </tr>
                   </table>
+                  <div align="center" ><md-progress-circular ng-if="!missingSteps" class="md-primary md-hue-2" md-mode="indeterminate" md-diameter="70"></md-progress-circular></div>
                 </div>
               </div>
             </div>

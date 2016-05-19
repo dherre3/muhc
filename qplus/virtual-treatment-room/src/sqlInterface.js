@@ -58,11 +58,23 @@ module.exports.getAllCheckinAppointments = function()
     {
       var urlCheckin = { path: urlsVirtualWaitingRoom["Checkin-Appointments"]};
       //making request to checkin
+        var response = '';
+        var i =0;
           var x = http.request(urlCheckin,function(res){
-              res.on('data',function(data){                
+              res.on('data',function(data){
                 //Data from php.
                 //console.log(data.toString());
-                resolve(JSON.parse(data.toString()));
+                //console.log(data.toString());
+                if(i==0)
+                {
+                  response += data.toString();
+                }
+                
+                
+              });
+              res.on('end',function()
+              {
+                resolve(JSON.parse(response));
               });
               res.on('error',function(error){
                 console.log(error);
@@ -72,7 +84,7 @@ module.exports.getAllCheckinAppointments = function()
     });
 };
 
-var resourcesForDayQuery = "SELECT DISTINCT ClinicResources.ResourceName, ClinicResources.FROM ClinicResources, ClinicSchedule WHERE ClinicSchedule.Day =  ? AND ClinicSchedule.AMPM IN ( 'AM',  'PM') AND ClinicResources.ClinicScheduleSerNum = ClinicSchedule.ClinicScheduleSerNum";
+var resourcesForDayQuery = "SELECT DISTINCT ClinicResources.ResourceName FROM ClinicResources, ClinicSchedule WHERE ClinicSchedule.Day =  ? AND ClinicSchedule.AMPM IN ( 'AM',  'PM') AND ClinicResources.ClinicScheduleSerNum = ClinicSchedule.ClinicScheduleSerNum"
 /**
 * @method
 * @name getResourcesForDay()
@@ -81,17 +93,21 @@ var resourcesForDayQuery = "SELECT DISTINCT ClinicResources.ResourceName, Clinic
 */ 
 module.exports.getResourcesForDay = function()
 {
-  var date = new Date();
-  var dayOfWeek = helperFunctions.getDayOfWeek(date);
+  
   return new Promise(function(resolve, reject){
-      var query = connection.query(resourcesForDayQuery, [dayOfWeek],function(error, rows)
+    var date = new Date();
+  var dayOfWeek = helperFunctions.getDayOfWeek(date);
+      connection.query(resourcesForDayQuery, [dayOfWeek],function(error, rows,fields)
       {
+        console.log(error);
         if(error) reject(error);
+
         resolve(rows);
       });
     });
-};
-var resourceRoomQuery = "SELECT DISTINCT ClinicResources.ResourceName, ExamRoom.AriaVenueId FROM ClinicResources, ClinicSchedule, ExamRoom WHERE ClinicResources.ResourceName IN ? AND ClinicResources.ClinicScheduleSerNum =  ClinicSchedule.ClinicScheduleSerNum AND ClinicSchedule.DAY =  ? AND ClinicSchedule.AMPM =  ? AND ClinicSchedule.ExamRoomSerNum = ExamRoom.ExamRoomSerNum";
+}
+//var resourceRoomQuery = "SELECT DISTINCT ClinicResources.ResourceName, ExamRoom.AriaVenueId FROM ClinicResources, ClinicSchedule, ExamRoom WHERE ClinicResources.ResourceName IN ? AND ClinicResources.ClinicScheduleSerNum =  ClinicSchedule.ClinicScheduleSerNum AND ClinicSchedule.DAY =  ? AND ClinicSchedule.AMPM =  ? AND ClinicSchedule.ExamRoomSerNum = ExamRoom.ExamRoomSerNum";
+var resourceRoomQuery = "SELECT  ExamRoom.AriaVenueId  FROM IntermediateVenue, ExamRoom WHERE IntermediateVenue.IntermediateVenueSerNum = ExamRoom.IntermediateVenueSerNum AND IntermediateVenue.AriaVenueId = ?"
 /**
  * @method
  * @name getRoomsResources
@@ -102,7 +118,7 @@ module.exports.getRoomsResources = function(array)
 {
     var date = new Date();
     var dayOfWeek = helperFunctions.getDayOfWeek(date);
-    var timeOfDay = date.getHours()>12? 'PM':'AM';
+    var timeOfDay = date.getHours() > 13 ? 'PM':'AM';
     return new Promise(function(resolve, reject){
       var query = connection.query(resourceRoomQuery, [array, dayOfWeek, timeOfDay],function(error, rows)
       {
@@ -112,18 +128,13 @@ module.exports.getRoomsResources = function(array)
     });
     
 };
-module.exports.getResourcesForDay().then(function(data){
-  //console.log(data);
-});
-module.exports.getRoomsResources([['Tarek Hijal, MD (08221)','Tirek Hijal']]).then(function(data){
-  //console.log(data);
-});
+
 
 var basicUrlPhp = "http://172.26.66.41/devDocuments/screens/php/";
 var urlsVirtualWaitingRoom = 
 {
   "ExamRooms":"http://172.26.66.41/devDocuments/screens/php/getExamRooms.php",
-  "Checkin-Appointments":"http://172.26.66.41/devDocuments/screens/php/getCheckinAppointments.php",
+  "Checkin-Appointments":"http://172.26.66.41/devDocuments/screens/php/getCheckins.php",
   "Checkin-Patient-Aria": basicUrlPhp + "checkinPatient.php",
   "Checkin-Patient-Medivisit":basicUrlPhp + "checkinPatientMV.php",
   "Similar-Checkins":basicUrlPhp+"similarCheckIns.php"
@@ -134,7 +145,7 @@ module.exports.checkinPatientToLocation = function(system,parameters)
   {
      var params = '?CheckinVenue='+parameters.CheckinVenue+'&ScheduledActivitySer='+parameters.ScheduledActivitySer; 
     var url= (system == 'Aria')?urlsVirtualWaitingRoom["Checkin-Patient-Aria"]+params: urlsVirtualWaitingRoom["Checkin-Patient-Medivisit"]+params;
-    var urlCheckin = { path:url};
+    var urlCheckin = { path:url}
       //making request to checkin
           var x = http.request(urlCheckin,function(res){
               res.on('data',function(data){                
@@ -168,7 +179,7 @@ module.exports.screenName = function(request)
     return new Promise(function(resolve,reject)
     {
       var params = '?FirstName='+patient.FirstName+'&LastNameFirstThree='+patient.SSN; 
-      var urlScreenName = { path:urlsVirtualWaitingRoom["Similar-Checkins"]+params};
+      var urlScreenName = { path:urlsVirtualWaitingRoom["Similar-Checkins"]+params}
         //making request to checkin
             var x = http.request(urlScreenName,function(res){
                 res.on('data',function(data){                
@@ -191,47 +202,70 @@ module.exports.screenName = function(request)
     });  
  
 };
-module.exports.getExamRooms = function(resources)
+module.exports.getExamRooms = function(user, resources)
 {
   return new Promise(function(resolve,reject){
     var promises = [];
+
     var objectToReturn = {};
-    for (var i = 0; i < resources.length; i++) {
-      promises.push(getExamRoomsHelper(resources[i])); 
-    }
-    Promise.all(promises).then(function(results)
+
+    var all = (typeof resources !== 'undefined')?true:false;
+      console.log(all);
+    if(all)
     {
-     
-      for (var j = 0; j < results.length; j++) {
-        objectToReturn[resources[j]] = results[j];
+      for (var i = 0; i < resources.length; i++) {
+        promises.push(getExamRoomsHelper(all,resources[i])); 
       }
-      resolve(objectToReturn);
-    }).catch(function(error){
-      reject(error);
-    }); 
+      var array = [];
+      Promise.all(promises).then(function(results)
+      {
+        
+        for (var j = 0; j < results.length; j++) {
+          console.log(Object.prototype.toString.call( results[j] ) === '[object Array]');
+          array = array.concat(results[j]);
+
+        }
+        //Cleans out the AriasVenueId object
+        array = getRoomsOnly(array);
+        resolve(array);
+      }).catch(function(error){
+        reject(error);
+      }); 
+    }else{
+      getExamRoomsHelper(true).then(function(data){
+        data = getRoomsOnly(data);
+        resolve(data);
+      }).catch(function(error){
+        reject(error);
+      })
+    }
+      
+    
+    
   });
 };
-function getExamRoomsHelper(examRoom)
+var examRoomsQueryPerResource  = "SELECT DISTINCT ExamRoom.AriaVenueId FROM `ExamRoom`, ClinicResources, ClinicSchedule WHERE  ClinicSchedule.ClinicScheduleSerNum = ClinicResources.ClinicScheduleSerNum AND ClinicSchedule.ExamRoomSerNum = ExamRoom.ExamRoomSerNum AND ClinicResources.ResourceName = ?";
+var examRoomsQueryPerResourceAll  = "SELECT DISTINCT ExamRoom.AriaVenueId FROM `ExamRoom`, ClinicResources, ClinicSchedule WHERE  ClinicSchedule.ClinicScheduleSerNum = ClinicResources.ClinicScheduleSerNum AND ClinicSchedule.ExamRoomSerNum = ExamRoom.ExamRoomSerNum";
+function getExamRoomsHelper(all, resource)
 {
   return new Promise(function(resolve,reject)
-  {
-    var urlCheckin = { path:urlsVirtualWaitingRoom.ExamRooms+'?'+'IntermediateVenue='+examRoom};
-      //making request to checkin
-          var x = http.request(urlCheckin,function(res){
-              res.on('data',function(data){                
-                //Data from php.
-                //console.log(data.toString());
-                resolve(JSON.parse(data.toString()));
-              });
-              res.on('error',function(error){
-                console.log(error);
-                reject(error);
-              });
-          }).end();
-  });
-  
+  { 
+    var url = (all)?examRoomsQueryPerResourceAll:examRoomsQueryPerResource;
+    var sql = connection.query(url,[resource],function(error, rows,fields){
+      if(error) reject(error);
+      resolve(rows);
+    });
+  }); 
+}
+function getRoomsOnly(results)
+{
+  var array = [];
+  for (var i = 0; i < results.length; i++) {
+    array.push(results[i].AriaVenueId);
+  };
+  return array;
 }
 
 
 
-
+    

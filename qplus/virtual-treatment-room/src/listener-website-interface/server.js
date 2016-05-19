@@ -10,7 +10,7 @@ app.all('/', function(req, res, next) {
   next();
  });
 app.get('/',function(req,res,next){
-  res.sendfile("./requestWebsite/public/index.html");
+  res.sendfile("./requestWebsite/index.html");
 });
 app.use(express.static('./requestWebsite/public'));
 app.get('/request',function(req,res,next){
@@ -21,10 +21,11 @@ app.get('/request',function(req,res,next){
 app.post('/login',function(req,res,next){
   main.processRequest(req.body, function(result)
   {
+    console.log('coming back with these request', result);   
     res.send(result);
   });
 });
 
-app.listen(3000,function(){
-  console.log("Started on PORT 3000");
+app.listen(4000,function(){
+  console.log("Started on PORT 4000");
 });

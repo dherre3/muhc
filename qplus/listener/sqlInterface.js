@@ -81,7 +81,7 @@ var requestMappings=
     processFunction:LoadAttachments,
     numberOfLastUpdated:1,
     table:'Messages',
-    serNum:'MessagesSerNum'
+    serNum:'MessageSerNum'
   },
   'Appointments':
   {
@@ -89,7 +89,7 @@ var requestMappings=
     numberOfLastUpdated:5,
     processFunction:combineResources,
     table:'Appointment',
-    serNum:'MessagesSerNum'
+    serNum:'AppointmentSerNum'
   },
   'Notifications':
   {

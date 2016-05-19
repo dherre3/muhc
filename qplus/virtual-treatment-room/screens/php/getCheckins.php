@@ -100,6 +100,7 @@ while($row = mssql_fetch_array($query)){
 #echo json_encode($json,<code> JSON_NUMERIC_CHECK</code>);
 echo json_encode($json);
 
+
 /* Free statement and connection resources. */
 
 if (!$query) {
@@ -108,6 +109,7 @@ if (!$query) {
 
 // Free the query result
 mssql_free_result($query);
+exit();
 
 ?>
 

@@ -8,6 +8,9 @@ app.config(function($mdThemingProvider) {
 
 app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', function($scope,$timeout,$filter,$rootScope){
   //Enter code here!!
+  var hospital = true;
+  var url = (!hospital)? "http://localhost:3000/login":"http://172.26.66.41:3000/login";
+
   $scope.cancerTypes = ['Breast', 'Prostate', 'Lung', 'Bladder','Colon','Rectal','Leukimia'];
   var nonEmpty = 0;
   var totalP = 0;
@@ -33,7 +36,7 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
     $rootScope.canceType = cancer;
     console.log(cancer);
     objectToSend[$rootScope.canceType] = {};
-    $.post("http://localhost:3000/login",{CancerType: cancer, Analysis:'SeqFreq', swapPairs:$scope.swapPairs}, function(data){
+    $.post(url,{CancerType: cancer, Analysis:'SeqFreq', swapPairs:$scope.swapPairs}, function(data){
       console.log(data);
       /*data = JSON.stringify(data);
       data = encryptObject(data, '12345');
@@ -52,7 +55,7 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
       });
     });
 
-    $.post("http://localhost:3000/login",{CancerType: cancer, Analysis:'StepFreq', swapPairs:false}, function(data){
+    $.post(url,{CancerType: cancer, Analysis:'StepFreq', swapPairs:false}, function(data){
       console.log(data);
      /* data = JSON.stringify(data);
       data = encryptObject(data, '12345');
@@ -68,7 +71,7 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
       });
 
     });
-    $.post("http://localhost:3000/login",{CancerType: cancer,NewAnalysis:true, Analysis:'SequencesPerPatient', swapPairs:false}, function(data){
+    $.post(url,{CancerType: cancer,NewAnalysis:true, Analysis:'SequencesPerPatient', swapPairs:false}, function(data){
       console.log(data);
        $timeout(function(){
          $scope.sequencesPerPatient = data;
@@ -110,7 +113,7 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
       });*/
 
     //});
-     $.post("http://localhost:3000/login",{CancerType: cancer, Analysis:'FixedStepFreq', swapPairs:false}, function(data){
+     $.post(url,{CancerType: cancer, Analysis:'FixedStepFreq', swapPairs:false}, function(data){
       /*data = JSON.stringify(data);
       data = encryptObject(data, '12345');
       objectToSend[$rootScope.canceType].MissingFreq = data;
@@ -124,7 +127,7 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
       });
     });
 
-    $.post("http://localhost:3000/login",{CancerType: cancer, Analysis:'MissingFreq', swapPairs:false}, function(data){
+    $.post(url,{CancerType: cancer, Analysis:'MissingFreq', swapPairs:false}, function(data){
       /*data = JSON.stringify(data);
       data = encryptObject(data, '12345');
       objectToSend[$rootScope.canceType].MissingFreq = data;
@@ -142,13 +145,14 @@ app.controller('TablesController',['$scope','$timeout','$filter','$rootScope', f
   //Grabs the information for a particular patient from the database
   $scope.getPatientInformation = function(patientSerNum)
   {
-    
-    $.post("http://localhost:3000/login",{Analysis:'GetPatient', PatientSerNum:patientSerNum}, function(data){
+    console.log(patientSerNum);
+    $.post(url,{Analysis:'GetPatient',NewAnalysis:true, PatientSerNum:patientSerNum}, function(data){
       /*data = JSON.stringify(data);
       data = encryptObject(data, '12345');
       objectToSend[$rootScope.canceType].MissingFreq = data;
       console.log(objectToSend);
       ref.update(objectToSend);*/
+      console.log(data);
       $timeout(function()
       {
         $scope.patientInformation = data;

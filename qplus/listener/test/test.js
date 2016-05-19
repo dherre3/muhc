@@ -19,7 +19,7 @@ var requestObject = {
 /*sqlInterface.checkIn(requestObject).then(function(response){
   console.log(response);
 });*/
-/*sqlInterface.runSqlQuery("SELECT AppointmentSerNum FROM Appointment WHERE PatientSerNum = ? ORDER BY ScheduledStartTime ASC",[51]).then(function(results){
+sqlInterface.runSqlQuery("SELECT AppointmentSerNum FROM Appointment WHERE PatientSerNum = ? ORDER BY ScheduledStartTime ASC",[51]).then(function(results){
   console.log(results);
   var today = new Date();
   today.setHours(18,0,0,0);
@@ -36,7 +36,7 @@ var requestObject = {
   Q.all(array).then(function(results){
     console.log(results);
   });
-});
+});/*
 var ref=new Firebase(credentials.FIREBASE_URL);
 ref.auth(credentials.FIREBASE_SECRET);
 //getCheckinEstimate(requestObject);

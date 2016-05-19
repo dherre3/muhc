@@ -7,12 +7,22 @@ var bluebird = require('bluebird');
 
 
 exports.requests = {
-  'Appointments-Resources':appointmentsResources
+  'Appointments-Resources':appointmentsResources,
+  'Get-Rooms':sqlInterface.getExamRooms,
+  'Patient-Arrived':sqlInterface.checkinPatientToLocation,
+  'Call-Patient':sqlInterface.screenName
 };
-exports.processRequest = function(request, parameters,callback)
+exports.processRequest = function(requestObject,callback)
 {
-  exports.requests[request](parameters).then(function(data){
-    callback(data);
+  var request = requestObject.request;
+  var parameters = requestObject.parameters;
+  console.log(parameters);
+  var user = requestObject.user;
+  
+  exports.requests[request](user, parameters).then(function(data){
+    callback({response:'success',data:data});
+  }).catch(function(error){
+    callback({response:'error', data:error})
   });
 };
 
@@ -21,8 +31,9 @@ function appointmentsResources()
 {
   return new Promise(function(resolve, reject){
     sqlInterface.getAllCheckinAppointments().then(function(data){
-    sqlInterface.sqlInterface.getResourcesForDay().then(function(data){
-        var appointments =new CheckinAppointments(data); 
+    sqlInterface.getResourcesForDay().then(function(resources){
+        var appointments =new CheckinAppointments(data);
+        appointments.setResources(resources); 
         resolve({appointments:appointments.CheckinAppointments, resources:appointments.Resources});
       }).catch(function(error){
         console.log(error);
