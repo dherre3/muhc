@@ -1,7 +1,7 @@
 
 var app=angular.module('adminPanelApp');
 app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeout','$rootScope',function($scope,$http,URLs,api,$timeout,$rootScope){
-  $scope.questions = [{id:1,Question:'What is the name of your first pet?'},{id:2,Question:'What is your favorite musical instrument?'},
+  /*$scope.questions = [{id:1,Question:'What is the name of your first pet?'},{id:2,Question:'What is your favorite musical instrument?'},
                 {id:3,Question:'What was the name of your favorite superhero as a child?'},{id:4,Question:'What is the first name of your childhood best friend?'},
                 {id:5,Question:'What was the color of your first car?'},
                 {id:6,Question:'What city were you born in?'},{id:7,Question:'What was the first name of your first roommate?'},
@@ -61,9 +61,7 @@ app.controller('RegistrationController',['$scope','$http', 'URLs','api', '$timeo
        console.log($scope.user);
     };
     
-    /*
-    * Verifying e-mail address
-    */
+   
    $scope.$watchGroup(['user.email','user.reemail'],function()
    {
      $scope.errorMessageEmail = '';
