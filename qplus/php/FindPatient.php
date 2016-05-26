@@ -1,9 +1,9 @@
-<?php
+    <?php
 
 // Parse the Parameters
 //$Data=file_get_contents("php://input");
 //$request=json_decode($Data);
-
+include "config.php";
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST)) $_POST = json_decode(file_get_contents('php://input'), true);
 $PatientSSN=$_POST["PatientSSN"];
 //echo "$_POST[patientId]";
@@ -72,7 +72,7 @@ else {
     $lookupresult= $conn->query($sqllookup);
     if ( $lookupresult->num_rows===1) {
         $row=$lookupresult->fetch_assoc();
-        $row['response']="Patient has already been registered!";
+        $row['response']="PatientAlreadyRegistered";
         echo json_encode($row);
 
     }

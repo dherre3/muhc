@@ -68,23 +68,28 @@ $scope.alert={};
    * @returns {String} $scope.patientFound
    */
     $rootScope.checkSession();
-
+    console.log($scope.SSN);
    $scope.message="";
      if ($scope.SSN.length>11){
         $scope.SSN=$scope.SSN.toUpperCase();
         var msURL=URLs.getBasicURLPHP()+"FindPatient.php";
         api.getFieldFromServer(msURL,{PatientSSN:ssn}).then(function(response)
         {
+          if (typeof response == 'string')
+          {
+            response = response.replace(/\s/g, "");
+          }
           $scope.ariaResponse=response;
           console.log(response);
-          if(response.response=="Patient has already been registered!")
+          if(response.response=="PatientAlreadyRegistered")
           {
             $scope.patientFound=false;
             $scope.alert.type="warning";
-            $scope.alert.message=response.response;
+            $scope.alert.message="Patient has already been registered to use Opal";
             $scope.patientRegistered=true;
           }
           else if ($scope.ariaResponse!=="PatientNotFound" ) {
+            console.log('david herrera')
             $scope.message = "";
             $scope.Email="";
             $scope.EmailConfirm="";
@@ -92,7 +97,7 @@ $scope.alert={};
             $scope.patientFound=true;
             var PatientSSN=$scope.SSN;
               $scope.Language="EN";
-            }else if($scope.SSN!==''){
+            }else if(typeof $scope.SSN =='undefined'||$scope.SSN==''){
              $scope.patientFound=false;
              $scope.message="SSN is invalid ! ";
             } else {

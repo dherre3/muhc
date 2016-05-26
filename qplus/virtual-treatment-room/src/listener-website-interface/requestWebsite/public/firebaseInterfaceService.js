@@ -94,7 +94,9 @@ exports.writeToFirebase = function(section, data)
  */
 exports.respondToRequest = function(user, request, response)
 {
-  firebaseRef.child(user+'/'+request).set(response);
+  var child_ref = firebaseRef.child(user+'/'+request)
+  child_ref.set(response);
+
 }
 exports.deleteFromFirebase = function(user, requestKey)
 {

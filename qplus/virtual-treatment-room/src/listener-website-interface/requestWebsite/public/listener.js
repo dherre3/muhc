@@ -56,6 +56,7 @@ ref.child('Users').on('value',function(snapshot){
         { 
           console.log(result.data)
           firebaseInterface.respondToRequest(user, req.request, result.data);
+          ref.child('requests').child(user).child(keys[0]).set(null);
         }else{
           console.log(result);
           //firebaseInterface.deleteFromFirebase(request.key(),keys[0]);
