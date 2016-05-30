@@ -57,7 +57,8 @@ else {
     	$json[]=$row;
     }
     //Prepare JSON output and extract PatientId for lookup in mySQL
-    $PatientId=$json[0]["PatientId"];
+    $PatientId=$json[0]["PatientId"]; 
+    //echo json_encode(utf8_encode($json[0]["Picture"]));
     $patientData= json_encode($json);
     // Query mySQL to see if the patient is already registered
     $conn=new mysqli("localhost","root","service","QPlusApp");
@@ -84,5 +85,14 @@ die('Query Failed!');
 }
 // Clean up
 mssql_free_result($all);
-
+function utf8ize($d) {
+    if (is_array($d)) {
+        foreach ($d as $k => $v) {
+            $d[$k] = utf8ize($v);
+        }
+    } else if (is_string ($d)) {
+        return utf8_encode($d);
+    }
+    return $d;
+}
 ?>
