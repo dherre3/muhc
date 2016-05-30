@@ -4,25 +4,57 @@ var sqlInterface = require('./sqlInterface.js');
 var helperFunctions = require('./helperFunctions.js');
 var CheckinAppointments = require('./checkinAppointments.js');
 var bluebird = require('bluebird');
+var Firebase = require('firebase');
 
-
+var ref = new Firebase('https://brilliant-inferno-7679.firebaseio.com/VWR');
+ref.child('requests').on('child_added',function(snapshot){
+   var key = snapshot.key();
+   var requestObject = snapshot.val();
+   var user = requestObject.uid;
+   console.log(requestObject);
+   if(typeof requestObject !== 'undefined')
+   {
+     exports.processRequest(requestObject,function(data){
+       data.Timestamp = Firebase.ServerValue.TIMESTAMP;
+       ref.child(user+'/'+key).set(data);
+       console.log(key);
+       //console.log(ref.key());
+       ref.child('requests').child(key).set({});
+     });
+   }
+});
+setInterval(function(){
+  ref.on('child_added',function(child)
+  {
+    if(typeof child !=='undefined' && child !== 'requests')
+    {
+      var date = new Date(Number(child.Timestamp));
+      if(child.Timestamp/(1000*60)>2)
+      {
+        ref.child(child).set(null);
+      }
+    }
+  });
+},60000);
 exports.requests = {
   'Appointments-Resources':appointmentsResources,
-  'Get-Rooms':sqlInterface.getExamRooms,
-  'Patient-Arrived':sqlInterface.checkinPatientToLocation,
+  'Get-Rooms':sqlInterface.getVenueIdForResources,
+  'Arrived-Patient':sqlInterface.checkinPatientToLocation,
   'Call-Patient':sqlInterface.screenName
 };
+
 exports.processRequest = function(requestObject,callback)
 {
   var request = requestObject.request;
   var parameters = requestObject.parameters;
+  var user = requestObject.uid;
+  console.log(request);
   console.log(parameters);
-  var user = requestObject.user;
-  
   exports.requests[request](user, parameters).then(function(data){
+    console.log(data);
     callback({response:'success',data:data});
   }).catch(function(error){
-    callback({response:'error', data:error})
+    callback({response:'error', data:error});
   });
 };
 
