@@ -40,3 +40,8 @@ function handleDisconnect(myconnection) {
 handleDisconnect(connection);
 
 var queryToObtain = "SELECT DISTINCT Source.SourceName as Source, Toxicity.ToxicityQuestion, Toxicity.ToxicityName, Toxicity.ToxicitySerNum, ToxicityGrade.GradeDescription, ToxicityGrade.GradeSerNum, Question.OrderNum,Question.QuestionSerNum,  PatientQuestionnaire.QuestionnaireSerNum FROM Patient, PatientQuestionnaire, Questionnaire, Question, Source, Toxicity, ToxicityGrade WHERE Patient.PatientSerNum = PatientQuestionnaire.PatientSerNum AND Questionnaire.QuestionnaireSerNum = PatientQuestionnaire.QuestionnaireSerNum AND Questionnaire.QuestionnaireSerNum = Question.QuestionnaireSerNum AND Question.ToxicitySerNum = Toxicity.ToxicitySerNum AND Toxicity.SourceSerNum = Source.SourceSerNum AND Toxicity.ToxicitySerNum = ToxicityGrade.ToxicitySerNum AND Patient.PatientAriaSer = 0";
+
+exports.getPatientQuestionnaires = function (patientAriaSer, questio)
+{
+  connection.query(quertyQuestionnaires, [patientAriaSer], )
+};

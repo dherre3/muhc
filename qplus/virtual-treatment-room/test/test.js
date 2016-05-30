@@ -21,7 +21,6 @@ describe('Get all checkin appointments',function()
        
    });
 });
-
 //Testing the clean data function
 
 describe('Cleans all the duplicated data from John\' scripts',function()

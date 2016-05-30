@@ -13,15 +13,15 @@ var helperFunctions = require('./helperFunctions.js');
 var http = require('http');
 var credentials = require('./credentials.js');
 module.exports = {};
-var sqlConfig={
+/*var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
   password:'root',
   database:'VirtualWaitingRoom',
   dateStrings:true
-};
+};*/
 
-/*var sqlConfig = {
+var sqlConfig = {
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,
@@ -51,8 +51,8 @@ var urlsVirtualWaitingRoom =
 {
   "ExamRooms":basicUrlPhp+"getExamRooms.php",
   "Checkin-Appointments":basicUrlPhp+"getCheckinsAll.php",
-  "Checkin-Patient-Aria": basicUrlPhp + "checkinPatient.php",
-  "Checkin-Patient-Medivisit":basicUrlPhp + "checkinPatientMV.php",
+  "Checkin-Patient-Aria": basicUrlPhp + "checkInPatient.php",
+  "Checkin-Patient-Medivisit":basicUrlPhp + "checkInPatientMV.php",
   "Similar-Checkins":basicUrlPhp+"similarCheckIns.php"
 };
 /**
@@ -141,7 +141,7 @@ module.exports.getVenueIdForResources = function(user, array)
     if(typeof array !=='undefined' && array.length > 0)
     {
       queryRooms = resourceRoomQuery;
-      params = [array,'Mon', timeOfDay];
+      params = [[array],'Mon', timeOfDay];
     }else{
       queryRooms = resourceAllRoomsQuery;
       params = ['Mon', timeOfDay];
@@ -164,19 +164,26 @@ module.exports.getVenueIdForResources = function(user, array)
 
 module.exports.checkinPatientToLocation = function(user,parameters)
 {
-  var system = parameters.system;
+  var system = parameters.CheckinSystem;
   return new Promise(function(resolve,reject)
-  {
-     var params = '?CheckinVenue='+parameters.CheckinVenue+'&ScheduledActivitySer='+parameters.ScheduledActivitySer; 
+  { 
+     var params = "?CheckinVenue="+parameters.CheckinVenue+"&ScheduledActivitySer="+parameters.ScheduledActivitySer; 
     var url= (system == 'Aria')?urlsVirtualWaitingRoom["Checkin-Patient-Aria"]+params: urlsVirtualWaitingRoom["Checkin-Patient-Medivisit"]+params;
-    var urlCheckin = { path:url};
+    var urlCheckin = { hostname:'172.26.66.41', path:"/devDocuments/screens/php/checkInPatient.php"+params};
+    console.log(urlCheckin)
       //making request to checkin
+        var response = '';
           var x = http.request(urlCheckin,function(res){
               res.on('data',function(data){                
                 //Data from php.
                 //console.log(data.toString());
-                resolve(JSON.parse(data.toString()));
+                response +=data;
+                //resolve(JSON.parse(data.toString()));
               });
+              response.on('end', function () {
+                  console.log(response);
+                  resolve(JSON.parse(response.toString()));
+                });
               res.on('error',function(error){
                 console.log(error);
                 reject(error);

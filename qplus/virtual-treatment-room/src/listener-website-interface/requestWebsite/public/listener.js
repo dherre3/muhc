@@ -9,65 +9,26 @@ app.controller('MainController',['$scope','$timeout','firebaseInterface','$q',fu
   },1296000000);
   var ref=new Firebase('https://brilliant-inferno-7679.firebaseio.com/VWR');
   ref.auth('9HeH3WPYe4gdTuqa88dtE3KmKy7rqfb4gItDRkPF');
-  setInterval(function(){
-ref.child('Users').on('value',function(snapshot){
-        //console.log(snapshot.val());
-        var now=(new Date()).getTime();
-        var usersData=snapshot.val();
-        for (var user in usersData) {
 
-          for(var device in usersData[user])
-          {
-            if(typeof usersData[user][device].Timestamp!=='undefined')
-            {
-              if(now-usersData[user][device].Timestamp>240000)
-              {
-                console.log('Deleting', user);
-                ref.child('Users/'+user+'/'+device).set({});
-              }
-            }else{
-              for(var request in usersData[user][device])
-              {
-                if(now-usersData[user][device][request].Timestamp>240000)
-                {
-                  console.log('Deleting', user);
-                  ref.child('Users/'+user+'/'+device).set({});
-                }
-              }
-            }
-          }
-        };
+//Obtain firebase requests and process them
+ref.child('requests').on('child_added',function(snapshot){
+   var key = snapshot.key();
+   var requestObject = snapshot.val();
+   var user = requestObject.uid;
+   console.log(requestObject);
+   if(typeof requestObject !== 'undefined')
+   {
+    requestBackend(requestObject).then(function(data){
+      console.log(data);
+      data.Timestamp = Firebase.ServerValue.TIMESTAMP;
+       ref.child(user+'/'+key).set(data);
+       console.log(key);
+       //console.log(ref.key());
+       ref.child('requests').child(key).set({});
     });
-},60000);
-
-  ref.child('requests').on('child_added',function(snapshot){
-    console.log(snapshot);
-    if(snapshot.val()||typeof snapshot.val() !== null)
-    {
-      var snap = snapshot.val();
-      var keys = Object.keys(snap);
-      var req = snap[keys[0]];
-      var user = snapshot.key();
-
-      var requestObject = {'user':user, 'request':req.request, 'parameters':req.parameters};
-      requestBackend(requestObject).then(function(result){
-        console.log(result);
-        if(result.response == 'success')
-        { 
-          console.log(result.data)
-          firebaseInterface.respondToRequest(user, req.request, result.data);
-          ref.child('requests').child(user).child(keys[0]).set(null);
-        }else{
-          console.log(result);
-          //firebaseInterface.deleteFromFirebase(request.key(),keys[0]);
-        }   
-      }); 
-    }
-
-  });
-
-
-   var interval = setInterval(function()
+   }
+});
+   /*var interval = setInterval(function()
    {
 
       requestBackend({request:'Appointments-Resources'}).then(function(result){
@@ -81,7 +42,7 @@ ref.child('Users').on('value',function(snapshot){
         }
         
       });
-   },10000);
+   },10000);*/
   
   function requestBackend(parameters)
   {
