@@ -14,6 +14,7 @@ $link = mssql_connect(ARIA_DB, ARIA_USERNAME, ARIA_PASSWORD);
 if (!$link) {
     die('Unable to connect or select database!');
 }
+ini_set('mssql.charset', 'UTF-8');
 // Query the appointments associated with the specific patient.
 $sql = "
 SELECT DISTINCT
@@ -54,7 +55,9 @@ else {
     $json= array();
     while ($row=mssql_fetch_array($all,MSSQL_ASSOC))
     {
+        $row["Picture"] = base64_encode($row["Picture"]);
     	$json[]=$row;
+        
     }
     //Prepare JSON output and extract PatientId for lookup in mySQL
     $PatientId=$json[0]["PatientId"]; 

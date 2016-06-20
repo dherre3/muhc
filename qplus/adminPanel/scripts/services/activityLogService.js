@@ -3,7 +3,9 @@ var app=angular.module('adminPanelApp');
 app.service('ActivityLogService',['api','URLs','$q','$filter',function(api, URLs,$q,$filter){
 	var activityLogObject={};
 	var activityLogArray=[];
-	var tablePrimaryIndexMappings={'MessagesMH':['MessageSerNum','MessageRevSerNum'],	'DocumentMH':['DocumentSerNum', 'DocumentRevSerNum'],
+	var tableMH = {'MessagesMH':true, 'Feedback':false,'AppointmentMH':true,'PatientMH':true, 'UsersMH':true};
+	
+	var tablePrimaryIndexMappings={'MessagesMH':['MessageSerNum','MessageRevSerNum'],'Feedback':['FeedbackSerNum'],	'DocumentMH':['DocumentSerNum', 'DocumentRevSerNum'],
 	'AppointmentMH':['AppointmentSerNum','AppointmentRevSerNum'],'PatientMH':['PatientSerNum','PatientRevSerNum'],'UsersMH':['UserSerNum', 'UserRevSerNum']};
 	var tableOfUpdatesSession=[];
 	var tableOfInsertsSession=[];
@@ -125,21 +127,27 @@ app.service('ActivityLogService',['api','URLs','$q','$filter',function(api, URLs
 			for (var key in sessionObject){
 				sessionObject[key]=$filter('orderBy')(sessionObject[key],tablePrimaryIndexMappings[key], false);
 				for (var i = 0;i<sessionObject[key].length;i++) {
-					var flag=false;
-					var serNum=tablePrimaryIndexMappings[key][0];
-					var revCount=tablePrimaryIndexMappings[key][1];
-					if(sessionObject[key][i][revCount]=='1')
+					if(tableMH[key])
 					{
-						sessionObject[key][i].LastUpdated=new Date(sessionObject[key][i].LastUpdated);
+						var flag=false;
+						var serNum=tablePrimaryIndexMappings[key][0];
+						var revCount=tablePrimaryIndexMappings[key][1];
+						if(sessionObject[key][i][revCount]=='1')
+						{
+							sessionObject[key][i].LastUpdated=new Date(sessionObject[key][i].LastUpdated);
+							tableOfInsertsSession.push(sessionObject[key][i]);	
+						}
+						if(i<sessionObject[key].length-1&&sessionObject[key][i][serNum]==sessionObject[key][i+1][serNum])
+						{
+							//On update
+							var arrayChanges=getChangeValues(key, sessionObject[key][i],sessionObject[key][i+1]);
+							tableOfUpdatesSession=tableOfUpdatesSession.concat(arrayChanges);
+
+						}
+					}else{
 						tableOfInsertsSession.push(sessionObject[key][i]);	
 					}
-					if(i<sessionObject[key].length-1&&sessionObject[key][i][serNum]==sessionObject[key][i+1][serNum])
-					{
-						//On update
-						var arrayChanges=getChangeValues(key, sessionObject[key][i],sessionObject[key][i+1]);
-						tableOfUpdatesSession=tableOfUpdatesSession.concat(arrayChanges);
-
-					}
+					
 				};
 
 			};

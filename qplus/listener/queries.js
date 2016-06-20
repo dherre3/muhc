@@ -44,7 +44,7 @@ exports.patientAnnouncementsTableFields=function()
 };
 exports.patientEducationalMaterialTableFields=function()
 {
-  return "SELECT DISTINCT EduMat.EducationalMaterialSerNum, EduControl.EducationalMaterialControlSerNum, EduMat.DateAdded, EduMat.ReadStatus, EduControl.EducationalMaterialType_EN, EduControl.EducationalMaterialType_FR, EduControl.Name_EN, EduControl.Name_FR, EduControl.URL_EN, EduControl.URL_FR, Phase.Name_EN as PhaseName_EN, Phase.Name_FR as PhaseName_FR FROM Users, Patient, EducationalMaterialControl as EduControl, EducationalMaterial as EduMat, PhaseInTreatment as Phase, EducationalMaterialTOC as TOC WHERE (EduMat.EducationalMaterialControlSerNum = EduControl.EducationalMaterialControlSerNum OR (TOC.ParentSerNum = EduMat.EducationalMaterialControlSerNum AND TOC.EducationalMaterialControlSerNum = EduControl.EducationalMaterialControlSerNum)) AND Phase.PhaseInTreatmentSerNum = EduControl.PhaseInTreatmentSerNum AND  EduMat.PatientSerNum = Patient.PatientSerNum AND Patient.PatientSerNum = Users.UserTypeSerNum AND Users.Username = ? AND (EduMat.LastUpdated > ? OR EduControl.LastUpdated > ? OR Phase.LastUpdated > ? OR TOC.LastUpdated > ?) order by FIELD(PhaseName_EN,'Prior To Treatment','During Treatment','After Treatment') ;";
+  return "SELECT DISTINCT EduMat.EducationalMaterialSerNum, EduControl.ShareURL_EN, EduControl.ShareURL_FR, EduControl.EducationalMaterialControlSerNum, EduMat.DateAdded, EduMat.ReadStatus, EduControl.EducationalMaterialType_EN, EduControl.EducationalMaterialType_FR, EduControl.Name_EN, EduControl.Name_FR, EduControl.URL_EN, EduControl.URL_FR, Phase.Name_EN as PhaseName_EN, Phase.Name_FR as PhaseName_FR FROM Users, Patient, EducationalMaterialControl as EduControl, EducationalMaterial as EduMat, PhaseInTreatment as Phase, EducationalMaterialTOC as TOC WHERE (EduMat.EducationalMaterialControlSerNum = EduControl.EducationalMaterialControlSerNum OR (TOC.ParentSerNum = EduMat.EducationalMaterialControlSerNum AND TOC.EducationalMaterialControlSerNum = EduControl.EducationalMaterialControlSerNum)) AND Phase.PhaseInTreatmentSerNum = EduControl.PhaseInTreatmentSerNum AND  EduMat.PatientSerNum = Patient.PatientSerNum AND Patient.PatientSerNum = Users.UserTypeSerNum AND Users.Username = ? AND (EduMat.LastUpdated > ? OR EduControl.LastUpdated > ? OR Phase.LastUpdated > ? OR TOC.LastUpdated > ?) order by FIELD(PhaseName_EN,'Prior To Treatment','During Treatment','After Treatment') ;";
 };
 exports.patientEducationalMaterialContents=function()
 {
@@ -58,14 +58,16 @@ exports.patientTestResultsTableFields=function()
 {
   return 'SELECT ComponentName, FacComponentName, AbnormalFlag, MaxNorm, MinNorm, TestValue, TestValueString, UnitDescription, CAST(TestDate AS char(30)) as `TestDate` FROM TestResult, Users, Patient WHERE Users.UserTypeSerNum=Patient.PatientSerNum AND TestResult.PatientSerNum = Patient.PatientSerNum AND Users.Username LIKE ? AND TestResult.LastUpdated > ?;';
 };
-
+exports.patientQuestionnaireTableFields = function()
+{
+  return "SELECT Patient.PatientAriaSer, Questionnaire.DateAdded, Questionnaire.QuestionnaireSerNum, QuestionnaireControl.QuestionnaireDBSerNum FROM QuestionnaireControl, Questionnaire, Patient, Users WHERE QuestionnaireControl.QuestionnaireControlSerNum = Questionnaire.QuestionnaireControlSerNum AND Questionnaire.PatientSerNum = Patient.PatientSerNum AND Users.UserTypeSerNum = Patient.PatientSerNum AND Users.Username = ? AND QuestionnaireControl.LastUpdated > ? AND Questionnaire.LastUpdated > ?";
+};
 exports.getPatientFieldsForPasswordReset=function(userID)
 {
   return 'SELECT Patient.SSN, Patient.PatientSerNum FROM Patient, Users WHERE Users.Username LIKE '+"\'"+ userID+"\'"+'AND Users.UserTypeSerNum = Patient.PatientSerNum';
 };
 exports.setNewPassword=function(password,patientSerNum, token)
 {
-  console.log("UPDATE Users SET Password='"+password+"', SessionId='"+token+"' WHERE UserType = 'Patient' AND UserTypeSerNum="+patientSerNum);
   return "UPDATE Users SET Password='"+password+"', SessionId='"+token+"' WHERE UserType = 'Patient' AND UserTypeSerNum="+patientSerNum;
 };
 
@@ -90,7 +92,7 @@ exports.accountChange=function( serNum, field, newValue, token)
 };
 exports.inputFeedback=function(UserSerNum, content)
 {
-  return "INSERT INTO Feedback (`FeedbackSerNum`,`UserSerNum`,`FeedbackContent`,`SessionId`, `LastUpdated`) VALUES (NULL,'"+UserSerNum+"','"+ content + "',"+"CURRENT_TIMESTAMP )";
+  return "INSERT INTO Feedback (`FeedbackSerNum`,`PatientSerNum`,`FeedbackContent`,`AppRating`,`DateAdded`, `SessionId`, `LastUpdated`) VALUES (NULL,?,?,?,NOW(),?, CURRENT_TIMESTAMP )";
 };
 exports.sendMessage=function(objectRequest)
 {
@@ -102,8 +104,6 @@ exports.sendMessage=function(objectRequest)
   var receiverSerNum=objectRequest.ReceiverSerNum;
   var messageContent=objectRequest.MessageContent;
   var messageDate=objectRequest.MessageDate;
-
-  console.log("INSERT INTO Messages (`MessageSerNum`, `SenderRole`,`ReceiverRole`, `SenderSerNum`, `ReceiverSerNum`,`MessageContent`,`ReadStatus`,`MessageDate`,`LastUpdated`) VALUES (NULL,'"+senderRole+"','"+ receiverRole + "', '"+senderSerNum+"','"+ receiverSerNum +"','" +messageContent+"',0,'"+messageDate+"' ,CURRENT_TIMESTAMP )");
   return "INSERT INTO Messages (`MessageSerNum`, `SenderRole`,`ReceiverRole`, `SenderSerNum`, `ReceiverSerNum`,`MessageContent`,`ReadStatus`,`MessageDate`,`SessionId`,`LastUpdated`) VALUES (NULL,'"+senderRole+"','"+ receiverRole + "', '"+senderSerNum+"','"+ receiverSerNum +"','" +messageContent+"',0,'"+messageDate+"','"+token+"' ,CURRENT_TIMESTAMP )";
 };
 exports.getUserFromUserId=function(userID)
@@ -148,4 +148,8 @@ exports.updateReadStatus=function()
 exports.getPatientDeviceLastActivity=function(userid,device)
 {
   return "SELECT * FROM PatientActivityLog WHERE Username='"+userid+"' AND DeviceId='"+device+"' ORDER BY ActivitySerNum DESC LIMIT 1;";
+};
+exports.insertQuestionnaireRatingQuery=function()
+{
+  return "INSERT INTO `EducationalMaterialRating`(`EducationalMaterialRatingSerNum`, `EducationalMaterialControlSerNum`, `PatientSerNum`, `RatingValue`, `SessionId`, `LastUpdated`) VALUES (NULL,?,?,?,?,NULL)";
 };

@@ -342,6 +342,7 @@ $scope.alert={};
 
                 var EnableSMS=0;
                 var objectToSend=$scope.ariaResponse[0];
+                objectToSend.Picture = transformToHex(objectToSend.Picture);
                 objectToSend.SSN=(objectToSend.SSN.split(' '))[0];
                 console.log(objectToSend.SSN);
                 if(typeof $scope.TelNumForSMS!=='undefined')
@@ -399,5 +400,14 @@ $scope.alert={};
 
 
 
+    }
+    function transformToHex(str)
+    {
+       for (var i = 0, bin = atob(str.replace(/[ \r\n]+$/, "")), hex = []; i < bin.length; ++i) {
+          var tmp = bin.charCodeAt(i).toString(16);
+           if (tmp.length === 1) tmp = "0" + tmp;
+              hex[hex.length] = tmp;
+          }
+      return hex.join("");
     }
 }]);

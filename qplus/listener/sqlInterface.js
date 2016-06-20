@@ -7,6 +7,7 @@ var credentials=require('./credentials.js');
 var CryptoJS=require('crypto-js');
 var buffer=require('buffer');
 var http = require('http');
+var questionnaires = require('./patientQuestionnaires.js');
 var timeEstimate = require('./timeEstimate.js');
 
 
@@ -76,13 +77,19 @@ var requestMappings=
     sql:queries.patientDiagnosisTableFields(),
     numberOfLastUpdated:1
   },
+  'Questionnaires':{
+    sql:queries.patientQuestionnaireTableFields(),
+    numberOfLastUpdated:2,
+    processFunction:questionnaires.getPatientQuestionnaires
+
+  },/*,
   'Messages':{
     sql:queries.patientMessageTableFields(),
     processFunction:LoadAttachments,
     numberOfLastUpdated:1,
     table:'Messages',
     serNum:'MessageSerNum'
-  },
+  }*/
   'Appointments':
   {
     sql:queries.patientAppointmentsTableFields(),
@@ -103,10 +110,10 @@ var requestMappings=
     sql:queries.patientTasksTableFields(),
     numberOfLastUpdated:2
   },
-  'LabTests':{
+  /*'LabTests':{
     sql:queries.patientTestResultsTableFields(),
     numberOfLastUpdated:1
-  },
+  },*/
   'TxTeamMessages':{
     sql:queries.patientTeamMessagesTableFields(),
     numberOfLastUpdated:2,
@@ -202,9 +209,9 @@ function processSelectRequest(table, userId, timestamp)
   {
     date=new Date(Number(timestamp));
   }
-  var paramArray=[userId,date];
-  if(requestMappingObject.numberOfLastUpdated>1){
-    for (var i = 1; i < requestMappingObject.numberOfLastUpdated; i++) {
+  var paramArray=[userId];
+  if(requestMappingObject.numberOfLastUpdated>0){
+    for (var i = 0; i < requestMappingObject.numberOfLastUpdated; i++) {
       paramArray.push(date);
     }
   }
@@ -235,7 +242,6 @@ function preparePromiseArrayFields(userId,timestamp,arrayTables)
   }
   return array;
 }
-
 
 //Update read status for a table
 exports.updateReadStatus=function(userId, parameters)
@@ -375,11 +381,10 @@ exports.inputFeedback=function(requestObject)
   var UserID=requestObject.UserID;
   getUserFromUserID(UserID).then(function(user)
   {
-    var userSerNum=user.UserSerNum;
-    var content=requestObject.Parameters.FeedbackContent;
-    connection.query(queries.inputFeedback(userSerNum,content,requestObject.Token),
+   connection.query(queries.inputFeedback(),[user.UserTypeSerNum,requestObject.Parameters.FeedbackContent,requestObject.Parameters.AppRating, requestObject.Token],
     function(error, rows, fields)
     {
+      
       if(error) r.reject(error);
       r.resolve('Hospital Request Proccessed');
     });
@@ -408,7 +413,7 @@ exports.updateDeviceIdentifier = function(requestObject)
     console.log(user);
     exports.runSqlQuery(queries.updateDeviceIdentifiers(),[user.UserTypeSerNum, requestObject.DeviceId, identifiers.registrationId, deviceType,requestObject.Token, identifiers.registrationId, requestObject.Token]).then(function(response){
       console.log(response);
-      r.resolve('success');
+      r.resolve('Hospital Request Proccessed');
     }).catch(function(error){
       r.reject(error);
     });
@@ -498,7 +503,28 @@ exports.getPatientDeviceLastActivity=function(userid,device)
   });
   return r.promise;
 };
+/**
+*@module sqlInterface
+*@name inputQuestionnaireRating
+*@require queries
+*@descrption Inputs educational material rating
+*@parameter {string} patientSerNum SerNum in database for user that rated the material
+*@parameter {string} edumaterialSerNum serNum for educational material
+*@parameter {string} ratingValue value from 1 to 5 for educational material
+*/
 
+exports.inputEducationalMaterialRating = function(requestObject)
+{
+  var r = Q.defer();
+  var parameters = requestObject.Parameters;
+  var sql = connection.query(queries.insertQuestionnaireRatingQuery(),[ parameters.EducationalMaterialControlSerNum,parameters.PatientSerNum, parameters.RatingValue, requestObject.Token],
+    function(err,rows,fields){
+      if(err) r.reject(err);
+      else r.resolve(rows);
+  });
+  console.log(sql.sql);
+  return r.promise;
+}
 exports.updateLogout=function(fields)
 {
   var r=Q.defer();
@@ -628,8 +654,11 @@ function getEducationTableOfContents(rows)
     }
   }
   //Delete 
-  for (var k = 0; k < indexes.length; k++) {
-    rows.splice(indexes[k],1);
+  for (var k = rows.length-1; k >= 0; k--) {
+    if(indexes.indexOf(k) !== -1)
+    {
+      rows.splice(k,1);
+    }
   }
   for (var l = 0; l < rows.length; l++) {
     promises.push(exports.runSqlQuery(queries.patientEducationalMaterialContents(),[rows[l].EducationalMaterialControlSerNum] ));
@@ -638,7 +667,7 @@ function getEducationTableOfContents(rows)
     function(results){
       for (var i = 0; i < results.length; i++) {
         if(results[i].length !== 0)
-        {
+        { 
             for (var j = 0; j < rows.length; j++) {
               if(rows[j].EducationalMaterialControlSerNum ==results[i][0].ParentSerNum)
               {
@@ -699,6 +728,7 @@ function checkIfCheckedIntoAriaHelper(patientActivitySerNum)
     var y = http.request(urlCheckCheckin,function(response){
       response.on('data',function(data){
           data = data.toString();
+          console.log(data);
           if(data.length === 0)
           {
             r.reject('failure');

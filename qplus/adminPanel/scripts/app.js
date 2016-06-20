@@ -63,6 +63,15 @@ app.config(['$urlRouterProvider', '$stateProvider', function ($urlRouterProvider
         label:'Messages'
       }
     })
+    .state('feedback',{
+      url:'/feedback',
+      templateUrl:'views/feedback.html',
+      controller:'FeedbackController',
+      data:{
+        requireLogin:true,
+        label:'Feedback'
+      }
+    })
     .state('requests',{
       url:'/requests',
       templateUrl:'views/requests.html',

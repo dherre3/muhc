@@ -19,11 +19,17 @@ var CheckinAppointments = function(data)
     this.setResources = function(data)
     {
         var array = [];
+        
         for (var index = 0; index < data.length; index++) {
-            data[index].ResourceName = data[index].ResourceName.replace(/\r/g,"");
-            array.push(data[index].ResourceName);
-            // this.resources.push(data[index].ResourceName);
-        } 
+            console.log(data[index]);
+            if(data[index]) 
+            {
+                data[index] = data[index].replace(/\r/g,"");
+                array.push(data[index]);
+            }
+
+            
+        }
         this.Resources = array;
         return array;
     };

@@ -6,28 +6,40 @@ var CheckinAppointments = require('./checkinAppointments.js');
 var bluebird = require('bluebird');
 var Firebase = require('firebase');
 
+
+//Firebase reference
 var ref = new Firebase('https://brilliant-inferno-7679.firebaseio.com/VWR');
+
+//Processing requests!
 ref.child('requests').on('child_added',function(snapshot){
+  //Get Key for response
    var key = snapshot.key();
+
+   //Get request
    var requestObject = snapshot.val();
+   //user id
    var user = requestObject.uid;
    console.log(requestObject);
    if(typeof requestObject !== 'undefined')
    {
+      //Process the request
      exports.processRequest(requestObject,function(data){
        data.Timestamp = Firebase.ServerValue.TIMESTAMP;
+       //Update request response
        ref.child(user+'/'+key).set(data);
-       console.log(key);
-       //console.log(ref.key());
+       //Delete request after processed
        ref.child('requests').child(key).set({});
      });
    }
 });
+
+//Delete all the requests that were not fetched
 setInterval(function(){
   ref.on('child_added',function(child)
   {
     if(typeof child !=='undefined' && child !== 'requests')
     {
+      //Get the child.Timestamp and check whether or not, its more than 2 minutes
       var date = new Date(Number(child.Timestamp));
       if(child.Timestamp/(1000*60)>2)
       {
@@ -36,13 +48,17 @@ setInterval(function(){
     }
   });
 },60000);
+
+//Api requests
 exports.requests = {
   'Appointments-Resources':appointmentsResources,
   'Get-Rooms':sqlInterface.getVenueIdForResources,
   'Arrived-Patient':sqlInterface.checkinPatientToLocation,
-  'Call-Patient':sqlInterface.screenName
+  'Call-Patient':sqlInterface.screenName,
+  'Discharge-Patient':sqlInterface.dischargePatient
 };
 
+//Process request function
 exports.processRequest = function(requestObject,callback)
 {
   var request = requestObject.request;
@@ -58,7 +74,7 @@ exports.processRequest = function(requestObject,callback)
   });
 };
 
-
+//Get Appointment and resources
 function appointmentsResources()
 {
   return new Promise(function(resolve, reject){
@@ -82,7 +98,7 @@ function appointmentsResources()
 
 
 
-function main()
+/*function main()
 {
   //Initialize Firebase request!
   ///setInterval(function()
@@ -115,5 +131,5 @@ function startRequestListener()
        firebaseInterface.replyRequest(snap.key(), snap.val(),data);
      });
   });
-}
+}*/
 

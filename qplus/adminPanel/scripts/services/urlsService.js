@@ -91,7 +91,19 @@ app.service('URLs',function(Credentials){
      getInsertMapUrl:function()
      {
       return basicURLPHP+'hospital-maps/insertMap.php';
-     }
+     },
+     getUrlFeedback:function()
+      {
+        return basicURLPHP+'feedback/getFeedback.php';
+      },
+    getUrlEducationalMaterialFeedback:function()
+      {
+        return basicURLPHP+'feedback/getEducationalMaterialFeedback.php';
+      },
+      getUrlEducationalMaterialRating:function()
+      {
+        return basicURLPHP+'feedback/getIndividualEducationalMaterialRating.php';
+      }
 
 
    };

@@ -92,6 +92,9 @@ function goActive() {
         <li class="sidebar-list">
           <a href="#/messages">Messages <span class="menu-icon glyphicon glyphicon-envelope"></span></a>
         </li>
+        <li class="sidebar-list">
+          <a href="#/feedback">Feedback <span class="menu-icon glyphicon glyphicon-thumbs-up"></span></a>
+        </li>
         
       </ul>
       <div class="sidebar-footer">
@@ -282,6 +285,9 @@ function goActive() {
     <script src="bower_components/angular-animate/angular-animate.js"></script>
     <script src="bower_components/angular-material/angular-material.js"></script>
     <script src="https://cdn.gitcdn.xyz/cdn/angular/bower-material/v1.0.5/angular-material.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
     <!--Crypto libraries-->
     <script src="bower_components/cryptojs/aes.js"></script>
     <script src="bower_components/cryptojs/mode-cfb-min.js"></script>
@@ -309,7 +315,7 @@ function goActive() {
         <script src="scripts/controllers/PatientsController.js"></script>
         <script src="scripts/controllers/RequestsController.js"></script>
         <script src="scripts/controllers/RegistrationController.js"></script>
-        <script src="scripts/controllers/mapsController.js"></script>
+        <script src="scripts/controllers/FeedbackController.js"></script>
 
 
         <script src="scripts/controllers/patient.js"></script>
@@ -323,12 +329,15 @@ function goActive() {
         <script src="scripts/services/allPatients.js"></script>
           <script src="scripts/services/validate.js"></script>
         <script src="scripts/services/activityLogService.js"></script>
+        <script src="scripts/services/feedbackService.js"></script>
+
         <script src="../credentialsService.js"></script>
 
         <!--filters-->
         <script src="scripts/filters.js"></script>
         <!--directives-->
         <script src="scripts/directives/fileUpload.js"></script>
+        <script src="scripts/directives/rateDirective.js"></script>
 
         <!-- endbuild -->
 </body>

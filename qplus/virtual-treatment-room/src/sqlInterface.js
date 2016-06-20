@@ -11,6 +11,7 @@ var mysql = require('mysql');
 var bluebird = require('bluebird');
 var helperFunctions = require('./helperFunctions.js');
 var http = require('http');
+var request = require('request');
 var credentials = require('./credentials.js');
 module.exports = {};
 /*var sqlConfig={
@@ -53,7 +54,8 @@ var urlsVirtualWaitingRoom =
   "Checkin-Appointments":basicUrlPhp+"getCheckinsAll.php",
   "Checkin-Patient-Aria": basicUrlPhp + "checkInPatient.php",
   "Checkin-Patient-Medivisit":basicUrlPhp + "checkInPatientMV.php",
-  "Similar-Checkins":basicUrlPhp+"similarCheckIns.php"
+  "Similar-Checkins":basicUrlPhp+"similarCheckIns.php",
+  "Resources":basicUrlPhp+"getResourcesAll.php"
 };
 /**
  * @method
@@ -104,7 +106,17 @@ module.exports.getResourcesForDay = function()
 {
   
   return new Promise(function(resolve, reject){
-    var date = new Date();
+    request(urlsVirtualWaitingRoom["Resources"],function(error, response, body){
+      if(error) reject(error);
+      if(!error&&response.statusCode=='200')
+      {
+        console.log();
+        resolve(JSON.parse(body));
+      }
+
+    });
+  });
+    /*var date = new Date();
   var timeOfDay = date.getHours() > 13 ? 'PM':'AM';
   var dayOfWeek = helperFunctions.getDayOfWeek(date);
       connection.query(resourcesForDayQuery, [dayOfWeek,timeOfDay],function(error, rows,fields)
@@ -114,7 +126,7 @@ module.exports.getResourcesForDay = function()
 
         resolve(rows);
       });
-    });
+    });*/
 };
 var resourceRoomQuery = "SELECT DISTINCT IntermediateVenue.AriaVenueId FROM ClinicResources, ClinicSchedule, ExamRoom, IntermediateVenue WHERE ClinicResources.ResourceName IN ? AND IntermediateVenue.IntermediateVenueSerNum = ExamRoom.IntermediateVenueSerNum AND  ClinicResources.ClinicScheduleSerNum =  ClinicSchedule.ClinicScheduleSerNum AND ClinicSchedule.DAY =  ? AND ClinicSchedule.AMPM =  ? AND ClinicSchedule.ExamRoomSerNum = ExamRoom.ExamRoomSerNum";
 var resourceAllRoomsQuery = "SELECT DISTINCT IntermediateVenue.AriaVenueId FROM ClinicResources, ClinicSchedule, ExamRoom, IntermediateVenue WHERE ClinicResources.ClinicScheduleSerNum =  ClinicSchedule.ClinicScheduleSerNum AND ClinicSchedule.DAY =  ? AND ClinicSchedule.AMPM =  ? AND ClinicSchedule.ExamRoomSerNum = ExamRoom.ExamRoomSerNum";
@@ -160,7 +172,22 @@ module.exports.getVenueIdForResources = function(user, array)
     
 };
 
-
+module.exports.dischargePatient = function(user, parameters)
+{
+   return new Promise(function(resolve,reject){
+    request({
+    url: 'http://172.26.66.41/devDocuments/screens/php/dischargePatient.php',
+    qs: parameters, //Query string data
+    method: 'GET'},function(error,response,body)
+    {
+      if(error) reject(error);
+      if(!error&&response.statusCode == '200')
+      {
+        resolve(body);
+      }
+    });
+   });
+};
 
 module.exports.checkinPatientToLocation = function(user,parameters)
 {
@@ -169,26 +196,15 @@ module.exports.checkinPatientToLocation = function(user,parameters)
   { 
      var params = "?CheckinVenue="+parameters.CheckinVenue+"&ScheduledActivitySer="+parameters.ScheduledActivitySer; 
     var url= (system == 'Aria')?urlsVirtualWaitingRoom["Checkin-Patient-Aria"]+params: urlsVirtualWaitingRoom["Checkin-Patient-Medivisit"]+params;
-    var urlCheckin = { hostname:'172.26.66.41', path:"/devDocuments/screens/php/checkInPatient.php"+params};
-    console.log(urlCheckin)
-      //making request to checkin
-        var response = '';
-          var x = http.request(urlCheckin,function(res){
-              res.on('data',function(data){                
-                //Data from php.
-                //console.log(data.toString());
-                response +=data;
-                //resolve(JSON.parse(data.toString()));
-              });
-              response.on('end', function () {
-                  console.log(response);
-                  resolve(JSON.parse(response.toString()));
-                });
-              res.on('error',function(error){
-                console.log(error);
-                reject(error);
-              });
-          }).end();
+    //var urlCheckin = { hostname:'172.26.66.41', path:"/devDocuments/screens/php/checkInPatient.php"+params};
+    request(url,function(error, response, body){
+      if(!error&&response.statusCode == 200)
+      { 
+        resolve('success');
+      }else{  
+        reject(error);
+      }
+    });
   });
 };
 
@@ -232,78 +248,12 @@ module.exports.screenName = function(user, parameters)
             }).catch(function(error){
               reject(error);
             });
-        });
-        
+        }); 
       }
-      // var params = '?FirstName='+patient.FirstName+'&LastNameFirstThree='+patient.SSN; 
-      // var urlScreenName = { path:urlsVirtualWaitingRoom["Similar-Checkins"]+params};
-      //   //making request to checkin
-      
-      //   resolve(1);
-        
-            // var x = http.request(urlScreenName,function(res){
-            //     res.on('data',function(data){                
-            //       var names = JSON.parse(data.toString());
-            //       var child_id = patient.PatientSer + "-" + patient.ScheduledActivitySer + "-" + patient.ScheduledStartTime;    
-            //       if(names.length == 1){
-            //         patient.LastName = patient.SSN + "*****"; 
-            //        }else{
-            //         if(patient.MONTHOFBIRTH > 50){patient.MONTHOFBIRTH-=50;}
-            //         patient.MONTHOFBIRTH = months[Number(patient.MONTHOFBIRTH)];
-            //          patient.LastName = patient.SSN + " (Naissance / Birthday: " + patient.DAYOFBIRTH + " " + patient.MONTHOFBIRTH + ")";    
-            //       }
-            //       resolve(patient.LastName);
-            //     });
-            //     res.on('error',function(error){
-            //       console.log(error);
-            //       reject(error);
-            //     });
-            // }).end();
     });  
  
 };
-module.exports.getExamRooms = function(user, resources)
-{
-  return new Promise(function(resolve,reject){
-    var promises = [];
 
-    var objectToReturn = {};
-
-    var all = (typeof resources !== 'undefined')?true:false;
-      console.log(all);
-    if(all)
-    {
-      for (var i = 0; i < resources.length; i++) {
-        promises.push(getExamRoomsHelper(all,resources[i])); 
-      }
-      var array = [];
-      Promise.all(promises).then(function(results)
-      {
-        
-        for (var j = 0; j < results.length; j++) {
-          console.log(Object.prototype.toString.call( results[j] ) === '[object Array]');
-          array = array.concat(results[j]);
-
-        }
-        //Cleans out the AriasVenueId object
-        array = getRoomsOnly(array);
-        resolve(array);
-      }).catch(function(error){
-        reject(error);
-      }); 
-    }else{
-      getExamRoomsHelper(true).then(function(data){
-        data = getRoomsOnly(data);
-        resolve(data);
-      }).catch(function(error){
-        reject(error);
-      });
-    }
-      
-    
-    
-  });
-};
 var examRoomsQueryPerResource  = "SELECT DISTINCT ExamRoom.AriaVenueId FROM `ExamRoom`, ClinicResources, ClinicSchedule WHERE  ClinicSchedule.ClinicScheduleSerNum = ClinicResources.ClinicScheduleSerNum AND ClinicSchedule.ExamRoomSerNum = ExamRoom.ExamRoomSerNum AND ClinicResources.ResourceName = ?";
 var examRoomsQueryPerResourceAll  = "SELECT DISTINCT ExamRoom.AriaVenueId FROM `ExamRoom`, ClinicResources, ClinicSchedule WHERE  ClinicSchedule.ClinicScheduleSerNum = ClinicResources.ClinicScheduleSerNum AND ClinicSchedule.ExamRoomSerNum = ExamRoom.ExamRoomSerNum";
 function getExamRoomsHelper(all, resource)
@@ -340,4 +290,45 @@ function similarNames(ssn, firstname)
   });
 }
 
+
+
+// module.exports.getExamRooms = function(user, resources)
+// {
+//   return new Promise(function(resolve,reject){
+//     var promises = [];
+//     var objectToReturn = {};
+//     var all = (typeof resources !== 'undefined')?true:false;
+//       console.log(all);
+//     if(all)
+//     {
+//       for (var i = 0; i < resources.length; i++) {
+//         promises.push(getExamRoomsHelper(all,resources[i])); 
+//       }
+//       var array = [];
+//       Promise.all(promises).then(function(results)
+//       {
+        
+//         for (var j = 0; j < results.length; j++) {
+//           console.log(Object.prototype.toString.call( results[j] ) === '[object Array]');
+//           array = array.concat(results[j]);
+
+//         }
+//         //Cleans out the AriasVenueId object
+//         array = getRoomsOnly(array);
+//         resolve(array);
+//       }).catch(function(error){
+//         reject(error);
+//       }); 
+//     }else{
+//       getExamRoomsHelper(true).then(function(data){
+//         data = getRoomsOnly(data);
+//         resolve(data);
+//       }).catch(function(error){
+//         reject(error);
+//       });
+//     }
+      
     
+    
+//   });
+// };

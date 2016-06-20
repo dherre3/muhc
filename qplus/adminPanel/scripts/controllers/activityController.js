@@ -42,10 +42,19 @@ app.controller('ActivityController',function($scope, $timeout,$filter, ActivityL
 	function init(param)
 	{
 		ActivityLogService.getPatientActivityLogFromServer(param).then(function(result){
-			ActivityLogService.setPatientActivityLogTable(result);
-			$scope.activityLogObject=ActivityLogService.getPatientActivityObject();
-			$scope.activityLogArray=ActivityLogService.getPatientActivityArray();
-			console.log($scope.activityLogArray);
+			if(result!=='No activity found')
+			{
+				ActivityLogService.setPatientActivityLogTable(result);
+				$scope.activityLogObject=ActivityLogService.getPatientActivityObject();
+				$scope.activityLogArray=ActivityLogService.getPatientActivityArray();
+				console.log($scope.activityLogArray);
+			}else{
+				$scope.noActivity = true;
+				$scope.activityLogObject = {};
+				$scope.activityLogArray = [];
+
+			}
+			
 		});	
 	}
 	
@@ -64,6 +73,9 @@ app.controller('ActivityController',function($scope, $timeout,$filter, ActivityL
 	}
 	$scope.searchActivity=function(session)
 	{
+		$scope.loading = true;
+		$scope.session.inserts = [];
+		$scope.session.updates = [];
 		closeAllOtherSessions(session.SessionId);
 		if(session.expanded)
 	   	{
@@ -80,6 +92,12 @@ app.controller('ActivityController',function($scope, $timeout,$filter, ActivityL
 				ActivityLogService.setPatientSessionObject(result);
 				$scope.session.inserts=ActivityLogService.getTableOfInsertsSession();
 				$scope.session.updates=ActivityLogService.getTableOfUpdatesSession();
+				$scope.loading = false;
+				$timeout(function(){
+					
+					
+				},200);
+				
 			});
 		}
 	}

@@ -60,7 +60,9 @@
           <th class="active"style="text-align:center">
           Logout Time
           </th>
-
+          <tr class="unfocus" align="center" ng-if="activityLogArray.length==0">
+              <td class="text-center" colspan="6"><div class="text-center" style="margin-top:30px" ><strong>No Activity Found!</strong></div></td>
+          </tr>
           <tr class="unfocus" align="center"  ng-repeat-start="value in activityLogArray|filter:searchPatient" ng-init="value.expanded=false" ng-click="searchActivity(value)">
             {{value}}
               <td>{{value.PatientId}}</td>
@@ -70,11 +72,16 @@
               <td>{{value.LoginTime|date:'dd/MM/yy h:mm a'}}</td>
               <td>{{value.LogoutTime|date:'dd/MM/yy h:mm a'}}</td>
           </tr>
+          
           <tr ng-if="value.expanded" ng-repeat-end="" style="background-color:lightgrey ">
             <td>
             </td>
-            <td colspan="5" >
-              <div class="col-xs-10 text-center" ng-if="session.inserts.length==0&&session.updates.length==0"><strong>No Activity!</strong></div> 
+            <td colspan="6" >
+              <div class="col-xs-10 text-center" ng-if="session.inserts.length==0&&session.updates.length==0&&!loading"><strong>No Activity!</strong></div> 
+              <div class="col-xs-10 text-center" ng-if="loading" align="center">
+                <div layout="row" layout-sm="column" layout-align="space-around">
+      <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+    </div></div> 
               <div ng-if='session.inserts.length>0'>
               <strong>Inserts</strong>
               <div class="row" ng-repeat="insert in session.inserts">

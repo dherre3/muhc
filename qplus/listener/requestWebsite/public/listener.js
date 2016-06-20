@@ -59,21 +59,25 @@ ref.child('Users').on('value',function(snapshot){
     console.log(requestKey);
     console.log(requestObject);
     console.log('I am about to go to into encrypting');
-    //console.log(request);
-    object=encryptObject(object,encryptionKey);
-    //console.log(object);
-    var request=uploadSection(requestObject);
-    var deviceId=requestObject.DeviceId;
-    var UserID=requestObject.UserID;
-    var userFieldsPath='Users/'+UserID+'/'+deviceId+'/'+request;
-    console.log(userFieldsPath);
-    object.Timestamp=Firebase.ServerValue.TIMESTAMP;
-      console.log('I am about to write to firebase');
-    ref.child(userFieldsPath).update(object, function(){
-      console.log('I just finished writing to firebase');
+    if(object=='success')
+    {
       completeRequest(requestKey, requestObject);
-      //logRequest(requestObject);
-    });
+    }else{
+      object=encryptObject(object,encryptionKey);
+      //console.log(object);
+      var request=uploadSection(requestObject);
+      var deviceId=requestObject.DeviceId;
+      var UserID=requestObject.UserID;
+      var userFieldsPath='Users/'+UserID+'/'+deviceId+'/'+request;
+      console.log(userFieldsPath);
+      object.Timestamp=Firebase.ServerValue.TIMESTAMP;
+      ref.child(userFieldsPath).update(object, function(){
+        console.log('I just finished writing to firebase');
+        completeRequest(requestKey, requestObject);
+        //logRequest(requestObject);
+      });
+    }
+    
   }
 
   function uploadSection(requestObject)
@@ -169,6 +173,7 @@ ref.child('Users').on('value',function(snapshot){
     }
 
   };
+
 
   }]);
   app.filter('filterRequests', function() {

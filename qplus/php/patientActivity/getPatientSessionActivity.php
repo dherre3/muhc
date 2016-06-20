@@ -11,14 +11,14 @@
 			//MessagesMH query
 			$query="SELECT * FROM MessagesMH WHERE ( MessageRevSerNum +1 IN ( SELECT MessageRevSerNum FROM MessagesMH WHERE SessionId = '".$_POST['SessionId']."' ) AND MessageSerNum IN ( SELECT MessageSerNum FROM MessagesMH WHERE SessionId = '".$_POST['SessionId']."' ) ) OR SessionId = '".$_POST['SessionId']."';";
 			//$query="SELECT `MessageSerNum`, `MessagesRevSerNum`, `SessionId`, `SenderRole`, `ReceiverRole`, `SenderSerNum`, `ReceiverSerNum`, `MessageContent`, `ReadStatus`, `Attachment`, `MessageDate`, `LastUpdated` FROM `MessagesMH` WHERE `SessionId` ='".$_POST['SessionId']."';";
-		
+			$query.= "SELECT * FROM Feedback WHERE SessionId ='".$_POST["SessionId"]."';";			
 			//DocumentMH query
 			$query.="SELECT * FROM DocumentMH WHERE DocumentRevSerNum+1=(SELECT DocumentRevSerNum FROM DocumentMH WHERE SessionId='".$_POST['SessionId']."') OR SessionId='".$_POST['SessionId']."';";
 			//$query.="SELECT * FROM  `PatientMH` AS user LEFT JOIN PatientMH AS parent ON ((user.PatientRevSerNum-1!=0) AND (user.PatientRevSerNum -1) = parent.PatientRevSerNum AND user.PatientSerNum = parent.PatientSerNum ) WHERE user.SessionId = '".$_POST['SessionId']."';";
 			$query.="SELECT * FROM PatientMH WHERE (PatientRevSerNum+1 IN (SELECT PatientRevSerNum FROM PatientMH WHERE SessionId='".$_POST['SessionId']."') AND PatientSerNum IN (SELECT PatientSerNum FROM PatientMH WHERE SessionId='".$_POST['SessionId']."'))OR SessionId='".$_POST['SessionId']."';";
 			$query.="SELECT * FROM UsersMH WHERE (UserRevSerNum+1=(SELECT UserRevSerNum FROM UsersMH WHERE SessionId='".$_POST['SessionId']."') AND UserTypeSerNum IN (SELECT UserTypeSerNum FROM UsersMH WHERE SessionId='".$_POST['SessionId']."' ))OR SessionId='".$_POST['SessionId']."';";
 			$query.="SELECT * FROM AppointmentMH WHERE (AppointmentRevSerNum+1=(SELECT AppointmentRevSerNum FROM AppointmentMH WHERE SessionId='".$_POST['SessionId']."') AND AppointmentSerNum IN (SELECT AppointmentSerNum FROM AppointmentMH WHERE SessionId='".$_POST['SessionId']."')) OR SessionId='".$_POST['SessionId']."';";
-			$fieldsArray=array('MessagesMH','DocumentMH','PatientMH','UsersMH','AppointmentMH');
+			$fieldsArray=array('MessagesMH','Feedback','DocumentMH','PatientMH','UsersMH','AppointmentMH');
 	 		$index=0;
 	 		
 			$patientDataArray=array();

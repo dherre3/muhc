@@ -5,6 +5,7 @@
 	  if ($conn->connect_error) {
 	      die("<br>Connection failed: " . $conn->connect_error);
 	  }
+	  mysqli_set_charset($conn,"utf8");
 	$filter=1;
 	$username=1;
 

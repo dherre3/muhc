@@ -1,22 +1,16 @@
+
 <?php
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST)) $_POST = json_decode(file_get_contents('php://input'), true);
 
   // Create DB connection
-  include 'config.php';
+  include '../config.php';
   $conn = new mysqli("localhost", DB_USERNAME, DB_PASSWORD, MYSQL_DB);  // Check connection
   if ($conn->connect_error) {
       die("<br>Connection failed: " . $conn->connect_error);
   }
-  $sqlLookup="
-   SELECT
-   patient.FirstName,
-   patient.LastName,
-   feedback.FeedbackContent,
-   feedback.LastUpdated
-    FROM
-    feedback,
-    patient
-    WHERE
-    feedback.PatientSerNum=patient.PatientSerNum";
+   mysqli_set_charset($conn,"utf8");
+
+  $sqlLookup="SELECT RatingValue FROM EducationalMaterialRating WHERE EducationalMaterialRating.EducationalMaterialControlSerNum = ".$_POST["EducationalMaterialControlSerNum"].";";
   $lookupResult = $conn->query($sqlLookup);
   // If patientId doesn't already exist , Register the patient
   $json = array();
@@ -32,9 +26,10 @@
     {
       while($row = $lookupResult->fetch_assoc())
         {
-            $json[] = $row;
+            $json[] = $row['RatingValue'];
         }
         echo json_encode($json);
     }
   }
   $conn->close();
+?>

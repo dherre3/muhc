@@ -28,7 +28,7 @@ ref.child('requests').on('child_added',function(snapshot){
     });
    }
 });
-   /*var interval = setInterval(function()
+   var interval = setInterval(function()
    {
 
       requestBackend({request:'Appointments-Resources'}).then(function(result){
@@ -42,7 +42,7 @@ ref.child('requests').on('child_added',function(snapshot){
         }
         
       });
-   },10000);*/
+   },10000);
   
   function requestBackend(parameters)
   {

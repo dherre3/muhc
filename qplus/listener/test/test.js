@@ -19,7 +19,12 @@ var requestObject = {
 /*sqlInterface.checkIn(requestObject).then(function(response){
   console.log(response);
 });*/
-sqlInterface.runSqlQuery("SELECT AppointmentSerNum FROM Appointment WHERE PatientSerNum = ? ORDER BY ScheduledStartTime ASC",[51]).then(function(results){
+sqlInterface.getPatientTableFields(requestObject.UserID,undefined,['Questionnaires']).then(function(rows){
+  console.log(rows);
+}).catch(function(error){
+  console.log(error);
+});
+/*sqlInterface.runSqlQuery("SELECT AppointmentSerNum FROM Appointment WHERE PatientSerNum = ? ORDER BY ScheduledStartTime ASC",[51]).then(function(results){
   console.log(results);
   var today = new Date();
   today.setHours(18,0,0,0);
