@@ -9,7 +9,9 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
   var ref=new Firebase('https://brilliant-inferno-7679.firebaseio.com/dev');
   ref.auth('9HeH3WPYe4gdTuqa88dtE3KmKy7rqfb4gItDRkPF');
   setInterval(function(){
-ref.child('Users').on('value',function(snapshot){
+    removeTimeoutLiveRequests();
+     
+ref.child('Users').once('value',function(snapshot){
         //console.log(snapshot.val());
         var now=(new Date()).getTime();
         var usersData=snapshot.val();
@@ -38,6 +40,24 @@ ref.child('Users').on('value',function(snapshot){
         };
     });
 },60000);
+  function removeTimedoutLiveRequests()
+  {
+    var usersRef = ref.child('Users');
+    usersRef.once('value', function(snapshot)
+    {
+      if(snapshot.exists())
+      {
+        var value = snapshot.val();
+        for (var key in value) {
+          if(value.Timestamp>240000)
+          {
+            usersRef[key].set(null);
+          }
+  
+        };
+      }
+    }
+  }
 
   ref.child('requests').on('child_added',function(request){
     $.post("http://172.26.66.41:8010/login",{key: request.key(),objectRequest: request.val()}, function(data){
@@ -50,10 +70,22 @@ ref.child('Users').on('value',function(snapshot){
       }else if(data.type=='ResetPasswordError')
       {
         resetPasswordError(data.requestKey,data.requestObject);
+      }else if(data.type=='LiveRequest')
+      {
+        uploadLiveRequest( request.key(), data.requestObject,data.encryptionKey,data.object);
       }
 
     });
   });
+  function uploadLiveRequest(requestKey,requestObject, encryptionKey, object)
+  {
+    object = encryptObject(object, encryptionKey);
+    object.Timestamp=Firebase.ServerValue.TIMESTAMP;
+    ref.child(requestObject.UserID+'/'+requestKey).set(object,function()
+    {
+      completeRequest(requestKey, requestObject);
+    })
+  }
   function uploadToFirebase(requestKey,encryptionKey,requestObject,object)
   {
     console.log(requestKey);

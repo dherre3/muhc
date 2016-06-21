@@ -55,7 +55,7 @@ exports.getPatientQuestionnaires = function (rows)
     var quer = connection.query(queryQuestions, [patientAriaSer, [questionnaireDBSerNumArray]], function(err,  questions, fields){
       if(err) r.reject(err);
 
-      console.log(quer.sql);
+      console.log('line 58', quer.sql);
       getQuestionChoices(questions).then(function(questionChoices){
         r.resolve(questionChoices);
       }).catch(function(err){
@@ -79,6 +79,7 @@ function getQuestionnaireSerNums(rows)
 function getQuestionChoices(rows)
 {
   var r = q.defer();
+  console.log('line 82 Questions', rows)
   var array = [];
   for (var i = 0; i < rows.length; i++) {
     array.push(rows[i].QuestionSerNum);
