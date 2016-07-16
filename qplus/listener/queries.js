@@ -1,5 +1,5 @@
 var exports=module.exports={};
-
+//Get Patient table information for a particular patient
 exports.patientTableFields=function()
 {
   return "SELECT Patient.PatientSerNum,Patient.FirstName, Patient.LastName, Patient.TelNum, Patient.PatientId, Patient.Email, Patient.Alias, Patient.Language, Patient.EnableSMS,Patient.ProfileImage, Patient.SSN FROM Patient, Users WHERE Users.Username LIKE ? AND Users.UserTypeSerNum=Patient.PatientSerNum AND Patient.LastUpdated > ?;";
@@ -60,7 +60,7 @@ exports.patientTestResultsTableFields=function()
 };
 exports.patientQuestionnaireTableFields = function()
 {
-  return "SELECT Patient.PatientAriaSer, Questionnaire.DateAdded, Questionnaire.QuestionnaireSerNum, QuestionnaireControl.QuestionnaireDBSerNum FROM QuestionnaireControl, Questionnaire, Patient, Users WHERE QuestionnaireControl.QuestionnaireControlSerNum = Questionnaire.QuestionnaireControlSerNum AND Questionnaire.PatientSerNum = Patient.PatientSerNum AND Users.UserTypeSerNum = Patient.PatientSerNum AND Users.Username = ? AND QuestionnaireControl.LastUpdated > ? AND Questionnaire.LastUpdated > ?";
+  return "SELECT Questionnaire.CompletedFlag, Questionnaire.DateAdded, Questionnaire.PatientQuestionnaireDBSerNum, Questionnaire.CompletionDate, Questionnaire.QuestionnaireSerNum, QuestionnaireControl.QuestionnaireDBSerNum FROM QuestionnaireControl, Questionnaire, Patient, Users WHERE QuestionnaireControl.QuestionnaireControlSerNum = Questionnaire.QuestionnaireControlSerNum AND Questionnaire.PatientSerNum = Patient.PatientSerNum AND Users.UserTypeSerNum = Patient.PatientSerNum AND Users.Username = ? AND QuestionnaireControl.LastUpdated > ? AND Questionnaire.LastUpdated > ?";
 };
 exports.getPatientFieldsForPasswordReset=function(userID)
 {
@@ -94,6 +94,7 @@ exports.inputFeedback=function(UserSerNum, content)
 {
   return "INSERT INTO Feedback (`FeedbackSerNum`,`PatientSerNum`,`FeedbackContent`,`AppRating`,`DateAdded`, `SessionId`, `LastUpdated`) VALUES (NULL,?,?,?,NOW(),?, CURRENT_TIMESTAMP )";
 };
+//As the name implies, sends the message, this message function needs to be improved to account for injection attacks
 exports.sendMessage=function(objectRequest)
 {
   var token=objectRequest.Token;
@@ -149,7 +150,11 @@ exports.getPatientDeviceLastActivity=function(userid,device)
 {
   return "SELECT * FROM PatientActivityLog WHERE Username='"+userid+"' AND DeviceId='"+device+"' ORDER BY ActivitySerNum DESC LIMIT 1;";
 };
-exports.insertQuestionnaireRatingQuery=function()
+exports.insertEducationalMaterialRatingQuery=function()
 {
   return "INSERT INTO `EducationalMaterialRating`(`EducationalMaterialRatingSerNum`, `EducationalMaterialControlSerNum`, `PatientSerNum`, `RatingValue`, `SessionId`, `LastUpdated`) VALUES (NULL,?,?,?,?,NULL)";
+};
+exports.setQuestionnaireCompletedQuery = function()
+{
+  return "UPDATE `Questionnaire` SET PatientQuestionnaireDBSerNum = ?, CompletedFlag = 1, CompletionDate = ?, SessionId = ? WHERE Questionnaire.QuestionnaireSerNum = ?;";
 };

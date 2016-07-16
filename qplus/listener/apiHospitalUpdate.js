@@ -13,7 +13,10 @@ exports.sendMessage=function(requestObject)
 {
   return sqlInterface.sendMessage(requestObject);
 };
-
+exports.inputQuestionnaireAnswers = function(requestObject)
+{
+  return sqlInterface.inputQuestionnaireAnswers(requestObject);
+};
 //Input feedback
 exports.inputFeedback=function(requestObject)
 {

@@ -17,7 +17,8 @@ var API = {
   'Feedback':apiHospitalUpdate.inputFeedback,
   'Logout': apiHospitalUpdate.logout,
   'DeviceIdentifier':apiHospitalUpdate.updateDeviceIdentifier,
-  'QuestionnaireRating':apiHospitalUpdate.inputEducationalMaterialRating
+  'QuestionnaireRating':apiHospitalUpdate.inputEducationalMaterialRating,
+  'QuestionnaireAnswers':apiHospitalUpdate.inputQuestionnaireAnswers
 };
 
 exports.processRequest=function(requestObject)

@@ -8,8 +8,7 @@ app.controller('MainController',['$scope','$timeout',function($scope,$timeout){
   },1296000000);
   var ref=new Firebase('https://brilliant-inferno-7679.firebaseio.com/dev');
   ref.auth('9HeH3WPYe4gdTuqa88dtE3KmKy7rqfb4gItDRkPF');
-  setInterval(function(){
-    removeTimeoutLiveRequests();
+  setInterval(function(){ 
      
 ref.child('Users').once('value',function(snapshot){
         //console.log(snapshot.val());
@@ -40,24 +39,7 @@ ref.child('Users').once('value',function(snapshot){
         };
     });
 },60000);
-  function removeTimedoutLiveRequests()
-  {
-    var usersRef = ref.child('Users');
-    usersRef.once('value', function(snapshot)
-    {
-      if(snapshot.exists())
-      {
-        var value = snapshot.val();
-        for (var key in value) {
-          if(value.Timestamp>240000)
-          {
-            usersRef[key].set(null);
-          }
-  
-        };
-      }
-    }
-  }
+ 
 
   ref.child('requests').on('child_added',function(request){
     $.post("http://172.26.66.41:8010/login",{key: request.key(),objectRequest: request.val()}, function(data){
@@ -153,7 +135,7 @@ ref.child('Users').once('value',function(snapshot){
       requestObject.response='Success';
     }
     $timeout(function(){
-      $scope.requests.push(requestObject);
+      $scope.requests[$scope.requests.length%20] = requestObject;
       console.log($scope.requests);
     });
     //Clear request

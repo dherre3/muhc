@@ -139,12 +139,13 @@ exports.getSqlApiMappings = function()
   return requestMappings;
 };
 
-//Query processing function
+//Query processing function 
 exports.runSqlQuery = function(query, parameters, processRawFunction)
 {
   var r = Q.defer();
 
-  var query = connection.query(query, parameters, function(err,rows,fields){
+  var que = connection.query(query, parameters, function(err,rows,fields){
+    console.log(que.sql);
     if (err) r.reject(err);
     if(typeof rows !=='undefined')
     {
@@ -160,7 +161,6 @@ exports.runSqlQuery = function(query, parameters, processRawFunction)
     }else{
       r.resolve([]);
     }
-    console.log(query.sql);
   });
   return r.promise;
 };
@@ -404,15 +404,12 @@ exports.updateDeviceIdentifier = function(requestObject)
   var r = Q.defer();
   var identifiers = requestObject.Parameters;
   var deviceType = (identifiers.deviceType == 'iOS')?0:1;
-  console.log('line 400', identifiers.deviceType, identifiers);
-  console.log(getUserFromUserID(requestObject.UserID));
-  console.log(requestObject.UserID);
+
 
 
   getUserFromUserID(requestObject.UserID).then(function(user){
-    console.log(user);
+
     exports.runSqlQuery(queries.updateDeviceIdentifiers(),[user.UserTypeSerNum, requestObject.DeviceId, identifiers.registrationId, deviceType,requestObject.Token, identifiers.registrationId, requestObject.Token]).then(function(response){
-      console.log(response);
       r.resolve('Hospital Request Proccessed');
     }).catch(function(error){
       r.reject(error);
@@ -430,7 +427,6 @@ exports.addToActivityLog=function(requestObject)
   connection.query(queries.logActivity(requestObject),
   function(error, rows, fields)
   {
-    console.log('Log Patient Activity', rows);
     if(error) r.reject(error);
     r.resolve('Hospital Request Proccessed');
     
@@ -443,7 +439,7 @@ exports.getUsersPassword=function(username)
   var r=Q.defer();
   connection.query(queries.userPassword(username),function(error,rows,fields)
   {
-    console.log(error);
+
     if(error) r.reject(error);
     r.resolve(rows);
   });
@@ -460,13 +456,30 @@ exports.getSecurityQuestions=function(PatientSerNum)
   });
   return r.promise;
 };
+//Questionnaire Answers
+exports.inputQuestionnaireAnswers = function(requestObject)
+{
+  var r = Q.defer();
+
+  var parameters = requestObject.Parameters;
+  questionnaires.inputQuestionnaireAnswers(parameters).then(function(patientQuestionnaireSerNum)
+  {
+    connection.query(queries.setQuestionnaireCompletedQuery(),[patientQuestionnaireSerNum, parameters.DateCompleted, requestObject.Token,parameters.QuestionnaireSerNum],
+      function(error, rows, fields){
+        if(error) r.reject(error);
+        r.resolve(rows);
+      });
+  }).catch(function(err){
+    r.reject(err);
+  });
+  return r.promise;
+};
 exports.getMapLocation=function(requestObject)
 {
   var qrCode=requestObject.Parameters.QRCode;
   var r=Q.defer();
   connection.query(queries.getMapLocation(qrCode),function(error,rows,fields)
   {
-    console.log(error);
     if(error) r.reject('Invalid');
     r.resolve({'MapLocation':rows[0]});
   });
@@ -517,12 +530,11 @@ exports.inputEducationalMaterialRating = function(requestObject)
 {
   var r = Q.defer();
   var parameters = requestObject.Parameters;
-  var sql = connection.query(queries.insertQuestionnaireRatingQuery(),[ parameters.EducationalMaterialControlSerNum,parameters.PatientSerNum, parameters.RatingValue, requestObject.Token],
+  var sql = connection.query(queries.insertEducationalMaterialRatingQuery(),[ parameters.EducationalMaterialControlSerNum,parameters.PatientSerNum, parameters.RatingValue, requestObject.Token],
     function(err,rows,fields){
       if(err) r.reject(err);
       else r.resolve(rows);
   });
-  console.log(sql.sql);
   return r.promise;
 }
 exports.updateLogout=function(fields)
@@ -553,7 +565,6 @@ function LoadDocuments(rows)
   *@name LoadImages
   *@description  Uses the q module to make a promise to load images. The promise is resolved after all of them have been read from file system using the fs module. The code continues to run only if the promise is resolved.
   **/
-   console.log('Inside document fetching function');
     var imageCounter=0 ;
     var deferred = Q.defer();
     if (rows.length === 0) { deferred.resolve([]); }
@@ -563,7 +574,7 @@ function LoadDocuments(rows)
       var n = rows[key].FinalFileName.lastIndexOf(".");
       var substring=rows[key].FinalFileName.substring(n+1,rows[key].FinalFileName.length);
       rows[key].DocumentType=substring;
-      rows[key].Content=filesystem.readFileSync(__dirname+'/Documents/' + rows[key].FinalFileName,'base64');
+      rows[key].Content=filesystem.readFileSync('/home/VarianFILEDATA/Documents/' + rows[key].FinalFileName,'base64');
       imageCounter++;
       //console.log('imagecounter is : ',imageCounter);
       if (imageCounter == Object.keys(rows).length )
@@ -614,6 +625,7 @@ function loadProfileImagePatient(rows){
 
   return deferred.promise;
 }
+//Obtains educational material table of contents
 function getEducationalMaterialTableOfContents(rows)
 {
   var r = Q.defer();
@@ -636,6 +648,7 @@ function getEducationalMaterialTableOfContents(rows)
   return r.promise;
 }
 
+//Obtains the educational material table of contents and adds it to the pertinent materials
 function getEducationTableOfContents(rows)
 {
   var r = Q.defer();
@@ -681,7 +694,7 @@ function getEducationTableOfContents(rows)
   ).catch(function(error){r.reject(error);});
   return r.promise;
 }
-
+//Attachements for messages, not yet implemented to be added eventually
 var LoadAttachments = function (rows )
 {
 
@@ -692,11 +705,12 @@ var LoadAttachments = function (rows )
   
  };
   
-
+//Get the appointment aria ser num for a particular AppointmentSerNum, Username is passed as a security measure
 function getAppointmentAriaSer(username, appSerNum)
 {
   return exports.runSqlQuery(queries.getAppointmentAriaSer(),[username, appSerNum]);
 }
+//Checks user into Aria
 function checkIntoAria(patientActivitySerNum)
 {
   var r = Q.defer();
@@ -728,7 +742,6 @@ function checkIfCheckedIntoAriaHelper(patientActivitySerNum)
     var y = http.request(urlCheckCheckin,function(response){
       response.on('data',function(data){
           data = data.toString();
-          console.log(data);
           if(data.length === 0)
           {
             r.reject('failure');
@@ -789,7 +802,7 @@ function combineResources(rows)
   delete rows[0].ResourceName;
   delete rows[0].ResourceType;
   rows[0].Resource = resource; 
-  console.log(rows.length);
+
   }
    r.resolve(rows);
   return r.promise;

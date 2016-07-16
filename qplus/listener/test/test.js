@@ -1,6 +1,7 @@
 var credentials=require('./../credentials.js');
 var sqlInterface=require('./../sqlInterface.js');
 var queries=require('./../queries.js');
+var updatePatient = require('../apiPatientUpdate.js');
 var Firebase    =require('firebase');
 var CryptoJS = require('crypto-js');
 var utility = require('./../utility.js');
@@ -15,15 +16,24 @@ var requestObject = {
   DeviceId:'browser', 
   Parameters:{'AppointmentSerNum':13, Latitude:'123.12312312', Longitude:'41.123123', Accuracy:'41'}
 };
+var requestObject = {
+    UserID:'ac6eaeaa-f725-4b07-bdc0-72faef725985',
+    Parameters:"Doctors",
+    Timestamp:undefined
+  };
+  updatePatient.refresh(requestObject).then(function(data)
+  {
+    console.log(data);
+  });
 //sqlInterface.runSqlQuery(queries.checkin(),['Kiosk', requestObject.UserID, requestObject.UserID]);
 /*sqlInterface.checkIn(requestObject).then(function(response){
   console.log(response);
 });*/
-sqlInterface.getPatientTableFields(requestObject.UserID,undefined,['Questionnaires']).then(function(rows){
-  console.log(rows);
-}).catch(function(error){
-  console.log(error);
-});
+// sqlInterface.getPatientTableFields(requestObject.UserID,undefined,['Questionnaires']).then(function(rows){
+//   console.log(rows);
+// }).catch(function(error){
+//   console.log(error);
+// });
 /*sqlInterface.runSqlQuery("SELECT AppointmentSerNum FROM Appointment WHERE PatientSerNum = ? ORDER BY ScheduledStartTime ASC",[51]).then(function(results){
   console.log(results);
   var today = new Date();

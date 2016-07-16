@@ -1,9 +1,24 @@
 var chai = require('chai');
 var expect = require('chai').expect;
 var utility = require('../utility.js');
+var updatePatient = require('../apiPatientUpdate.js');
 var sinon = require('sinon');
 var sinonChai = require('sinon-chai');
 chai.use(require('chai-datetime'));
+describe('Testing the sql functionality that grabs info from the tables in the database',function()
+{
+  var requestObject = {
+    UserID:'ac6eaeaa-f725-4b07-bdc0-72faef725985',
+    Parameters:"All",
+    Timestamp:"1468596592301"
+  };
+  updatePatient.refresh(requestObject).then(function(data)
+  {
+    console.log(data);
+  });
+});
+
+
 
 describe('Tests proper encryption for the encryptObject function', function()
 {
