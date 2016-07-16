@@ -14,36 +14,36 @@ $link = mssql_connect(ARIA_DB, ARIA_USERNAME, ARIA_PASSWORD);
 if (!$link) {
     die('Unable to connect or select database!');
 }
-ini_set('mssql.charset', 'UTF-8');
 // Query the appointments associated with the specific patient.
-$sql = "
-SELECT DISTINCT
-     Patient.PatientSer,
- 	 Patient.LastName AS PatientLastName,
-	 Patient.FirstName AS PatientFirstName,
-	 Doctor.FirstName AS DoctorFirstName,
-	 Doctor.LastName AS DoctorLastName,
-	 PatientDoctor.PrimaryFlag,
-	 PatientDoctor.OncologistFlag,
-     Photo.Picture,
-	 Patient.SSN,
-	 Patient.PatientId,
-	 Diagnosis.Description
-	 FROM
-	 variansystem.dbo.Patient Patient,
-     variansystem.dbo.Photo Photo,
-	 variansystem.dbo.Diagnosis Diagnosis,
-	 variansystem.dbo.PatientActuals PatientActuals,
-	 variansystem.dbo.PatientDoctor PatientDoctor,
-	 variansystem.dbo.Doctor Doctor
-	 WHERE
-	 Patient.SSN LIKE '%".$PatientSSN."%'
-     AND Photo.PatientSer = Patient.PatientSer
-	 AND Patient.SSN=PatientActuals.SSN
-	 AND PatientActuals.PatientSer=Diagnosis.PatientSer
-	 AND PatientActuals.PatientSer=PatientDoctor.PatientSer
-	 AND Doctor.ResourceSer=PatientDoctor.ResourceSer
-";
+$sql ="SELECT Patient.PatientSer, Patient.LastName AS PatientLastName, Patient.FirstName AS PatientFirstName, Photo.Picture, Patient.SSN, Patient.PatientId FROM variansystem.dbo.Patient Patient LEFT JOIN variansystem.dbo.Photo Photo ON  Photo.PatientSer = Patient.PatientSer WHERE Patient.SSN LIKE '%".$PatientSSN."%';";
+
+// SELECT DISTINCT 
+//      Patient.PatientSer, 
+//  	 Patient.LastName AS PatientLastName, 
+// 	 Patient.FirstName AS PatientFirstName, 
+// 	 Doctor.FirstName AS DoctorFirstName, 
+// 	 Doctor.LastName AS DoctorLastName, 
+// 	 PatientDoctor.PrimaryFlag, 
+// 	 PatientDoctor.OncologistFlag, 
+//      Photo.Picture, 
+// 	 Patient.SSN, 
+// 	 Patient.PatientId, 
+// 	 Diagnosis.Description 
+// 	 FROM 
+// 	 variansystem.dbo.Patient Patient, 
+//      variansystem.dbo.Photo Photo, 
+// 	 variansystem.dbo.Diagnosis Diagnosis, 
+// 	 variansystem.dbo.PatientActuals PatientActuals, 
+// 	 variansystem.dbo.PatientDoctor PatientDoctor, 
+// 	 variansystem.dbo.Doctor Doctor
+// 	 WHERE 
+// 	 Patient.SSN LIKE '%".$PatientSSN."%' 
+//      AND Photo.PatientSer = Patient.PatientSer 
+// 	 AND Patient.SSN=PatientActuals.SSN 
+// 	 AND PatientActuals.PatientSer=Diagnosis.PatientSer 
+// 	 AND PatientActuals.PatientSer=PatientDoctor.PatientSer 
+// 	 AND Doctor.ResourceSer=PatientDoctor.ResourceSer 
+// ";
 if (isset($PatientSSN) ){
 
     $all = MSSQL_Query($sql);
