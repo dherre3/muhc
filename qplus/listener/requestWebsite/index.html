@@ -60,7 +60,7 @@
         <th>Parameters</th>
         <th>Status</th>
       </tr>
-      <tr ng-repeat="request in requests|filterRequests:selectTimeline|filter:searchUser">
+      <tr ng-repeat="request in requests|orderBy:'time':true|filterRequests:selectTimeline|filter:searchUser">
         <td>{{request.Request}}</td>
         <td>{{request.UserID}} </td>
         <td>{{request.DeviceId}}</td>

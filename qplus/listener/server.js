@@ -38,11 +38,12 @@ app.post('/login',function(req,res,next){
     }else{
       mainRequestApi.apiRequestFormatter(requestKey, requestObject).then(function(results){
         console.log('Api call from server.js');
+        console.log(results);
         res.send(results);
       });
     }
 });
 
-app.listen(8010,function(){
+app.listen(8020,function(){
   console.log("Started on PORT 8020");
 });

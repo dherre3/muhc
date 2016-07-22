@@ -9,15 +9,14 @@ exports.resolveEmptyResponse=function(data)
   for (var key in data) {
     if(data[key].length>0)
     {
+      console.log(data[key]);
       counter++;
+      break;
     }
   }
-  if(counter>0)
-    {
-      return data;
-    }else{
-      return {Response:'No Results'};
-    }
+  console.log('line 16',counter);
+  if(counter === 0) data = 'empty';
+  return data;
 };
 
 //Converts date object to mysql date

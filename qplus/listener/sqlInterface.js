@@ -13,7 +13,7 @@ var timeEstimate = require('./timeEstimate.js');
 
 
 
-/*var sqlConfig={
+var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
   password:'root',
@@ -23,7 +23,7 @@ var timeEstimate = require('./timeEstimate.js');
 /*
 *Connecting to mysql database
 */
-var sqlConfig={
+/*var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,
@@ -60,14 +60,14 @@ var requestMappings=
     processFunction:loadProfileImagePatient,
     numberOfLastUpdated:1
   },
-  'Documents':
+  /*'Documents':
   {
     sql:queries.patientDocumentTableFields(),
     processFunction:LoadDocuments,
     numberOfLastUpdated:2,
     table:'Document',
     serNum:'DocumentSerNum'
-  },
+  },*/
   'Doctors':{
     sql:queries.patientDoctorTableFields(),
     processFunction:loadImageDoctor,
@@ -145,7 +145,6 @@ exports.runSqlQuery = function(query, parameters, processRawFunction)
   var r = Q.defer();
 
   var que = connection.query(query, parameters, function(err,rows,fields){
-    console.log(que.sql);
     if (err) r.reject(err);
     if(typeof rows !=='undefined')
     {
@@ -193,9 +192,9 @@ exports.getPatientTableFields = function(userId,timestamp,arrayTables)
          index++;
        }
      }   
-     r.resolve(objectToFirebase);
+     r.resolve({Data:objectToFirebase,Response:'success'});
   },function(error){
-    r.reject(error);
+    r.reject({Response:'error',Reason:'Problems querying the database due to '+error});
   });
   return r.promise;
 };
@@ -251,9 +250,9 @@ exports.updateReadStatus=function(userId, parameters)
   tableSerNum = requestMappings[parameters.Field].serNum;
   id=parameters.Id;
   var query=connection.query(queries.updateReadStatus(),[table,table, tableSerNum, id, table, userId],
-  function(err,rows,fields){
-    if(err) r.reject(err);
-    r.resolve(rows);
+  function(error,rows,fields){
+    if(error) r.reject({Response:'error',Reason:error});
+    r.resolve({Response:'success'});
   });
   return r.promise;
 };
@@ -265,9 +264,8 @@ exports.sendMessage=function(requestObject)
   connection.query(queries.sendMessage(requestObject),function(error,rows, fields)
   {
 
-    if(error) r.reject(error);
-    //connection.query(queriesMH.sendMessage(objectRequest,id));
-    r.resolve('Hospital Request Proccessed');
+    if(error) r.reject({Response:'error',Reason:error});
+    r.resolve({Response:'success'});
   });
   return r.promise;
 };
@@ -286,16 +284,30 @@ exports.checkCheckinInAria = function(requestObject)
     checkIfCheckedIntoAriaHelper(ariaSerNum).then(function(success){
       console.log('the user has checked in ', success);
       //Check in the user into mysql if they have indeed checkedin at kiosk
-      exports.runSqlQuery(queries.checkin(),['Kiosk', serNum, username]);
-      r.resolve({CheckCheckin:{response:'failure', AppointmentSerNum:serNum}});
+      if(success) exports.runSqlQuery(queries.checkin(),['Kiosk', serNum, username]);
+      r.resolve({Response:'success', Data:{'CheckedIn':success, AppointmentSerNum:serNum}});
     }).catch(function(error){
-      //Returns false to whether the patient has checked in.
-      r.reject({CheckCheckin:{response:error, AppointmentSerNum:serNum}});
+      //Error occur while checking patient status
+      r.reject({Response:'error', Reason:error});
     });
   });
   return r.promise;
 };
-
+exports.checkinUpdate = function(requestObject)
+{
+    var r = Q.defer();
+    console.log('hello world');
+    exports.runSqlQuery(queries.getAppointmentAriaSer(),[requestObject.UserID,requestObject.Parameters.AppointmentSerNum], exports.getTimeEstimate).then(
+    function(response)
+    {
+      console.log(response);
+      r.resolve({Response:'success',Data:response});
+    }).catch(function(error)
+    {
+      r.reject({Response:'error',Reason:'Checkin update error due to '+error});
+    });
+    return r.promise;
+};
 
 
 //Api call to checkin to an Appointment (Implementation in Aria is yet to be done)
@@ -315,29 +327,33 @@ exports.checkIn=function(requestObject)
     console.log('Appointment aria ser', ariaSerNum);
     //Check in to aria using Johns script
     checkIntoAria(ariaSerNum).then(function(response){
-      console.log('Checked in successfully done in aria', response);
-
-      //If successfully checked in change field in mysql
-      exports.runSqlQuery(queries.checkin(),[session, serNum, username]).then(function(result){
-        console.log('Checkin to appointment in sql', result);
-        exports.runSqlQuery(queries.logCheckin(),[serNum, deviceId,latitude, longitude, accuracy, new Date()]).then(function(response){
-          console.log('Checkin done successfully', 'Finished writint to database');
-          r.resolve({Checkin:{response:'success'}});
+      if(response)
+      {
+        console.log('Checked in successfully done in aria', response);
+        //If successfully checked in change field in mysql
+        exports.runSqlQuery(queries.checkin(),[session, serNum, username]).then(function(result){
+          console.log('Checkin to appointment in sql', result);
+          exports.runSqlQuery(queries.logCheckin(),[serNum, deviceId,latitude, longitude, accuracy, new Date()]).then(function(response){
+            console.log('Checkin done successfully', 'Finished writint to database');
+            r.resolve({Response:'success'});
+          }).catch(function(error){
+            console.log('error login checkin', error);
+            r.reject({Response:'error',Reason:'Unable to logCheckin parameters due to '+error});
+          });
         }).catch(function(error){
-          console.log('error login checkin', error);
-          r.resolve({Checkin:{response:'failure'}});
+          console.log('Error inserting in sql', error);
+          r.reject({Response:'error',Reason:'Unable to Checkin patient into Opal due to,'+error});
         });
-      }).catch(function(error){
-        console.log('Error inserting in sql', error);
-        r.resolve({Checkin:{response:'failure'}});
-      });
+      }else{
+        r.reject({Response:'error', Reason:error});
+      }
     }).catch(function(error){
       console.log('Unable to checkin to aria',error);
-      r.resolve({Checkin:{response:'failure'}});
+      r.reject({Response:'error', Reason:error});
     });
   }).catch(function(error){
     console.log('Error while grabbing aria ser num', error);
-    r.resolve({Checkin:{response:'failure'}});
+    r.reject({Response:'error', Reason:'Error grabbing aria ser num from aria'+error});
   });
   return r.promise;
 };
@@ -358,17 +374,16 @@ exports.updateAccountField=function(requestObject)
       connection.query(queries.setNewPassword(newValue,patientSerNum,requestObject.Token),
       function(error, rows, fields)
       {
-        if(error) r.reject(error);
+        if(error) r.reject({Response:'error',Reason:error});
         delete requestObject.Parameters.NewValue;
-        r.resolve(requestObject);
+        r.resolve({Response:'success'});
       });
-
     }else{
       connection.query(queries.accountChange(patientSerNum,field,newValue,requestObject.Token),
       function(error, rows, fields)
       {
-        if(error) r.reject(error);
-        r.resolve(requestObject);
+        if(error) r.reject({Response:'error',Reason:error});
+        r.resolve({Response:'success'});
       });
     }
   });
@@ -385,8 +400,8 @@ exports.inputFeedback=function(requestObject)
     function(error, rows, fields)
     {
       
-      if(error) r.reject(error);
-      r.resolve('Hospital Request Proccessed');
+      if(error) r.reject({Response:'error',Reason:error});
+      r.resolve({Response:'success'});
     });
   });
   return r.promise;
@@ -410,12 +425,12 @@ exports.updateDeviceIdentifier = function(requestObject)
   getUserFromUserID(requestObject.UserID).then(function(user){
 
     exports.runSqlQuery(queries.updateDeviceIdentifiers(),[user.UserTypeSerNum, requestObject.DeviceId, identifiers.registrationId, deviceType,requestObject.Token, identifiers.registrationId, requestObject.Token]).then(function(response){
-      r.resolve('Hospital Request Proccessed');
+      r.resolve({Response:'success'});
     }).catch(function(error){
-      r.reject(error);
+      r.reject({Response:'error', Reason:'Error updating device identifiers due to '+error});
     });
   }).catch(function(error){
-    r.reject(error);
+    r.reject({Response:'error', Reason:'Error getting patient fields due to '+error});
   });
   return r.promise;
 
@@ -427,8 +442,8 @@ exports.addToActivityLog=function(requestObject)
   connection.query(queries.logActivity(requestObject),
   function(error, rows, fields)
   {
-    if(error) r.reject(error);
-    r.resolve('Hospital Request Proccessed');
+    if(error) r.reject({Response:'error', Reason:error});
+    r.resolve({Response:'success'});
     
   });
   return r.promise;
@@ -466,11 +481,11 @@ exports.inputQuestionnaireAnswers = function(requestObject)
   {
     connection.query(queries.setQuestionnaireCompletedQuery(),[patientQuestionnaireSerNum, parameters.DateCompleted, requestObject.Token,parameters.QuestionnaireSerNum],
       function(error, rows, fields){
-        if(error) r.reject(error);
-        r.resolve(rows);
+        if(error) r.reject({Response:'error',Reason:error});
+        r.resolve({Response:'success'});
       });
-  }).catch(function(err){
-    r.reject(err);
+  }).catch(function(error){
+    r.reject(error);
   });
   return r.promise;
 };
@@ -480,8 +495,8 @@ exports.getMapLocation=function(requestObject)
   var r=Q.defer();
   connection.query(queries.getMapLocation(qrCode),function(error,rows,fields)
   {
-    if(error) r.reject('Invalid');
-    r.resolve({'MapLocation':rows[0]});
+    if(error) r.reject({Response:'error', Reason:'Problem fetching maps'});
+    r.resolve({Response:'success', Data:{MapLocation:rows[0]}});
   });
   return r.promise;
 };
@@ -532,11 +547,11 @@ exports.inputEducationalMaterialRating = function(requestObject)
   var parameters = requestObject.Parameters;
   var sql = connection.query(queries.insertEducationalMaterialRatingQuery(),[ parameters.EducationalMaterialControlSerNum,parameters.PatientSerNum, parameters.RatingValue, requestObject.Token],
     function(err,rows,fields){
-      if(err) r.reject(err);
-      else r.resolve(rows);
+      if(err) r.reject({Response:'error',Reason:err});
+      else r.resolve({Response:'success'});
   });
   return r.promise;
-}
+};
 exports.updateLogout=function(fields)
 {
   var r=Q.defer();
@@ -722,6 +737,7 @@ function checkIntoAria(patientActivitySerNum)
   //making request to checkin
       var x = http.request(urlCheckin,function(res){
           res.on('data',function(data){
+            console.log(data);
             //Check if it successfully checked in
             checkIfCheckedIntoAriaHelper(patientActivitySerNum).then(function(response){
               r.resolve(response);
@@ -729,6 +745,9 @@ function checkIntoAria(patientActivitySerNum)
               r.reject(error);
             });
           });
+      }).on('error',function(error)
+      {
+        r.reject(error);
       }).end();
   return r.promise;
 }
@@ -744,11 +763,14 @@ function checkIfCheckedIntoAriaHelper(patientActivitySerNum)
           data = data.toString();
           if(data.length === 0)
           {
-            r.reject('failure');
+            r.resolve(false);
           }else{
-            r.resolve('success');
+            r.resolve(true);
           }
         });
+      }).on('error',function(error)
+      {
+        r.reject(error.message);
       }).end();
     return r.promise;
 }
@@ -760,10 +782,10 @@ exports.getTimeEstimate = function(result)
   result = result[0];
   timeEstimate.getEstimate(result.AppointmentAriaSer).then(
       function(estimate){
-          r.resolve({CheckinUpdate: estimate});
+          r.resolve( estimate);
       },function(error)
       {
-        r.resolve({CheckinUpdate: error});
+        r.resolve(error);
     });
     return r.promise;
 };

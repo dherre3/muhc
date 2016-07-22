@@ -26,16 +26,12 @@ exports.processRequest=function(requestObject)
   console.log(requestObject);
   
   var r=Q.defer();
-  if(!validate('DefinedObjectRequest',requestObject))
-  {
-    r.reject('Invalid');
-  }
   var type = requestObject.Request;
   if(API.hasOwnProperty(type))
   {
     return  API[type](requestObject);
   }else{
-    r.reject('Invalid');
+    r.reject('error');
   }
   return r.promise;
 };
