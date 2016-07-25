@@ -3,7 +3,7 @@ var mysql = require('mysql');
 var q = require('q');
 var credentials = require('./credentials.js');
 
-var sqlConfig={
+/*var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
   password:'root',
@@ -13,7 +13,7 @@ var sqlConfig={
 /*
 *Connecting to mysql database
 */
-/*var sqlConfig={
+var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,

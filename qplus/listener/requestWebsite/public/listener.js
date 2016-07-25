@@ -31,7 +31,7 @@ function clearTimeoutRequests()
 
   ref.child('requests').on('child_added',function(request){
     console.log(request.val());
-      $.post("http://localhost:8020/login",{key: request.key(),objectRequest: request.val()}, function(response){
+      $.post("http://172.26.66.41:8020/login",{key: request.key(),objectRequest: request.val()}, function(response){
         console.log(response);
         if(response.Code == 1)
         {

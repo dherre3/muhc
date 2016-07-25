@@ -13,7 +13,7 @@ var timeEstimate = require('./timeEstimate.js');
 
 
 
-var sqlConfig={
+/*var sqlConfig={
   port:'/Applications/MAMP/tmp/mysql/mysql.sock',
   user:'root',
   password:'root',
@@ -23,7 +23,7 @@ var sqlConfig={
 /*
 *Connecting to mysql database
 */
-/*var sqlConfig={
+var sqlConfig={
   host:credentials.HOST,
   user:credentials.MYSQL_USERNAME,
   password:credentials.MYSQL_PASSWORD,
@@ -60,14 +60,14 @@ var requestMappings=
     processFunction:loadProfileImagePatient,
     numberOfLastUpdated:1
   },
-  /*'Documents':
+  'Documents':
   {
     sql:queries.patientDocumentTableFields(),
     processFunction:LoadDocuments,
     numberOfLastUpdated:2,
     table:'Document',
     serNum:'DocumentSerNum'
-  },*/
+  },
   'Doctors':{
     sql:queries.patientDoctorTableFields(),
     processFunction:loadImageDoctor,
