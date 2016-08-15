@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html ng-app="waitApp">
-<!--<META HTTP-EQUIV="refresh" CONTENT="6000" URL="http://172.26.66.41/devDocuments/screens/waitDisplayDS1-1.html">-->
 <META HTTP-EQUIV="refresh" CONTENT="6000" URL="http://172.26.66.41/devDocuments/screens/waitDisplayDRC-1.html">
 <head>
 
@@ -10,6 +9,7 @@
 <script src="http://172.26.66.41/Documents/config/angularjs/angular.min.js"></script>
 <script src="http://172.26.66.41/Documents/config/angularjs/angular-poller.js"></script>
 <script src="http://172.26.66.41/Documents/config/angularjs/checklist-model.js"></script>
+<script src="http://172.26.66.41/Documents/config/angularjs/angular-sanitize.js"></script>
 
 <!--Firebase libraries -->
 <!--<script src="https://cdn.firebase.com/js/client/2.2.1/firebase.js"></script> -->
@@ -46,7 +46,6 @@
   </td>
   <td align="left" valign="center">
     <!--<h2><b>Waiting Room Management</b></h2> -->
-    <!--<h2><b>Waiting Room Management</b></h2> -->
   </td>
 </tr>
 </table>
@@ -54,8 +53,8 @@
 <p/>
   <table class="table table-striped" border="0" style="width: 1700px; text-align: center;">
     </tr>
-    <tr ng-repeat="item in screenRows | orderBy: '-Timestamp' | filter:{'PatientStatus': 'Called'}" ng-class=" (item.diff > 0) && (item.diff < 18000) ? 'bg-danger': '' ">
-      <td ng-class=" (item.diff > 0) && (item.diff < 18000) ? 'bg-danger': ''"><span class="invisible" style="font-size: 1px;"><span style="font-weight: bold; font-size: 75px;" >{{ item.FirstName}} {{ item.LastName}}</span><br><span style="font-size: 55px;">{{item.Destination}}</span>{{ item.diff = timeNow - item.Timestamp}}</span></td>  
+    <tr ng-repeat="item in screenRows | orderBy: '-Timestamp' | filter:{'PatientStatus': 'CallRC'}" ng-class=" (item.diff > 0) && (item.diff < 18000) ? 'bg-danger': '' ">
+      <td ng-class=" (item.diff > 0) && (item.diff < 18000) ? 'bg-danger': ''"><span style="font-weight: bold; font-size: 75px;" >{{ item.FirstName}} {{ item.LastName}}</span><br><span style="font-size: 55px;"><span ng-bind-html="item.Destination"></span></span><span class="invisible" style="font-size: 1px;">{{ item.diff = timeNow - item.Timestamp}}</span></td>  
     </tr>
   </table>
 <p/>
