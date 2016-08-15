@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "firebase-brilliant-inferno-767",
+  "private_key_id": "08727a9739a17e8d055f08384aeb51c81eb84aca",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC+W8hzmLmU4J8u\njxPw6ouj6ZFVBATmWuAvjAnIasioDn03sPVi5IJ9P9Z4zZAq05m7rcoI+c191i7k\nnzrpjB+/RjFMQ7IeK6t4A9vMHsDvieX3W/pCggYkhhoYv4cYIc613ckIXNTqSoSp\nGrm5d+uu3EFYukSzuJFCYKzwO5qxN3ogqRgPuPFxJJrdlmAYDbTbDSsAKtwjqlPP\nOgiBa5Fi6RIpr38FBaTsa8z0M+gxLEfB5g1OW55XwHTPRpPA8CCk/NofzNYYRyuw\ni6m8FyAdQ+/Uk01/NvxJduLSbDmkxFcSZDdmi2n57w4LyJ/NO/eoSMP9KsNdjs+s\n7U5I0Nv1AgMBAAECggEABEu/91PgBEsZbIyQD6TLZ/SScg+4KJauboRDiEFYq+o/\nyyz0LLopc7goF+vTsBO8aW7fm1o/1/IodsJdKv4djUyBOk5gy6uCoB++Kxoako1T\nIkTyHeQfTV21Yw+XdeT1bEdIDSdDKtJpsgNHY7cgG38e/midukyVAqF55aYCtLMY\n2L0//a3fRxxW4MQIGaPakAjIxjt4fpNzLHI14cq/Hw5BjZLxsK4lZxzTftYRbydM\neXAOgPZx76UtX6YrV7Doue16Ks48pfvxQSCtnsRB7QhJn0QWG5VZHN2yQoNADOhL\nzuXI8dJC3rN+yvEqG4867n3CIauo4Efz07AjITFy4QKBgQDdSdFyWMfYtyeq1dSO\nzJnCWSby6Ei2/A3rcIlir0ht2qkd0CDbC7le1yRA179a3QXAbAWbBxnyCg94MdOn\n7wGw2Chdpj6LBDv89aTLF0Jd+yge//QeoHBZTrg/YIK07XiYchH1DKAN4ZOYX08A\n+kxREnRguskCpMDCNc6WMXpnOQKBgQDcN+3ZexOMhtHXFk/ylbdq0wS3T7+/XqnH\nagwnz5rumdb05gUpUW3WvdRWVrBk9dzbVGZtmgCb2CTH2khXreKYKIhPbChwFM6P\nTVj6x9EA6inlVRrgsNQEZFzSJKA0M7ADTzZrRMRLfCq8ZE3R7usQvNQbWk3tCw1i\ng8MDU/3+nQKBgEf9wPcLbRDTHUOVx04hwBAbQvGZojZtr/WdqgSB8/VRQt2hHV9F\n5Cu3oGK8DdP4vetI+VXjLIyyuy+mPi6PMiSfXhqBgC1n1kBIhjFQQtYiZH4ZVQk1\ntvdHBegQdNV5wFcQHUl0rwl1DrhuoVw3Eeb6MwRZIBYNFWzZZnk0ZZb5AoGAHUAs\njqOjcBoES16CVgV+7GiFCthD7uZjBMLYRH115dV3UOYwr1FKlqh2SNWQ7ogdwuBO\nDqbTB+BI2mbrDwJgw7c2i94g7OpGmZA7jmv2Hfn8gKKyREAYmVC/Z4ZH5UcsTPQ7\nlTn4HNKsVoO4NndWr811GwD+ssqyB3Da+Vkxtp0CgYA1ts2Odp5zqA/EDgvfiu8U\napgygtbDeDJLWY3nEc8OXDdrUO2CJoX7tVYo7Y3hOtdfox+hL7w1y8uXYeV+/LKL\nNctCYhqs+XqVY20t3PZZClMpBRvceuGKHJSG3V137ATeXY+VPwDIYFTT0PwERgF1\nv0BtxzGU2Bl5XRHhGMi1jw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "opal-backend@firebase-brilliant-inferno-767.iam.gserviceaccount.com",
+  "client_id": "112421715434435039928",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/opal-backend%40firebase-brilliant-inferno-767.iam.gserviceaccount.com"
+}
