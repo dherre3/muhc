@@ -63,7 +63,7 @@ var requestMappings=
   'Documents':
   {
     sql:queries.patientDocumentTableFields(),
-    processFunction:LoadDocuments,
+    //processFunction:LoadDocuments,
     numberOfLastUpdated:2,
     table:'Document',
     serNum:'DocumentSerNum'
