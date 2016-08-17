@@ -20,7 +20,7 @@ exports.apiRequestFormatter=function(requestKey,requestObject)
       //Rejects requests if username returns more than one password
       console.log('Rejecting request due to injection attack', rows);
       //Construction of request object
-      responseObject = { RequestKey:requestKey,Data:{},Response:'error', Reason:'Injection attack, incorrect UserID'};       
+      responseObject = { RequestKey:requestKey, Code: 1, Data:{},Response:'error', Reason:'Injection attack, incorrect UserID'};       
       r.resolve(responseObject);
     }else{
       //Gets password and decrypts request
@@ -30,7 +30,7 @@ exports.apiRequestFormatter=function(requestKey,requestObject)
       //If requests after decryption is empty, key was incorrect, reject the request
       if(requestObject.Request === '') {
         console.log('Rejecting request due to incorrect password recorded');
-        responseObject = { RequestKey:requestKey,Data:{}, Response:'error', Reason:'Incorrect password for decryption'};
+        responseObject = { RequestKey:requestKey, Code: 1,Data:{}, Response:'error', Reason:'Incorrect password for decryption'};
         r.resolve(responseObject);
       }else{
         //Otherwise decrypt the parameters and send to process api request
