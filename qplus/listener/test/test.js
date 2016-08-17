@@ -18,10 +18,9 @@ var requestObject = {
 };
 var requestObject = {
     UserID:'ac6eaeaa-f725-4b07-bdc0-72faef725985',
-    Parameters:"Doctors",
-    Timestamp:undefined
+    Parameters:["2","7"]
   };
-  updatePatient.refresh(requestObject).then(function(data)
+  sqlInterface.getDocumentsContent(requestObject).then(function(data)
   {
     console.log(data);
   });

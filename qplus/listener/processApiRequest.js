@@ -11,6 +11,7 @@ var API = {
   'Checkin':apiHospitalUpdate.checkIn,
   'CheckinUpdate':apiPatientUpdate.checkinUpdate,
   'MapLocation':apiPatientUpdate.getMapLocation,
+  'DocumentContent':apiPatientUpdate.getDocumentsContent,
   'Message':apiHospitalUpdate.sendMessage,
   'Read':apiHospitalUpdate.updateReadStatus,
   'AccountChange':apiHospitalUpdate.accountChange,

@@ -98,3 +98,10 @@ exports.getMapLocation=function(requestObject)
 {
    return sqlInterface.getMapLocation(requestObject);
 };
+
+//Get Document Content
+exports.getDocumentsContent=function(requestObject)
+{
+
+   return sqlInterface.getDocumentsContent(requestObject);
+};

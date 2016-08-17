@@ -63,8 +63,8 @@ var requestMappings=
   'Documents':
   {
     sql:queries.patientDocumentTableFields(),
-    //processFunction:LoadDocuments,
     numberOfLastUpdated:2,
+    //processFunction:LoadDocuments,
     table:'Document',
     serNum:'DocumentSerNum'
   },
@@ -134,6 +134,7 @@ var requestMappings=
     serNum:'AnnouncementSerNum'
   }
 };
+
 exports.getSqlApiMappings = function()
 {
   return requestMappings;
@@ -357,6 +358,42 @@ exports.checkIn=function(requestObject)
   });
   return r.promise;
 };
+exports.getDocumentsContent = function(requestObject)
+{
+
+  var r = Q.defer();
+  var documents = requestObject.Parameters;
+
+  var userID = requestObject.UserID;
+  if(!(typeof documents.constructor !=='undefined'&&documents.constructor=== Array)){
+    r.reject({Response:'error',Reason:'Not an array'});
+  }else{
+    console.log('line 370', documents);
+   var quer = connection.query(queries.getDocumentsContentQuery(),[[documents],userID],function(err,rows,fields)
+    {
+
+      console.log(rows);
+      if(err){
+        r.reject({Response:'error',Reason:err});
+      }else if(rows.length==0)
+      {
+        r.resolve({Response:'success',Data:'DocumentNotFound'});
+      }else{
+        LoadDocuments(rows).then(function(documents)
+        {
+          if(documents.length==1)r.resolve({Response:'success',Data:documents[0
+            ]});
+          else r.resolve({Response:'success',Data:documents});
+          
+        });
+        
+      }
+      
+    });
+  }
+  return r.promise;
+
+};
 //Updating field in the database tables
 exports.updateAccountField=function(requestObject)
 {
@@ -396,10 +433,9 @@ exports.inputFeedback=function(requestObject)
   var UserID=requestObject.UserID;
   getUserFromUserID(UserID).then(function(user)
   {
-   connection.query(queries.inputFeedback(),[user.UserTypeSerNum,requestObject.Parameters.FeedbackContent,requestObject.Parameters.AppRating, requestObject.Token],
+   var quer = connection.query(queries.inputFeedback(),[user.UserTypeSerNum,requestObject.Parameters.FeedbackContent,requestObject.Parameters.AppRating, requestObject.Token],
     function(error, rows, fields)
     {
-      
       if(error) r.reject({Response:'error',Reason:error});
       r.resolve({Response:'success'});
     });
@@ -591,12 +627,8 @@ function LoadDocuments(rows)
       rows[key].DocumentType=substring;
       rows[key].Content=filesystem.readFileSync('/home/VarianFILEDATA/Documents/' + rows[key].FinalFileName,'base64');
       imageCounter++;
-      //console.log('imagecounter is : ',imageCounter);
-      if (imageCounter == Object.keys(rows).length )
-       {
-         deferred.resolve(rows);
-       }
     }
+    deferred.resolve(rows);
     return deferred.promise;
 }
 
