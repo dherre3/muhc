@@ -767,22 +767,35 @@ function checkIntoAria(patientActivitySerNum)
     };
 
   //making request to checkin
+    var dataResponse = '';
       var x = http.request(urlCheckin,function(res){
           res.on('data',function(data){
-            console.log(data);
+            data = data.toString();
+            dataResponse+=data;
+          });
+          res.on('end',function()
+          {
+            //data = JSON.parse(data);
+            console.log(dataResponse);
             //Check if it successfully checked in
             checkIfCheckedIntoAriaHelper(patientActivitySerNum).then(function(response){
               r.resolve(response);
             }).catch(function(error){
+              console.log('line784',error);
               r.reject(error);
             });
           });
       }).on('error',function(error)
       {
+        console.log('line 790',error);
         r.reject(error);
       }).end();
   return r.promise;
 }
+checkIfCheckedIntoAriaHelper(1737696).then(function(result)
+{
+  console.log(result);
+})
 //Check if checked in for an appointment in aria
 function checkIfCheckedIntoAriaHelper(patientActivitySerNum)
 {
@@ -790,16 +803,19 @@ function checkIfCheckedIntoAriaHelper(patientActivitySerNum)
     var urlCheckCheckin = {
       path: 'http://medphys/devDocuments/ackeem/getCheckins.php?AppointmentAriaSer='+patientActivitySerNum
     };
+    var dataResponse = '';
     var y = http.request(urlCheckCheckin,function(response){
       response.on('data',function(data){
           data = data.toString();
-          if(data.length === 0)
-          {
-            r.resolve(false);
-          }else{
-            r.resolve(true);
-          }
+          dataResponse+=data;
         });
+      response.on('end',function()
+      {
+        dataResponse = JSON.parse(dataResponse);
+        console.log(dataResponse);
+        if(dataResponse.length == 0||!(dataResponse instanceof Array)) r.resolve(false);
+        else r.resolve(true);
+      });
       }).on('error',function(error)
       {
         r.reject(error.message);
