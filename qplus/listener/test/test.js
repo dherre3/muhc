@@ -8,7 +8,21 @@ var utility = require('./../utility.js');
 var http = require('http');
 var q = require('q');
 var timeEstimate = require('../timeEstimate.js');
+var spawn = require('child_process').spawnSync;
 
+ls = spawn('ls', ['-lh','/usr']);
+ls.stdout.on('data',function(data)
+{
+  console.log(data.toString());
+
+});
+ls.stderr.on('data',function(data)
+{
+  console.log('error',data.toString());
+});
+ls.on('close', function(code){
+  console.log(code.toString());
+});
 
 var requestObject = {
   UserID:'ac6eaeaa-f725-4b07-bdc0-72faef725985',
@@ -16,14 +30,14 @@ var requestObject = {
   DeviceId:'browser', 
   Parameters:{'AppointmentSerNum':13, Latitude:'123.12312312', Longitude:'41.123123', Accuracy:'41'}
 };
-var requestObject = {
-    UserID:'ac6eaeaa-f725-4b07-bdc0-72faef725985',
-    Parameters:["2","7"]
-  };
-  sqlInterface.getDocumentsContent(requestObject).then(function(data)
-  {
-    console.log(data);
-  });
+// var requestObject = {
+//     UserID:'ac6eaeaa-f725-4b07-bdc0-72faef725985',
+//     Parameters:["2","7"]
+//   };
+//   sqlInterface.getDocumentsContent(requestObject).then(function(data)
+//   {
+//     console.log(data);
+//   });
 //sqlInterface.runSqlQuery(queries.checkin(),['Kiosk', requestObject.UserID, requestObject.UserID]);
 /*sqlInterface.checkIn(requestObject).then(function(response){
   console.log(response);

@@ -7,6 +7,7 @@ var credentials=require('./credentials.js');
 var CryptoJS=require('crypto-js');
 var buffer=require('buffer');
 var http = require('http');
+var request = require('request');
 var questionnaires = require('./patientQuestionnaires.js');
 var timeEstimate = require('./timeEstimate.js');
 
@@ -346,10 +347,10 @@ exports.checkIn=function(requestObject)
           r.reject({Response:'error',Reason:'Unable to Checkin patient into Opal due to,'+error});
         });
       }else{
-        r.reject({Response:'error', Reason:error});
+        r.reject({Response:'error', Reason:'Unable to checkin Aria'});
       }
     }).catch(function(error){
-      console.log('Unable to checkin to aria',error);
+      console.log('Unable to checkin aria',error);
       r.reject({Response:'error', Reason:error});
     });
   }).catch(function(error){
@@ -761,35 +762,49 @@ function getAppointmentAriaSer(username, appSerNum)
 function checkIntoAria(patientActivitySerNum)
 {
   var r = Q.defer();
-  //Url to checkin
-  var urlCheckin = {
-      path: 'http://medphys/devDocuments/screens/php/checkInPatient.php?CheckinVenue=8225&ScheduledActivitySer='+patientActivitySerNum
-    };
-
+    var url = 'http://172.26.66.41/devDocuments/screens/php/checkInPatient.php?CheckinVenue=8225&ScheduledActivitySer='+patientActivitySerNum;
   //making request to checkin
-    var dataResponse = '';
-      var x = http.request(urlCheckin,function(res){
-          res.on('data',function(data){
-            data = data.toString();
-            dataResponse+=data;
-          });
-          res.on('end',function()
-          {
-            //data = JSON.parse(data);
-            console.log(dataResponse);
-            //Check if it successfully checked in
-            checkIfCheckedIntoAriaHelper(patientActivitySerNum).then(function(response){
-              r.resolve(response);
-            }).catch(function(error){
-              console.log('line784',error);
-              r.reject(error);
-            });
-          });
-      }).on('error',function(error)
+  console.log(url);
+   request(url,function(error, response, body)
+    {
+      if(error){console.log('line770,sqlInterface',error);r.reject(error);}
+      if(!error&&response.statusCode=='200')
       {
-        console.log('line 790',error);
-        r.reject(error);
-      }).end();
+        checkIfCheckedIntoAriaHelper(patientActivitySerNum).then(function(response){
+              r.resolve(response);
+        }).catch(function(error){
+           console.log('line778',error);
+          r.reject(error);
+        });
+      }
+    });
+  //  //Url to checkin
+  // var urlCheckin = {
+  //     path: 'http://medphys/devDocuments/screens/php/checkInPatient.php?CheckinVenue=8225&ScheduledActivitySer='+patientActivitySerNum
+  //   };
+  //   var dataResponse = '';
+  //     var x = http.request(urlCheckin,function(res){
+  //         res.on('data',function(data){
+  //           data = data.toString();
+  //           dataResponse+=data;
+  //         });
+  //         res.on('end',function()
+  //         {
+  //           //data = JSON.parse(data);
+  //           console.log(dataResponse);
+  //           //Check if it successfully checked in
+  //           checkIfCheckedIntoAriaHelper(patientActivitySerNum).then(function(response){
+  //             r.resolve(response);
+  //           }).catch(function(error){
+  //             console.log('line784',error);
+  //             r.reject(error);
+  //           });
+  //         });
+  //     }).on('error',function(error)
+  //     {
+  //       console.log('line 790',error);
+  //       r.reject(error);
+  //     }).end();
   return r.promise;
 }
 checkIfCheckedIntoAriaHelper(1737696).then(function(result)
@@ -799,27 +814,36 @@ checkIfCheckedIntoAriaHelper(1737696).then(function(result)
 //Check if checked in for an appointment in aria
 function checkIfCheckedIntoAriaHelper(patientActivitySerNum)
 {
-  var r = Q.defer();
-    var urlCheckCheckin = {
-      path: 'http://medphys/devDocuments/ackeem/getCheckins.php?AppointmentAriaSer='+patientActivitySerNum
-    };
-    var dataResponse = '';
-    var y = http.request(urlCheckCheckin,function(response){
-      response.on('data',function(data){
-          data = data.toString();
-          dataResponse+=data;
-        });
-      response.on('end',function()
+    var r = Q.defer();
+    var url = 'http://172.26.66.41/devDocuments/ackeem/getCheckins.php?AppointmentAriaSer='+patientActivitySerNum;
+    request(url,function(error, response, body)
+    {
+      if(error){console.log('line811,sqlInterface',error);r.reject(error);}
+      if(!error&&response.statusCode=='200')
       {
-        dataResponse = JSON.parse(dataResponse);
-        console.log(dataResponse);
-        if(dataResponse.length == 0||!(dataResponse instanceof Array)) r.resolve(false);
-        else r.resolve(true);
-      });
-      }).on('error',function(error)
-      {
-        r.reject(error.message);
-      }).end();
+        body = JSON.parse(body);
+        console.log(body);
+        if(body.lenght>0) r.resolve(true);
+        else r.resolve(false);
+      }
+    });
+    //    var dataResponse = '';
+    // var y = http.request(urlCheckCheckin,function(response){
+    //   response.on('data',function(data){
+    //       data = data.toString();
+    //       dataResponse+=data;
+    //     });
+    //   response.on('end',function()
+    //   {
+    //     dataResponse = JSON.parse(dataResponse);
+    //     console.log(dataResponse);
+    //     if(dataResponse.length == 0||!(dataResponse instanceof Array)) r.resolve(false);
+    //     else r.resolve(true);
+    //   });
+    //   }).on('error',function(error)
+    //   {
+    //     r.reject(error.message);
+    //   }).end();
     return r.promise;
 }
 //Get time estimate from Ackeem's scripts
