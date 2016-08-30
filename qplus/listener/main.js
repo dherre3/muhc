@@ -12,7 +12,7 @@ exports.apiRequestFormatter=function(requestKey,requestObject)
 {
   var r=q.defer();
   var responseObject = {};
-  
+  var encryptionKey = '';
   //Gets user password for decryptiong
   sqlInterface.getUsersPassword(requestObject.UserID).then(function(rows){
     if(rows.length>1||rows.length === 0)
@@ -20,17 +20,17 @@ exports.apiRequestFormatter=function(requestKey,requestObject)
       //Rejects requests if username returns more than one password
       console.log('Rejecting request due to injection attack', rows);
       //Construction of request object
-      responseObject = { RequestKey:requestKey, Code: 1, Data:{},Response:'error', Reason:'Injection attack, incorrect UserID'};       
+      responseObject = { Headers:{RequestKey:requestKey,RequestObject:requestObject},EncryptionKey:'', Code: 1, Data:{},Response:'error', Reason:'Injection attack, incorrect UserID'};       
       r.resolve(responseObject);
     }else{
       //Gets password and decrypts request
       var key=rows[0].Password;
       requestObject.Request=utility.decryptObject(requestObject.Request,key);
-      var encryptionKey=key;
+      encryptionKey=key;
       //If requests after decryption is empty, key was incorrect, reject the request
       if(requestObject.Request === '') {
         console.log('Rejecting request due to incorrect password recorded');
-        responseObject = { RequestKey:requestKey, Code: 1,Data:{}, Response:'error', Reason:'Incorrect password for decryption'};
+        responseObject = { Headers:{RequestKey:requestKey,RequestObject:requestObject},EncryptionKey:'', Code: 1, Data:{},Response:'error', Reason:'Incorrect Password for decryption'};
         r.resolve(responseObject);
       }else{
         //Otherwise decrypt the parameters and send to process api request
@@ -59,7 +59,7 @@ exports.apiRequestFormatter=function(requestKey,requestObject)
     }
   }).catch(function(error){
     console.log(error);
-    responseObject = { RequestKey:requestKey,Code:1,Data:error, Headers:{RequestKey:requestKey,RequestObject:requestObject},Response:'error', Reason:'Server error, report the error to the hospital'};
+    responseObject = { RequestKey:requestKey,EncryptionKey:encryptionKey, Code:2,Data:error, Headers:{RequestKey:requestKey,RequestObject:requestObject},Response:'error', Reason:'Server error, report the error to the hospital'};
     r.resolve(responseObject);
   });
 

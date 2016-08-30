@@ -1,35 +1,63 @@
-var credentials=require('./../credentials.js');
+// var credentials=require('./../credentials.js');
 var sqlInterface=require('./../sqlInterface.js');
-var queries=require('./../queries.js');
-var updatePatient = require('../apiPatientUpdate.js');
-var Firebase    =require('firebase');
-var CryptoJS = require('crypto-js');
-var utility = require('./../utility.js');
-var http = require('http');
-var q = require('q');
-var timeEstimate = require('../timeEstimate.js');
-var spawn = require('child_process').spawnSync;
+// var queries=require('./../queries.js');
+// var updatePatient = require('../apiPatientUpdate.js');
+// var Firebase    =require('firebase');
+// var CryptoJS = require('crypto-js');
+// var utility = require('./../utility.js');
+// var http = require('http');
+// var q = require('q');
+// var timeEstimate = require('../timeEstimate.js');
+// var exec = require('child_process').exec;
+// exec('python3 /var/www/devDocuments/marc/ML_Algorithm_MUHC/predictor.py 43235', function(error, stdout, stderr){
+//   if (error) {
+//     console.error(error);
+//     return;
+//   } 
+//   stdout = stdout.toString();
+//   var firstParenthesis = stdout.indexOf('{');
+//   var lastParenthesis = stdout.lastIndexOf('}');
+//   var length = lastParenthesis - firstParenthesis+1;
+//   var data = JSON.parse(stdout.substring(firstParenthesis, length).replace(/'/g, "\""));
+//   console.log(data);
 
-ls = spawn('ls', ['-lh','/usr']);
-ls.stdout.on('data',function(data)
-{
-  console.log(data.toString());
-
-});
-ls.stderr.on('data',function(data)
-{
-  console.log('error',data.toString());
-});
-ls.on('close', function(code){
-  console.log(code.toString());
-});
-
+// });
 var requestObject = {
   UserID:'ac6eaeaa-f725-4b07-bdc0-72faef725985',
   Token:'sdfasdfasdfasdf',
   DeviceId:'browser', 
-  Parameters:{'AppointmentSerNum':13, Latitude:'123.12312312', Longitude:'41.123123', Accuracy:'41'}
+  Parameters:{'AppointmentSerNum':'196'}
 };
+sqlInterface.checkinUpdate(requestObject).then(function(data)
+{
+  console.log(data);
+}).catch(function(error){
+  console.log(error);
+});
+// sqlInterface.planningStepsAndEstimates('ac6eaeaa-f725-4b07-bdc0-72faef725985',12312312).then(function(data)
+// {
+//   console.log(data);
+// }).catch(function(error)
+// {
+//   console.log(error);
+// });
+// ls = exec('python3', ['/var/www/devDocuments/marc/ML_Algorithm_MUHC/predictor.py','4654']);
+// var result = '';
+// ls.stdout.on('data',function(data){
+//   data = data.toString();
+//   result+=data;
+  
+
+// });
+// ls.stderr.on('data',function(data)
+// {
+//   console.log('error',data.toString());
+// });
+// ls.on('close', function(){
+//   console.log(JSON.parse(result));
+// });
+
+
 // var requestObject = {
 //     UserID:'ac6eaeaa-f725-4b07-bdc0-72faef725985',
 //     Parameters:["2","7"]

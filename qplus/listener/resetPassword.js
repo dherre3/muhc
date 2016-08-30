@@ -3,16 +3,45 @@ var q=require('q');
 var utility=require('./utility.js');
 var CryptoJS=require('crypto-js');
 var exports=module.exports={};
+
+
+exports.resetPasswordRequest=function(requestKey, requestObject)
+{
+  var r=q.defer();
+  console.log(requestObject.UserID);
+  var responseObject = {};
+  //Get the patient fields to verify the credentials
+  sqlInterface.getPatientFieldsForPasswordReset(requestObject.UserID).then(function(patient){
+    //Check for injection attacks by the number of rows the result is returning
+    if(patient.length>1||patient.lenght === 0)
+    {
+      responseObject = { Headers:{RequestKey:requestKey,RequestObject:requestObject}, Code: 2, Data:{},Response:'error', Reason:'Injection attack, incorrect UserID'};       
+      r.resolve(responseObject);
+    }else{
+      //If the request is not erroneus simply direct the request to appropiate function based on the request mapping object
+      var request = requestObject.Request;
+      console.log(requestMappings,requestMappings[requestObject.Request]);
+      requestMappings[requestObject.Request](requestKey, requestObject,patient[0]).then(function(response){
+            r.resolve(response);
+          });
+      }
+  }).catch(function(error){
+    console.log(error);
+    //If there is an error with the queries reply with an error message
+    responseObject = { Headers:{RequestKey:requestKey,RequestObject:requestObject}, Code: 2, Data:{},Response:'error', Reason:'Invalid arguments for query'};       
+    r.resolve(response);
+  });
+  return r.promise;
+
+};
 exports.verifySecurityAnswer=function(requestKey,requestObject,patient)
 {
   var r=q.defer();
   var unencrypted=utility.decryptObject(requestObject.Parameters,patient.SSN);
-  console.log('unencrypted parameters');
   console.log(unencrypted);
-  console.log(patient.PatientSerNum);
   sqlInterface.getSecurityQuestions(patient.PatientSerNum).then(function(questions)
   {
-
+    console.log('line 44', questions);
     var flag=false;
     for (var i = 0; i < questions.length; i++) {
 
@@ -26,88 +55,17 @@ exports.verifySecurityAnswer=function(requestKey,requestObject,patient)
     }
     if(flag)
     {
-      console.log('boom');
-      var firebaseObject={
-        type:'UploadToFirebase',
-        requestKey:requestKey,
-        requestObject:requestObject,
-        response:'Success',
-        encryptionKey:patient.SSN,
-        object:{VerifySecurityAnswer:{type:'Success'}}
-      };
-      r.resolve(firebaseObject);
+      var response = { RequestKey:requestKey, Code:3,Data:{AnswerVerified:"true"}, Headers:{RequestKey:requestKey,RequestObject:requestObject},Response:'success'};
+      r.resolve(response);
     }else{
-      var response={
-        type:'ResetPasswordError',
-        requestKey:requestKey,
-        response:'Error',
-        reason:'Incorrect answer to security question',
-        requestObject:requestObject
-      };
+      var response = { RequestKey:requestKey, Code:3,Data:{AnswerVerified:"false"}, Headers:{RequestKey:requestKey,RequestObject:requestObject},Response:'success'};
       r.resolve(response);
     }
   }).catch(function(error){
-    var response={
-      type:'ResetPasswordError',
-      requestKey:requestKey,
-      response:'Error',
-      reason:'Incorrect SSN number',
-      requestObject:requestObject
-    };
+    var response = { Headers:{RequestKey:requestKey,RequestObject:requestObject}, Code: 2, Data:{},Response:'error', Reason:'Could not obtain security questions'};       
     r.resolve(response);
   });
   return r.promise;
-};
-
-exports.resetPasswordRequest=function(requestKey, requestObject)
-{
-  var r=q.defer();
-  console.log(requestObject.UserID);
-  sqlInterface.getPatientFieldsForPasswordReset(requestObject.UserID).then(function(patient){
-    console.log(patient);
-    //Check for injection attacks by the number of rows the result is returning
-    if(patient.length>1||patient.lenght === 0)
-    {
-      r.reject('Invalid');
-      var response={
-        type:'ResetPasswordError',
-        requestKey:requestKey,
-        response:'Error',
-        reason:'No patient matches username, or injection attack',
-        requestObject:requestObject
-      };
-      r.resolve(response);
-    }else{
-        if(requestObject.Request=='VerifySSN')
-        {
-          exports.verifySSN(requestKey, requestObject,patient[0]).then(function(response){
-            r.resolve(response);
-          });
-        }else if(requestObject.Request=='SetNewPassword')
-        {
-        exports.setNewPassword(requestKey, requestObject,patient[0]).then(function(response){
-            r.resolve(response);
-          });
-        }else if(requestObject.Request=='VerifySecurityAnswer'){
-          exports.verifySecurityAnswer(requestKey, requestObject,patient[0]).then(function(response){
-            r.resolve(response);
-          });
-
-        }
-      }
-}).catch(function(error){
-  console.log(error);
-  var response={
-    type:'ResetPasswordError',
-    requestKey:requestKey,
-    response:'Error',
-    reason:'Invalid arguments for query',
-    requestObject:requestObject
-  };
-  r.resolve(response);
-});
-  return r.promise;
-
 };
 exports.setNewPassword=function(requestKey, requestObject,patient)
 {
@@ -133,36 +91,18 @@ exports.setNewPassword=function(requestKey, requestObject,patient)
       }
       if(!flag)
       {
-        var response={
-          type:'ResetPasswordError',
-          requestKey:requestKey,
-          response:'Error',
-          reason:'Invalid answer, rejecting request',
-          requestObject:requestObject
-        };
+        var response = { RequestKey:requestKey, Code:3,Data:{PasswordReset:"false"}, Headers:{RequestKey:requestKey,RequestObject:requestObject},Response:'success'};
+
         r.resolve(response);
       }else{
-        console.log(patient);
         sqlInterface.setNewPassword(newPassword,patient.PatientSerNum, requestObject.Token).then(function(){
-          var firebaseObject={
-            type:'CompleteRequest',
-            response:'Success',
-            requestKey:requestKey,
-            requestObject:{}
-          };
-          r.resolve(firebaseObject);
+          var response = { RequestKey:requestKey, Code:3,Data:{PasswordReset:"true"}, Headers:{RequestKey:requestKey,RequestObject:requestObject},Response:'success'};
+          r.resolve(response);
         }).catch(function(response){
           console.log('Invalid setting password');
             //completeRequest(requestKey,{},'Invalid');
-            var firebaseObject={
-              type:'CompleteRequest',
-              Invalid:'Invalid',
-              response:'Error',
-              requestKey:requestKey,
-              reason:response,
-              requestObject:{}
-            };
-            r.resolve(firebaseObject);
+            var response = { Headers:{RequestKey:requestKey,RequestObject:requestObject}, Code: 2, Data:{},Response:'error', Reason:'Could not set password'};       
+            r.resolve(response);
         });
       }
     });
@@ -176,35 +116,29 @@ exports.verifySSN=function(requestKey, requestObject,patient)
     console.log(unencrypted);
     if(typeof unencrypted.SSN!=='undefined'&&unencrypted.SSN!=='')
     {
-      //console.log(patient.PatientSerNum);
+      console.log('line 131',patient.PatientSerNum);
       sqlInterface.getSecurityQuestions(patient.PatientSerNum).then(function(questions)
       {
         console.log(questions);
         var integer=Math.floor((questions.length*Math.random()));
-        console.log(integer);
-        questions[integer].type='success';
-        var response={ResetPassword:questions[integer]};
-        var firebaseObject={
-          type:'UploadToFirebase',
-          requestKey:requestKey,
-          requestObject:requestObject,
-          response:'Success',
-          encryptionKey:patient.SSN,
-          object:response
-        };
-        console.log(firebaseObject);
-        r.resolve(firebaseObject);
+        delete questions[integer].Answer;
+        questions[integer].ValidSSN = "true";
+        var response = { RequestKey:requestKey, Code:3,Data:questions[integer], Headers:{RequestKey:requestKey,RequestObject:requestObject},Response:'success'};
+        r.resolve(response);
+      }).catch(function(error){
+        var response = { Headers:{RequestKey:requestKey,RequestObject:requestObject}, Code: 2, Data:{},Response:'error', Reason:'Error obtaining security question'};       
+        r.resolve(response);
       });
     }else{
-      var response={
-        type:'ResetPasswordError',
-        requestKey:requestKey,
-        response:'Error',
-        reason:'Incorrect SSN number',
-        requestObject:requestObject
-      };
+      var response = { Headers:{RequestKey:requestKey,RequestObject:requestObject}, Code: 3, Data:{ValidSSN:"false"},Response:'success', Reason:'Invalid SSN'};       
       r.resolve(response);
     }
 
   return r.promise;
+};
+
+var requestMappings = {
+  'VerifySSN':exports.verifySSN,
+  'SetNewPassword':exports.setNewPassword,
+  'VerifyAnswer':exports.verifySecurityAnswer
 };

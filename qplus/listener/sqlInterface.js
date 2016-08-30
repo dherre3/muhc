@@ -10,6 +10,8 @@ var http = require('http');
 var request = require('request');
 var questionnaires = require('./patientQuestionnaires.js');
 var timeEstimate = require('./timeEstimate.js');
+var exec = require('child_process').exec;
+
 
 
 
@@ -111,6 +113,11 @@ var requestMappings=
     sql:queries.patientTasksTableFields(),
     numberOfLastUpdated:2
   },
+  'TreatmentPlanning':
+  {
+    processFunction:planningStepsAndEstimates,
+    numberOfLastUpdated:0
+  },
   /*'LabTests':{
     sql:queries.patientTestResultsTableFields(),
     numberOfLastUpdated:1
@@ -205,6 +212,7 @@ function processSelectRequest(table, userId, timestamp)
 {
   var r=Q.defer();
   var requestMappingObject = requestMappings[table];
+  console.log(requestMappings[table]);
   var date=new Date(0);
   if(typeof timestamp!=='undefined')
   {
@@ -215,15 +223,29 @@ function processSelectRequest(table, userId, timestamp)
     for (var i = 0; i < requestMappingObject.numberOfLastUpdated; i++) {
       paramArray.push(date);
     }
-  }
-  exports.runSqlQuery(requestMappingObject.sql,paramArray,
-    requestMappingObject.processFunction).then(function(rows)
-    {
-       r.resolve(rows);
-    },function(err)
-    {
-      r.reject(err);
-    });
+  }   
+  if(requestMappingObject.hasOwnProperty('sql'))
+  {
+     exports.runSqlQuery(requestMappingObject.sql,paramArray,
+      requestMappingObject.processFunction).then(function(rows)
+      {
+         r.resolve(rows);
+      },function(err)
+      {
+        r.reject(err);
+      });
+    }else{
+      console.log(requestMappingObject.processFunction);
+      requestMappingObject.processFunction(userId,timestamp).then(function(rows)
+      {
+        console.log('adasdas');
+         r.resolve(rows);
+      },function(err)
+      {
+        r.reject(err);
+      });
+    }
+ 
   return r.promise;
 }
 
@@ -299,15 +321,28 @@ exports.checkinUpdate = function(requestObject)
 {
     var r = Q.defer();
     console.log('hello world');
-    exports.runSqlQuery(queries.getAppointmentAriaSer(),[requestObject.UserID,requestObject.Parameters.AppointmentSerNum], exports.getTimeEstimate).then(
-    function(response)
+    connection.query(queries.getAppointmentAriaSer(),[requestObject.UserID,requestObject.Parameters.AppointmentSerNum],function(error,rows,fields)
     {
-      console.log(response);
-      r.resolve({Response:'success',Data:response});
-    }).catch(function(error)
-    {
-      r.reject({Response:'error',Reason:'Checkin update error due to '+error});
+      if(error||rows.length==0) r.reject({'Response':'error'});
+      console.log(rows);
+      var appointmentAriaSer = rows[0].AppointmentAriaSer;
+      exports.getTimeEstimate(appointmentAriaSer).then(function(data)
+      {
+        r.resolve(data);
+      }).catch(function(error)
+      { 
+        r.reject({'Response':'error'});
+      });
     });
+    // exports.runSqlQuery(queries.getAppointmentAriaSer(),[requestObject.UserID,requestObject.Parameters.AppointmentSerNum], exports.getTimeEstimate).then(
+    // function(response)
+    // {
+    //   console.log(response);
+    //   r.resolve({Response:'success',Data:response});
+    // }).catch(function(error)
+    // {
+    //   r.reject({Response:'error',Reason:'Checkin update error due to '+error});
+    //});
     return r.promise;
 };
 
@@ -464,6 +499,7 @@ exports.updateDeviceIdentifier = function(requestObject)
     exports.runSqlQuery(queries.updateDeviceIdentifiers(),[user.UserTypeSerNum, requestObject.DeviceId, identifiers.registrationId, deviceType,requestObject.Token, identifiers.registrationId, requestObject.Token]).then(function(response){
       r.resolve({Response:'success'});
     }).catch(function(error){
+      console.log("UPDATE USER IDENTIFIER requestObject: " + requestObject);
       r.reject({Response:'error', Reason:'Error updating device identifiers due to '+error});
     });
   }).catch(function(error){
@@ -558,6 +594,12 @@ exports.setNewPassword=function(password,patientSerNum, token)
   });
   return r.promise;
 };
+//Getting planning estimate from Marc's script
+exports.planningStepsAndEstimates = function(userId, timestamp)
+{
+  return planningStepsAndEstimates(userId, timestamp);
+};
+
 exports.getPatientDeviceLastActivity=function(userid,device)
 {
   var r=Q.defer();
@@ -744,7 +786,7 @@ function getEducationTableOfContents(rows)
 }
 //Attachements for messages, not yet implemented to be added eventually
 var LoadAttachments = function (rows )
-{
+{ 
 
     var messageCounter=0 ;
     var r = Q.defer();
@@ -762,7 +804,7 @@ function getAppointmentAriaSer(username, appSerNum)
 function checkIntoAria(patientActivitySerNum)
 {
   var r = Q.defer();
-    var url = 'http://172.26.66.41/devDocuments/screens/php/checkInPatient.php?CheckinVenue=8225&ScheduledActivitySer='+patientActivitySerNum;
+    var url = 'http://172.26.66.41/devDocuments/screens/php/checkInPatient_David.php?CheckinVenue=8225&ScheduledActivitySer='+patientActivitySerNum;
   //making request to checkin
   console.log(url);
    request(url,function(error, response, body)
@@ -778,39 +820,9 @@ function checkIntoAria(patientActivitySerNum)
         });
       }
     });
-  //  //Url to checkin
-  // var urlCheckin = {
-  //     path: 'http://medphys/devDocuments/screens/php/checkInPatient.php?CheckinVenue=8225&ScheduledActivitySer='+patientActivitySerNum
-  //   };
-  //   var dataResponse = '';
-  //     var x = http.request(urlCheckin,function(res){
-  //         res.on('data',function(data){
-  //           data = data.toString();
-  //           dataResponse+=data;
-  //         });
-  //         res.on('end',function()
-  //         {
-  //           //data = JSON.parse(data);
-  //           console.log(dataResponse);
-  //           //Check if it successfully checked in
-  //           checkIfCheckedIntoAriaHelper(patientActivitySerNum).then(function(response){
-  //             r.resolve(response);
-  //           }).catch(function(error){
-  //             console.log('line784',error);
-  //             r.reject(error);
-  //           });
-  //         });
-  //     }).on('error',function(error)
-  //     {
-  //       console.log('line 790',error);
-  //       r.reject(error);
-  //     }).end();
   return r.promise;
 }
-checkIfCheckedIntoAriaHelper(1737696).then(function(result)
-{
-  console.log(result);
-})
+
 //Check if checked in for an appointment in aria
 function checkIfCheckedIntoAriaHelper(patientActivitySerNum)
 {
@@ -823,42 +835,38 @@ function checkIfCheckedIntoAriaHelper(patientActivitySerNum)
       {
         body = JSON.parse(body);
         console.log(body);
-        if(body.lenght>0) r.resolve(true);
+        if(body.length>0) r.resolve(true);
         else r.resolve(false);
       }
     });
-    //    var dataResponse = '';
-    // var y = http.request(urlCheckCheckin,function(response){
-    //   response.on('data',function(data){
-    //       data = data.toString();
-    //       dataResponse+=data;
-    //     });
-    //   response.on('end',function()
-    //   {
-    //     dataResponse = JSON.parse(dataResponse);
-    //     console.log(dataResponse);
-    //     if(dataResponse.length == 0||!(dataResponse instanceof Array)) r.resolve(false);
-    //     else r.resolve(true);
-    //   });
-    //   }).on('error',function(error)
-    //   {
-    //     r.reject(error.message);
-    //   }).end();
     return r.promise;
 }
 //Get time estimate from Ackeem's scripts
-
-exports.getTimeEstimate = function(result)
+exports.getTimeEstimate = function(appointmentAriaSer)
 {
   var r = Q.defer();
-  result = result[0];
-  timeEstimate.getEstimate(result.AppointmentAriaSer).then(
-      function(estimate){
-          r.resolve( estimate);
-      },function(error)
+  var url = 'http://172.26.66.41/devDocuments/WTSim/api/getEstimate.php?appt_aria_ser='+appointmentAriaSer;
+    request(url,function(error, response, body)
+    {
+      if(error){console.log('line814,sqlInterface',error);r.reject(error);}
+      if(!error&&response.statusCode=='200')
       {
+        console.log(body);
+        body = JSON.parse(body);
+
+        if(body.length>1)r.resolve(body[0]);
+        else r.reject({Response:'error'})
+      }else{
         r.resolve(error);
+      }
     });
+  // timeEstimate.getEstimate(result.AppointmentAriaSer).then(
+  //     function(estimate){
+  //         r.resolve( estimate);
+  //     },function(error)
+  //     {
+  //       r.resolve(error);
+  //   });
     return r.promise;
 };
 /**
@@ -899,5 +907,32 @@ function combineResources(rows)
 
   }
    r.resolve(rows);
+  return r.promise;
+}
+
+function planningStepsAndEstimates (userId, timestamp)
+{
+  var r = Q.defer();
+  //Obtaing patient aria ser num
+  var que= connection.query(queries.getPatientAriaSerQuery(),[userId],function(error,rows,fields)
+  {
+    if(error) r.reject(error);
+    var command = 'python3 /var/www/devDocuments/marc/ML_Algorithm_MUHC/predictor.py '+rows[0].PatientAriaSer;
+    //Execute Marc's script
+    exec(command, function(error, stdout, stderr){
+      if (error) {
+        r.reject(error);
+      } 
+      stdout = stdout.toString();
+      //Parse through the response
+      var firstParenthesis = stdout.indexOf('{');
+      var lastParenthesis = stdout.lastIndexOf('}');
+      var length = lastParenthesis - firstParenthesis+1;
+      //Convert into object
+      var data = JSON.parse(stdout.substring(firstParenthesis, length).replace(/'/g, "\""));
+      //Return data
+      r.resolve(data);
+    });
+  });
   return r.promise;
 }

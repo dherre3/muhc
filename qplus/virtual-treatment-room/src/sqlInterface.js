@@ -70,28 +70,14 @@ module.exports.getAllCheckinAppointments = function()
       var urlCheckin = { path: urlsVirtualWaitingRoom["Checkin-Appointments"]};
       //making request to checkin
         var response = '';
-        var i =0;
-          var x = http.request(urlCheckin,function(res){
-              res.on('data',function(data){
-                //Data from php.
-                //console.log(data.toString());
-                //console.log(data.toString());
-                if(i==0)
-                {
-                  response += data.toString();
-                }
-                
-                
-              });
-              res.on('end',function()
-              {
-                resolve(JSON.parse(response));
-              });
-              res.on('error',function(error){
-                console.log(error);
-                reject(error);
-              });
-          }).end();
+        request(urlsVirtualWaitingRoom["Checkin-Appointments"],function(error, response,body)
+        {
+            if(error) reject(error);
+            if(!error&&response.statusCode=='200')
+            {
+              resolve(JSON.parse(body));
+            }
+        });
     });
 };
 

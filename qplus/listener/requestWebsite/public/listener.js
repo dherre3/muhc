@@ -31,29 +31,24 @@ function clearTimeoutRequests()
 
   ref.child('requests').on('child_added',function(request){
     console.log(request.val());
-      $.post("http://172.26.66.41:8020/login",{key: request.key(),objectRequest: request.val()}, function(response){
-        console.log(response);
-        if(response.Code == 1)
-        {
-          //Delete request, problems with authentication
-          completeRequest(response.Headers,false);
-        }else
-        {
-          uploadToFirebase(response);
-        }
+    var headers = {key: request.key(),objectRequest: request.val()}
+      $.post("http://172.26.66.41:8020/login",headers, function(response){
+        uploadToFirebase(response);
       });
    
   });
   function uploadToFirebase(response)
   {
     console.log('I am about to go to into encrypting');
+
     var headers = angular.copy(response.Headers);
     var success = response.Response;
     var requestKey = headers.RequestKey;
     var userId = headers.RequestObject.UserID;
     var encryptionKey = response.EncryptionKey;
+    console.log(encryptionKey);
     delete response.EncryptionKey;
-    response = encryptObject(response, encryptionKey);
+    if(typeof encryptionKey!=='undefined' && encryptionKey!=='') response = encryptObject(response, encryptionKey);
     response.Timestamp = Firebase.ServerValue.TIMESTAMP;
     console.log(response);
     ref.child('users/'+userId+'/'+requestKey).set(response, function(){

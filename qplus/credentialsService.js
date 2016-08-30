@@ -22,12 +22,12 @@ appModule.service('Credentials',[function(){
 
 
   }]);
-appModule.directive('loadApp', function() {
-    return {
-        restrict: 'E',
-        link: function(scope, element, attrs) {
-            var url = scope.$eval(attrs.src);
-            element.replaceWith('<object type="text/html" data="'+url+'" style="width:100%; height:100%; border:1px solid lightgrey;border-radius:2px">');
-        }
-    };
-});
+// appModule.directive('loadApp', function() {
+//     return {
+//         restrict: 'E',
+//         link: function(scope, element, attrs) {
+//             var url = scope.$eval(attrs.src);
+//             element.replaceWith('<object type="text/html" data="'+url+'" style="width:100%; height:100%; border:1px solid lightgrey;border-radius:2px">');
+//         }
+//     };
+// });

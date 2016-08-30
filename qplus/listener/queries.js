@@ -56,7 +56,7 @@ exports.patientEducationalMaterialContents=function()
 };
 exports.patientTasksTableFields=function()
 {
-  return "SELECT Alias.AliasName_EN AS TaskName_EN,Alias.AliasName_FR AS TaskName_FR,Alias.AliasDescription_EN AS TaskDescription_EN,Alias.AliasDescription_FR AS TaskDescription_FR,Task.DueDateTime FROM Task,Alias,AliasExpression,Patient,Users WHERE Patient.PatientSerNum = Task.PatientSerNum AND AliasExpression.AliasExpressionSerNum =Task.AliasExpressionSerNum AND AliasExpression.AliasSerNum = Alias.AliasSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND (Task.LastUpdated > ? OR Alias.LastUpdated > ?);";
+  return "SELECT Patient.PatientAriaSer, Alias.AliasName_EN AS TaskName_EN,Alias.AliasName_FR AS TaskName_FR,Alias.AliasDescription_EN AS TaskDescription_EN,Alias.AliasDescription_FR AS TaskDescription_FR,Task.DueDateTime FROM Task,Alias,AliasExpression,Patient,Users WHERE Patient.PatientSerNum = Task.PatientSerNum AND AliasExpression.AliasExpressionSerNum =Task.AliasExpressionSerNum AND AliasExpression.AliasSerNum = Alias.AliasSerNum AND Users.UserTypeSerNum=Patient.PatientSerNum AND Users.Username LIKE ? AND (Task.LastUpdated > ? OR Alias.LastUpdated > ?);";
 };
 exports.patientTestResultsTableFields=function()
 {
@@ -162,3 +162,8 @@ exports.setQuestionnaireCompletedQuery = function()
 {
   return "UPDATE `Questionnaire` SET PatientQuestionnaireDBSerNum = ?, CompletedFlag = 1, CompletionDate = ?, SessionId = ? WHERE Questionnaire.QuestionnaireSerNum = ?;";
 };
+
+exports.getPatientAriaSerQuery = function()
+{
+  return "SELECT Patient.PatientAriaSer FROM Patient, Users WHERE Patient.PatientSerNum = Users.UserTypeSerNum && Users.Username = ?"
+}
