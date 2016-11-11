@@ -1,22 +1,22 @@
 <html>
   <head>
     <title>MUHC Listener</title>
-    <script src="./jquery.min.js">  </script>
-    <script src="./firebase.js"></script>
-    <script src="./aes.js"></script>
-      <script src="./mode-cfb-min.js"/></script>
-      <script src="./bower_components/angular/angular.min.js"/></script>
-      <link href="./styles.css" rel="stylesheet" type="text/css">
-      <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"/></script>
-      <link href="./bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-      <script src="./bower_components/cryptojs/mode-cfb-min.js"/></script>
-      <script src="./bower_components/cryptojs/sha256.js"/></script>
-      <script src="./bower_components/cryptojs/aes.js"/></script>
-    <script src="./bower_components/angular-aria/angular-aria.js"></script>
-    <script src="./bower_components/angular-animate/angular-animate.js"></script>
-    <script src="./bower_components/angular-material/angular-material.js"></script>
+    <script src="./public/jquery.min.js">  </script>
+    <script src="./public/firebase.js"></script>
+    <script src="./public/aes.js"></script>
+      <script src="./public/mode-cfb-min.js"></script>
+      <script src="./public/bower_components/angular/angular.min.js"></script>
+      <link href="./public/styles.css" rel="stylesheet" type="text/css">
+      <script src="./public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+      <link href="./public/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+      <script src="./public/bower_components/cryptojs/mode-cfb-min.js"></script>
+      <script src="./public/bower_components/cryptojs/sha256.js"></script>
+      <script src="./public/bower_components/cryptojs/aes.js"></script>
+    <script src="./public/bower_components/angular-aria/angular-aria.js"></script>
+    <script src="./public/bower_components/angular-animate/angular-animate.js"></script>
+    <script src="./public/bower_components/angular-material/angular-material.js"></script>
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <link rel="stylesheet" href="./bower_components/angular-material/angular-material.css">
+  <link rel="stylesheet" href="./public/bower_components/angular-material/angular-material.css">
 
   </head>
   <body ng-app="MUHCPushNotifications" ng-controller="MainController">
@@ -40,40 +40,8 @@
       </div>
     </div>
   </md-toolbar>
-      <md-content layout-padding ng-controller="LeftCtrl">
-        <md-card>
-        <md-card-title>
-          <md-card-title-text>
-            <span class="md-headline">Send push notification</span>
-          </md-card-title-text>
-        </md-card-title>
-        <md-card-content>
-          <div style="margin-top:100px">
-          <md-input-container class="md-block">
-            <label>To:</label>
-            <md-select ng-model="name">
-              <md-option  value="'Ackeem'">
-                Ackeem
-              </md-option>
-              <md-option  value="'John'">
-                John
-              </md-option>
-              <md-option  value="'David'">
-                David
-              </md-option>
-            </md-select>
-          </md-input-container>
-          <md-input-container class="md-block">
-               <label>Message</label>
-               <textarea ng-model="message" md-maxlength="150" rows="5" md-select-on-focus></textarea>
-             </md-input-container>
-           </div>
-        </md-card-content>
-        <md-card-actions layout="row" layout-align="end center">
-          <md-button ng-click="sendPush(name, message)">Send</md-button>
-          <md-button ng-click="cancel()">Cancel</md-button>
-        </md-card-actions>
-      </md-card>
+      <md-content layout-padding >
+        
       </md-content>
     </md-sidenav>
     <md-content flex>
@@ -86,27 +54,53 @@
                 <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
               </md-button>
               <h2>
-                <span>List Of Messages</span>
+                <span>Notification Types</span>          
+
               </h2>
               <span flex></span>
 
             </div>
           </md-toolbar>
         </md-card-title>
-        <md-card-content>
+        <md-card-content style="overflow-y:scroll">
+          
           <md-list flex >
-       <md-subheader class="md-no-sticky">3 line item (with hover)</md-subheader>
-
-       <div class="text-center" style="margin-top:20px" ng-show="todos.length==0"><p style="color:white">No push messages sent!</p></div>
-
-       <md-list-item class="md-3-line" ng-repeat="item in todos" ng-click="null">
-         <div class="md-list-item-text" layout="column">
-           <h3> To: {{ item.who }}</h3>
-           <h4> Date: {{ item.when|date:"EEEE, MMMM d, y 'at' h:mm a" }}</h4>
-           <p>Message:  {{ item.notes }}</p>
-         </div>
+            
+       <md-subheader class="md-no-sticky">Push Notifications Try</md-subheader>
+       <md-list-item class="md-3-line" >
+          <md-button class="md-raised md-primary" ng-click="pushNotificationApi('SendNotification')">Send Notification</md-button><br>
+          
+       </md-list-item>
+       <md-list-item class="md-3-line" >
+          <md-button class="md-raised md-primary" ng-click="pushNotificationApi('RoomAssignedNotification')">Send Room Assigned Notification</md-button>
+       </md-list-item>
+       
+       <md-list-item class="md-3-line" >
+          <md-button class="md-raised md-primary" ng-click="pushNotificationApi('SendNotificationMultipleDevices')">Send Notification Multiple Devices</md-button>
+       </md-list-item>
+       <md-list-item class="md-3-line" >
+          <md-button class="md-raised md-primary" ng-click="pushNotificationApi('SendNotificationUsingPatientId')">Send Notification Using PatientId</md-button>
        </md-list-item>
      </md-list>
+          <h4>Type: </h4>
+          {{type}}
+          <h4>Parameters:</h4>
+          <div style="width:100%;border:1px solid black;overflow-x:scroll;word-wrap: break-word;">
+            <ul >
+              <li ng-repeat="(key,value) in params">
+                {{key}}:{{value}}
+              </li>
+            </ul>
+             </div>
+          <h4>Response: </h4>
+
+          <div style="width:100%;border:1px solid black;overflow-x:scroll;word-wrap: break-word;">
+            <ul >
+              <li ng-repeat="(key,value) in response">
+                {{key}}:{{value}}
+              </li>
+            </ul>
+          </div>
         </md-card-content>
         <md-card-actions layout="row" layout-align="end center">
 
@@ -117,28 +111,11 @@
       </div>
       <div flex></div>
     </md-content>
-    <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
-      <md-toolbar class="md-theme-light">
-        <h1 class="md-toolbar-tools">Sidenav Right</h1>
-      </md-toolbar>
-      <md-content ng-controller="RightCtrl" layout-padding>
-        <form>
-          <md-input-container>
-            <label for="testInput">Test input</label>
-            <input type="text" id="testInput"
-                   ng-model="data" md-autofocus>
-          </md-input-container>
-        </form>
-        <md-button ng-click="close()" class="md-primary">
-          Close Sidenav Right
-        </md-button>
-      </md-content>
-    </md-sidenav>
   </section>
 </div>
   </body>
   <!-- Latest compiled and minified CSS -->
 <!-- Optional theme -->
-  <script src="./listener.js"></script>
+  <script src="./public/listener.js"></script>
 
 </html>

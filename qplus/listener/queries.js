@@ -137,7 +137,7 @@ exports.updateLogout=function(requestObject)
 };
 exports.updateDeviceIdentifiers = function(requestObject)
 {
-  return "INSERT INTO `PatientDeviceIdentifier`(`PatientDeviceIdentifierSerNum`, `PatientSerNum`, `DeviceId`, `RegistrationId`, `DeviceType`,`SessionId`, `LastUpdated`) VALUES (NULL, ?,?,?,?,?, NULL) ON DUPLICATE KEY UPDATE RegistrationId = ?, SessionId = ?;"
+  return "INSERT INTO `PatientDeviceIdentifier`(`PatientDeviceIdentifierSerNum`, `PatientSerNum`, `DeviceId`, `RegistrationId`, `DeviceType`,`SessionId`, `LastUpdated`) VALUES (NULL, ?,?,?,?,?, NULL) ON DUPLICATE KEY UPDATE RegistrationId = ?, SessionId = ?, PatientSerNum = ?";
 };
 exports.getMapLocation=function(qrCode)
 {

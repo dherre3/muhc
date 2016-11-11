@@ -5,125 +5,48 @@ app.config(function($mdThemingProvider) {
   .accentPalette('orange').dark();
 });
 app.controller('MainController',['$scope','$timeout','$mdSidenav','$log','$rootScope',function($scope,$timeout, $mdSidenav, $log,$rootScope){
-  function request(object)
+  $rootScope.pushNotificationApi = function(type)
   {
-    $.post("http://172.26.66.41:8010/login",{key: request.key(),objectRequest: request.val()}, function(data){
-      if(data.type=='UploadToFirebase')
-      {
-        uploadToFirebase(data.requestKey, data.encryptionKey,data.requestObject, data.object);
-      }else if(data.type=='CompleteRequest')
-      {
-        completeRequest(data.requestKey,data.requestObject,data.Invalid);
-      }else if(data.type=='ResetPasswordError')
-      {
-        resetPasswordError(data.requestKey,data.requestObject);
-      }
+    $scope.params = {};
+    $scope.params.NotificationType = type;
+    $scope.type = type;
+    switch(type){
+      case 'SendNotification':
+        $scope.params.DeviceType = '0';
+        $scope.params.RegistrationId = '065d6f42deca7a36ee57c14384b031972622b3213819116b65dd69de09390542';
+        $scope.params.NotificationTitle = "Hello";
+        $scope.params.NotificationDescription = "Opal Single Device";
+      break;
+      case 'RoomAssignedNotification':
+        $scope.params.RoomLocation = "DC 2544";
+        $scope.params.PatientId = "9999996";
+        $scope.params.AppointmentAriaSer = "1373467";
+      break;
+      case 'SendNotificationMultipleDevices':
 
+        $scope.params.NotificationTitle = "Hello";
+        $scope.params.NotificationDescription = "Opal Multiple Device";
+        $scope.params.Devices = [
+          {DeviceType:'0', 
+          RegistrationId:'065d6f42deca7a36ee57c14384b031972622b3213819116b65dd69de09390542'},
+          {DeviceType:'1', 
+          RegistrationId:'cuKpVMY6z4E:APA91bHN_6hcpXxjnTpTPDAcsfjcq6OpljGdd_XMR0_snJPSwUdUme099pY5uxSuzIsdxpvWqaDipxcNIbrAOwWPvKTFgsYdjlVNqeXiETozgyvGJulKIGAWPKwjrtag8Rbl7yox_EPV'}];
+      break;
+      case 'SendNotificationUsingPatientId':
+        $scope.params.PatientId = '9999996';
+        $scope.params.NotificationTitle = "Hello";
+        $scope.params.NotificationDescription = "Opal Using Patient Id";
+        break;
+      
+    }
+    $.post("http://localhost:8888/muhc/copyServer/qplus/pushNotifications/post-push-api.php",$scope.params, function(data){
+      console.log(JSON.parse(data));
+      $timeout(function()
+      {
+        $scope.response = JSON.parse(data);
+      });
     });
-  }
+  };
 
-
-  var imagePath = '';
-  $rootScope.todos = [];
-
-  $scope.toggleLeft = buildDelayedToggler('left');
-     $scope.toggleRight = buildToggler('right');
-     $scope.isOpenRight = function(){
-       return $mdSidenav('right').isOpen();
-     };
-     /**
-      * Supplies a function that will continue to operate until the
-      * time is up.
-      */
-     function debounce(func, wait, context) {
-       var timer;
-       return function debounced() {
-         var context = $scope,
-             args = Array.prototype.slice.call(arguments);
-         $timeout.cancel(timer);
-         timer = $timeout(function() {
-           timer = undefined;
-           func.apply(context, args);
-         }, wait || 10);
-       };
-     }
-     /**
-      * Build handler to open/close a SideNav; when animation finishes
-      * report completion in console
-      */
-     function buildDelayedToggler(navID) {
-       return debounce(function() {
-         // Component lookup should always be available since we are not using `ng-if`
-         $mdSidenav(navID)
-           .toggle()
-           .then(function () {
-             $log.debug("toggle " + navID + " is done");
-           });
-       }, 200);
-     }
-     function buildToggler(navID) {
-       return function() {
-         // Component lookup should always be available since we are not using `ng-if`
-         $mdSidenav(navID)
-           .toggle()
-           .then(function () {
-             $log.debug("toggle " + navID + " is done");
-           });
-       }
-     }
-   }])
-   .controller('LeftCtrl', function ($rootScope,$scope, $timeout, $mdSidenav, $log) {
-     function sendPushToBackend(name, message)
-     {
-       //"http://172.26.66.41:8010/login"
-       console.log(name, message);
-       $.post("http://localhost:3000/login",{name: name,message: message}, function(data){
-         if(data.type=='UploadToFirebase')
-         {
-           uploadToFirebase(data.requestKey, data.encryptionKey,data.requestObject, data.object);
-         }else if(data.type=='CompleteRequest')
-         {
-           completeRequest(data.requestKey,data.requestObject,data.Invalid);
-         }else if(data.type=='ResetPasswordError')
-         {
-           resetPasswordError(data.requestKey,data.requestObject);
-         }
-         console.log(data);
-
-       });
-     }
-     $scope.sendPush = function(person, message)
-     {
-       var date = new Date();
-       person = person.replace(/'/g,"");
-       $rootScope.todos.push({
-         who:person,
-         when:date,
-         notes:message
-       });
-       sendPushToBackend(person, message)
-       $scope.name = '';
-       $scope.message = '';
-     }
-     $scope.cancel = function()
-     {
-       $scope.name = '';
-       $scope.message = '';
-     }
-     $scope.close = function () {
-       // Component lookup should always be available since we are not using `ng-if`
-       $mdSidenav('left').close()
-         .then(function () {
-           $log.debug("close LEFT is done");
-         });
-     };
-   })
-   .controller('RightCtrl', function ($scope, $timeout, $mdSidenav, $log) {
-     $scope.close = function () {
-       // Component lookup should always be available since we are not using `ng-if`
-       $mdSidenav('right').close()
-         .then(function () {
-           $log.debug("close RIGHT is done");
-         });
-     };
-   });
+   }]);
+  
